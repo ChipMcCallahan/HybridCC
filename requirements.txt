@@ -1,4 +1,5 @@
 ###### Requirements without Version Specifiers ######`
 
 ###### Requirements with Version Specifiers ######`
-setuptools==67.6.0
+setuptools==69.0.3
+cc_tools @ git+https://github.com/ChipMcCallahan/CCTools.git
