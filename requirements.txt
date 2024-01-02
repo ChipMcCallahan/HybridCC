@@ -3,3 +3,5 @@
 ###### Requirements with Version Specifiers ######`
 setuptools==69.0.3
 cc_tools @ git+https://github.com/ChipMcCallahan/CCTools.git
+
+pygame~=2.5.2

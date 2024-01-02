@@ -16,7 +16,8 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         'setuptools==67.6.0',
-        'cc_tools @ git+https://github.com/ChipMcCallahan/CCTools.git'
+        'cc_tools @ git+https://github.com/ChipMcCallahan/CCTools.git',
+        'pygame==2.5.2'
     ],
     version='0.1',
     license='LICENSE',
