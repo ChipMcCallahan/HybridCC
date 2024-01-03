@@ -1,10 +1,9 @@
-#pylint:disable=no-member
+# pylint:disable=no-member
 """
-Module for collecting and managing keyboard inputs in a Pygame application.
+Module for managing keyboard input in Pygame applications.
 
-This module contains the InputCollector class, which is designed to track
-keyboard inputs, specifically arrow key presses, and maintain a record of
-keys pressed and released within a specified time frame.
+This module defines the InputCollector class, which is responsible for tracking
+keyboard events and maintaining a list of currently pressed keys.
 """
 
 import pygame
@@ -12,57 +11,43 @@ import pygame
 
 class InputCollector:
     """
-    A class to collect and manage keyboard inputs in a Pygame application.
+    A class for collecting and managing keyboard input events in Pygame.
 
-    This class tracks the state of arrow keys (up, down, left, right) and
-    provides an updated list of pressed keys, taking into account rapid key
-    taps that might occur between input reads.
+    This class tracks the current state of specific keyboard keys (arrow keys in this case)
+    and provides methods to capture and process these keypress events.
 
     Attributes:
-        pressed_keys (list): A list of keys that are currently pressed down.
-        keys_since_last_read (list): A list of keys pressed and released since
-                                     the last input read.
-
-    Methods:
-        update(events): Updates the key states based on Pygame events.
-        get_pressed_keys(): Returns a list of pressed keys.
+        pressed_keys (list): A list of keys that are currently pressed.
+        released_keys (list): A list of keys that were recently released.
     """
+
     def __init__(self):
         """
-        Initializes the InputCollector with empty lists for pressed_keys and
-        keys_since_last_read.
+        Initializes the InputCollector with empty lists for pressed_keys and unpressed_keys.
         """
         self.pressed_keys = []
-        self.keys_since_last_read = []
+        self.released_keys = []
 
     def capture_keypress_events(self, events):
         """
-        Updates the state of pressed keys based on Pygame events. This method
-        should be called more frequently than the collect() method. Its purpose
-        is to track key presses in between collections.
+        Captures keypress events from Pygame and updates the pressed and unpressed keys lists.
 
         Args:
             events (list): A list of Pygame events to process.
-
-        This method updates the pressed_keys list by adding or removing keys
-        based on KEYDOWN and KEYUP events. It also tracks keys that are pressed
-        and released rapidly in keys_since_last_read.
         """
         for event in events:
             if event.type == pygame.KEYDOWN and event.key in self.key_map:
                 self.pressed_keys.append(self.key_map[event.key])
-                self.keys_since_last_read.append(self.key_map[event.key])
 
             elif event.type == pygame.KEYUP and event.key in self.key_map:
-                self.pressed_keys.remove(self.key_map[event.key])
+                self.released_keys.append(self.key_map[event.key])
 
     @property
     def key_map(self):
         """
         Returns a dictionary mapping Pygame key constants to direction strings.
 
-        The direction strings are "N", "S", "W", and "E" corresponding to the
-        up, down, left, and right arrow keys, respectively.
+        Maps the arrow keys to corresponding direction strings: 'N', 'S', 'W', and 'E'.
         """
         return {
             pygame.K_UP: "N",
@@ -73,27 +58,20 @@ class InputCollector:
 
     def collect(self):
         """
-        Returns a list of currently pressed keys, including those tapped
-        rapidly since the last time this method was called. Note that due to
-        keyboard ghosting this only returns 2 directions even if all 4 are
-        pressed. This method should be called on movement ticks to collect
-        inputs.
+        Processes the collected key events and returns the current state of
+        pressed keys.
 
-        This method returns a combined list of currently pressed keys and keys
-        that were pressed and released since the last read. It ensures that
-        rapid key taps are not missed.
+        This method returns a copy of the pressed keys list after removing
+        any keys that have been released. It then clears the unpressed keys
+        list.
 
         Returns:
-            list: A list of pressed keys.
+            list: A list of currently pressed keys.
         """
-        # Start with currently pressed keys. Append any keys that were pressed
-        # and released since last read. This ensures we collect all key taps.
-        pressed = self.pressed_keys.copy()
-        for k in self.keys_since_last_read:
-            if k not in pressed:
-                pressed.append(k)
+        pressed_copy = self.pressed_keys.copy()
+        for unpressed in self.released_keys:
+            if unpressed in self.pressed_keys:
+                self.pressed_keys.remove(unpressed)
+        self.released_keys.clear()
 
-        self.keys_since_last_read.clear()
-        # Optionally, add logic to sort 'pressed' based on the order in
-        # 'self.active_keys'
-        return pressed
+        return pressed_copy
