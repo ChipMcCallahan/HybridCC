@@ -6,9 +6,14 @@ from PIL import Image
 from hybrid_cc.gfx.gfx_utils import colorize
 from hybrid_cc.gfx.label_maker import LabelMaker
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.key_rule import KeyRule
+from hybrid_cc.shared.thief_rule import ThiefRule
 from hybrid_cc.shared.trap_rule import TrapRule
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
+
+DEFAULT_COLOR = "white"
 
 
 class GfxProvider:
@@ -38,7 +43,7 @@ class GfxProvider:
         return [self.cc2(name) for name in
                 [f"{base}_{i}" if i > 0 else base for i in range(n)]]
 
-    def process(self, elem, default_color, base_images):
+    def process(self, elem, base_images, *, default_color=None):
         color = elem.color or default_color
         memo_name = hash(elem)
         if memo_name in self.memoized:
@@ -49,12 +54,47 @@ class GfxProvider:
 
         processed_images = [
             colorize(img, color) for img
-            in base_images]
+            in base_images] if color else base_images
+
+        color = color or DEFAULT_COLOR
 
         if elem.id == Id.TRAP and elem.channel is not None:
             label = str(elem.channel)
             self.label_maker.position = 9  # bottom right
-            self.label_maker.text_color = elem.color.name.lower()
+            self.label_maker.text_color = color.name.lower()
+            processed_images = [
+                self.label_maker.apply(img, label)
+                for img in processed_images
+            ]
+        elif (elem.id in (Id.POP_UP_WALL, Id.STEPPING_STONE)
+              and elem.count and elem.count > 1):
+            label = str(elem.count)
+            self.label_maker.position = 9  # bottom right
+            self.label_maker.text_color = color
+            processed_images = [
+                self.label_maker.apply(img, label)
+                for img in processed_images
+            ]
+        elif elem.id in (Id.DOOR, Id.SOCKET) and elem.count and elem.count > 1:
+            label = str(elem.count)
+            self.label_maker.position = 7  # lower left
+            self.label_maker.text_color = color
+            processed_images = [
+                self.label_maker.apply(img, label)
+                for img in processed_images
+            ]
+        elif elem.id in (Id.KEY, Id.TOOL) and elem.count and elem.count > 1:
+            label = str(elem.count)
+            self.label_maker.position = 3  # upper right
+            self.label_maker.text_color = color
+            processed_images = [
+                self.label_maker.apply(img, label)
+                for img in processed_images
+            ]
+        elif elem.id in (Id.BUTTON,) and elem.channel:
+            label = str(elem.channel)
+            self.label_maker.position = 7  # lower left
+            self.label_maker.text_color = color
             processed_images = [
                 self.label_maker.apply(img, label)
                 for img in processed_images
@@ -68,14 +108,14 @@ class GfxProvider:
         return result
 
     def floor(self, elem):
-        return self.process(elem, Color.GREY, self.cc2("FLOOR"))
+        return self.process(elem, self.cc2("FLOOR"), default_color=Color.GREY)
 
     def wall(self, elem):
-        return self.process(elem, Color.GREY, self.cc2("WALL"))
+        return self.process(elem, self.cc2("WALL"), default_color=Color.GREY)
 
     def exit(self, elem):
         base = self.cc2_series("EXIT", 4)
-        return self.process(elem, Color.BLUE, base)
+        return self.process(elem, base, default_color=Color.BLUE)
 
     def water(self, elem):
         return self.cc2_series("WATER", 4)
@@ -93,10 +133,11 @@ class GfxProvider:
             TrickWallRule.INVISIBLE_BECOMES_WALL
         ].index(elem.rule)
         base = self.custom_tile(index)
-        return self.process(elem, Color.GREY, base)
+        return self.process(elem, base, default_color=Color.GREY)
 
     def dirt(self, elem):
-        return self.process(elem, Color.GREY, self.cc2("DIRT"))
+        return self.process(elem, self.custom_tile(10),
+                            default_color=Color.GREY)
 
     def ice(self, elem):
         return self.cc2("ICE")
@@ -124,15 +165,85 @@ class GfxProvider:
                 frames.append(new_frame)
         else:
             frames = self.cc2_series(f"FORCE_RANDOM", 8)
-        return self.process(elem, Color.GREEN, frames)
+        return self.process(elem, frames, default_color=Color.GREY)
 
     def teleport(self, elem):
         frames = [self.custom_tile(i) for i in range(6, 10)]
-        return self.process(elem, Color.BLUE, frames)
+        return self.process(elem, frames, default_color=Color.BLUE)
 
     def trap(self, elem):
         name = "TRAP_SHUT" if elem.rule == TrapRule.SHUT else "TRAP"
-        return self.process(elem, Color.TAN, self.cc2(name))
+        return self.process(elem, self.cc2(name), default_color=Color.TAN)
 
     def gravel(self, elem):
-        return self.cc2("GRAVEL")
+        return self.custom_tile(11)
+
+    def pop_up_wall(self, elem):
+        return self.process(elem, self.cc2("POP_UP_WALL"),
+                            default_color=Color.GREY)
+
+    def stepping_stone(self, elem):
+        top = self.custom_tile(12)
+        bottom = self.fire(elem) if elem.rule == "fire" else self.water(elem)
+        combined = []
+        for frame in bottom:
+            copy = frame.copy()
+            copy.paste(top, (0, 0), top)
+            combined.append(copy)
+        return self.process(elem, combined)
+
+    def hint(self, elem):
+        return self.cc2("HINT")
+
+    def cloner(self, elem):
+        cloner = self.cc2("CLONER").copy()
+        d = elem.direction
+        processed = self.process(elem, cloner, default_color=Color.RED)
+        if d:
+            arrow = self.cc2(f"CLONER_ARROW_{d.name}")
+            processed.paste(arrow, (0, 0), arrow)
+        return processed
+
+    def door(self, elem):
+        return self.process(elem, self.custom_tile(13),
+                            default_color=Color.GREY)
+
+    def thief(self, elem):
+        if elem.rule == ThiefRule.KEYS:
+            return self.custom_tile(14)
+        return self.cc2("THIEF")
+
+    def socket(self, elem):
+        return self.process(elem, self.custom_tile(15),
+                            default_color=Color.GREY)
+
+    def bomb(self, elem):
+        return self.process(elem, self.custom_tile(16),
+                            default_color=Color.RED)
+
+    def key(self, elem):
+        index = {
+            KeyRule.DEFAULT: 17,
+            KeyRule.FRAGILE: 18,
+            KeyRule.ACTING_DIRT: 19,
+        }[elem.rule]
+        return self.process(elem, self.custom_tile(index))
+
+    def tool(self, elem):
+        name = ["FLIPPERS", "FIRE_BOOTS", "SKATES", "SUCTION_BOOTS"][
+            elem.rule.value - 1]
+        return self.process(elem, self.cc2(name))
+
+    def button(self, elem):
+        if elem.rule == ButtonRule.TOGGLE:
+            frames = [self.custom_tile(i) for i in range(20, 22)]
+            return self.process(elem, frames, default_color=Color.GREY)
+        elif elem.rule == ButtonRule.HOLD_ALL:
+            return self.process(elem, self.custom_tile(22),
+                                default_color=Color.GREY)
+        elif elem.rule == ButtonRule.HOLD_ONE:
+            return self.process(elem, self.custom_tile(23),
+                                default_color=Color.GREY)
+        elif elem.rule == ButtonRule.DPAD:
+            return self.process(elem, self.custom_tile(24),
+                                default_color=Color.GREY)

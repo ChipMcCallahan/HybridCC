@@ -7,8 +7,12 @@ from PIL import ImageTk
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.levelset import Elem
 from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.force_rule import ForceRule
+from hybrid_cc.shared.key_rule import KeyRule
+from hybrid_cc.shared.thief_rule import ThiefRule
+from hybrid_cc.shared.tool_rule import ToolRule
 from hybrid_cc.shared.trap_rule import TrapRule
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
@@ -29,23 +33,89 @@ for r in TrickWallRule:
 for d in "NESW":
     ELIB[f"FORCE_{d}"] = [Elem(Id.FORCE, direction=Direction[d], color=c) for c
                           in Color]
-
 ELIB.update(
     {
-        "FORCE_RANDOM": [Elem(Id.FORCE, rule=ForceRule.RANDOM, color=c) for c in
+        "FORCE_RANDOM": [Elem(Id.FORCE, rule=ForceRule.RANDOM, color=c) for
+                         c in
                          Color],
         "TELEPORT": [Elem(Id.TELEPORT, color=c) for c in Color],
         "TRAP_OPEN": [Elem(Id.TRAP, color=c, rule=TrapRule.OPEN) for c in
                       Color],
         "TRAP_SHUT": [Elem(Id.TRAP, color=c, rule=TrapRule.SHUT) for c in
                       Color],
-        "TRAP_OPEN_1": [Elem(Id.TRAP, color=c, rule=TrapRule.OPEN, channel=1)
-                        for c in
-                        Color],
+        "TRAP_OPEN_1": [
+            Elem(Id.TRAP, color=c, rule=TrapRule.OPEN, channel=1)
+            for c in
+            Color],
         "TRAP_SHUT_128": [
             Elem(Id.TRAP, color=c, rule=TrapRule.SHUT, channel=128) for c in
             Color],
-        "GRAVEL": [Elem(Id.GRAVEL)]
+        "GRAVEL": [Elem(Id.GRAVEL)],
+        "POP_UP_WALL": [Elem(Id.POP_UP_WALL, color=c) for c in Color],
+        "POP_UP_WALL_COUNT": [Elem(Id.POP_UP_WALL, color=c, count=2) for c
+                              in
+                              Color],
+        "STEPPING_STONE": [Elem(Id.STEPPING_STONE, rule="fire"),
+                           Elem(Id.STEPPING_STONE, rule="fire", count=2),
+                           Elem(Id.STEPPING_STONE, rule="water"),
+                           Elem(Id.STEPPING_STONE, rule="water", count=2)],
+        "HINT": [Elem(Id.HINT)],
+        "CLONER_N": [Elem(Id.CLONER, color=c, direction=Direction.N) for c
+                     in
+                     Color],
+        "CLONER_E": [Elem(Id.CLONER, color=c, direction=Direction.E) for c
+                     in
+                     Color],
+        "CLONER_S": [Elem(Id.CLONER, color=c, direction=Direction.S) for c
+                     in
+                     Color],
+        "CLONER_W": [Elem(Id.CLONER, color=c, direction=Direction.W) for c
+                     in
+                     Color],
+        "DOOR": [Elem(Id.DOOR, color=c) for c in Color],
+        "DOOR_COUNT": [Elem(Id.DOOR, color=c, count=99) for c in Color],
+        "THIEF": [Elem(Id.THIEF, rule=ThiefRule.TOOLS),
+                  Elem(Id.THIEF, rule=ThiefRule.KEYS)],
+        "SOCKET": [Elem(Id.SOCKET, color=c) for c in Color],
+        "SOCKET_COUNT": [Elem(Id.SOCKET, color=c, count=99) for c in Color],
+        "BOMB": [Elem(Id.BOMB, color=c) for c in Color],
+        "KEY_DEFAULT": [Elem(Id.KEY, color=c, rule=KeyRule.DEFAULT) for c in
+                        Color],
+        "KEY_DEFAULT_COUNT": [
+            Elem(Id.KEY, color=c, rule=KeyRule.DEFAULT, count=9) for c in
+            Color],
+        "KEY_FRAGILE": [Elem(Id.KEY, color=c, rule=KeyRule.FRAGILE) for c in
+                        Color],
+        "KEY_FRAGILE_COUNT": [
+            Elem(Id.KEY, color=c, rule=KeyRule.FRAGILE, count=32) for c in
+            Color],
+        "KEY_ACTING_DIRT": [Elem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT)
+                            for c in Color],
+        "KEY_ACTING_DIRT_COUNT": [
+            Elem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT, count=150) for
+            c in Color],
+        "TOOL": [Elem(Id.TOOL, rule=r) for r in ToolRule] + [
+            Elem(Id.TOOL, rule=r, count=49) for r in ToolRule],
+        "TOGGLE_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.TOGGLE, color=c) for c
+                          in Color],
+        "TOGGLE_BUTTON_CHANNEL": [
+            Elem(Id.BUTTON, rule=ButtonRule.TOGGLE, channel="HI", color=c) for c
+            in Color],
+        "HOLD_ONE_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c)
+                            for c in Color],
+        "HOLD_ONE_BUTTON_CHANNEL": [
+            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c, channel="P51")
+            for c in Color],
+        "HOLD_ALL_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c)
+                            for c in Color],
+        "HOLD_ALL_BUTTON_CHANNEL": [
+            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c, channel="POOP")
+            for c in Color],
+        "DPAD_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.DPAD, color=c) for c in
+                        Color],
+        "DPAD_BUTTON_CHANNEL": [
+            Elem(Id.BUTTON, rule=ButtonRule.DPAD, color=c, channel=841) for c in
+            Color],
     }
 )
 
