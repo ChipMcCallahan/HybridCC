@@ -6,9 +6,48 @@ from PIL import ImageTk
 
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.levelset import Elem
-from hybrid_cc.shared import Id
+from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.force_rule import ForceRule
+from hybrid_cc.shared.trap_rule import TrapRule
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
+
+ELIB = {
+    "FLOOR": [Elem(Id.FLOOR, color=c) for c in Color],
+    "WALL": [Elem(Id.WALL, color=c) for c in Color],
+    "EXIT": [Elem(Id.EXIT, color=c) for c in Color],
+    "WATER": [Elem(Id.WATER)],
+    "FIRE": [Elem(Id.FIRE)],
+    "DIRT": [Elem(Id.DIRT, color=c) for c in Color],
+    "ICE": [Elem(Id.ICE)],
+}
+
+for r in TrickWallRule:
+    ELIB[f"TRICK_WALL_{r.name}"] = [Elem(Id.TRICK_WALL, rule=r, color=c) for c
+                                    in Color]
+
+for d in "NESW":
+    ELIB[f"FORCE_{d}"] = [Elem(Id.FORCE, direction=Direction[d], color=c) for c
+                          in Color]
+
+ELIB.update(
+    {
+        "FORCE_RANDOM": [Elem(Id.FORCE, rule=ForceRule.RANDOM, color=c) for c in
+                         Color],
+        "TELEPORT": [Elem(Id.TELEPORT, color=c) for c in Color],
+        "TRAP_OPEN": [Elem(Id.TRAP, color=c, rule=TrapRule.OPEN) for c in
+                      Color],
+        "TRAP_SHUT": [Elem(Id.TRAP, color=c, rule=TrapRule.SHUT) for c in
+                      Color],
+        "TRAP_OPEN_1": [Elem(Id.TRAP, color=c, rule=TrapRule.OPEN, channel=1)
+                        for c in
+                        Color],
+        "TRAP_SHUT_128": [
+            Elem(Id.TRAP, color=c, rule=TrapRule.SHUT, channel=128) for c in
+            Color],
+        "GRAVEL": [Elem(Id.GRAVEL)]
+    }
+)
 
 
 class GfxViewerApp:
@@ -18,6 +57,9 @@ class GfxViewerApp:
 
         # Listbox for elemids
         self.listbox = Listbox(root)
+        # Calculate the width required for the longest entry
+        max_width = max(len(entry) for entry in ELIB) + 5
+        self.listbox.config(width=max_width)
         self.listbox.pack(side="left", fill="y")
 
         # Canvas for displaying images with a scrollbar
@@ -28,11 +70,11 @@ class GfxViewerApp:
         self.canvas.pack(side="left", fill="both", expand=True)
 
         # Scrollbar
-        scrollbar = tk.Scrollbar(canvas_frame, orient="vertical", command=self.canvas.yview)
+        scrollbar = tk.Scrollbar(canvas_frame, orient="vertical",
+                                 command=self.canvas.yview)
         scrollbar.pack(side="right", fill="y")
 
         self.canvas.configure(yscrollcommand=scrollbar.set)
-
 
         self.animate_toggle = True  # Initial state of the animation toggle
 
@@ -44,31 +86,21 @@ class GfxViewerApp:
 
         self.gfx = GfxProvider()
 
-        # Hardcoded list of elemids
-        elemids = [Id[n] for n in (
-            "FLOOR",
-            "WALL",
-            "EXIT",
-            "WATER",
-            "FIRE",
-            "TRICK_WALL"
-        )]
-        for elem in elemids:
-            self.listbox.insert("end", elem.name)
+        for entry in ELIB:
+            self.listbox.insert("end", entry)
 
         # Binding Listbox selection event
         self.listbox.bind('<<ListboxSelect>>', self.on_select)
         root.bind('<space>', self.toggle_animation)
-
 
     def toggle_animation(self, event=None):
         self.animate_toggle = not self.animate_toggle
         self.update_canvas(self.listbox.get(self.listbox.curselection()[0]))
 
     def update_canvas(self, selected_eid):
+        self.stop_animations()
         self.canvas.delete("all")
         self.image_refs.clear()
-        self.stop_animations()
 
         elements = self.get_images(selected_eid)
         x_offset, y_offset = 0, 10
@@ -127,16 +159,18 @@ class GfxViewerApp:
         self.image_refs.append(tk_img)
 
     def start_animation(self, anim_id, images, x):
-        self.animations[anim_id] = cycle(images)
+        self.animations[anim_id] = {'images': cycle(images)}
         self.animate(anim_id, x)
 
     def animate(self, anim_id, x):
         if anim_id in self.animations:
-            img = next(self.animations[anim_id])
+            img = next(self.animations[anim_id]['images'])
             tk_img = ImageTk.PhotoImage(img)
             self.canvas.create_image(x, 10, anchor="nw", image=tk_img)
             self.image_refs.append(tk_img)
-            self.root.after(200, lambda: self.animate(anim_id, x))  # Schedule next frame update
+            # Schedule next frame update and store the task reference
+            task = self.root.after(200, lambda: self.animate(anim_id, x))
+            self.animations[anim_id]['task'] = task
 
     def run_animation(self, images, x):
         frame_duration = 1 / 5  # 1/5 of a second per frame
@@ -148,47 +182,36 @@ class GfxViewerApp:
             self.root.update()  # Update the root window for each frame
 
     def stop_animations(self):
+        # Cancel scheduled animation tasks
+        for anim_id in self.animations.keys():
+            if 'task' in self.animations[anim_id]:
+                self.root.after_cancel(self.animations[anim_id]['task'])
         self.animations.clear()
 
     def should_animate(self):
         # Now returns the state of the animate_toggle
         return self.animate_toggle
 
+    def display_entry_over_canvas(self, entry_text):
+        self.canvas.delete("entry_text")  # Remove previous text
+        # Ensuring x, y coordinates and text are correctly passed
+        self.canvas.create_text(
+            10, 10,  # x, y coordinates
+            text=entry_text,  # The text to display
+            anchor="nw",  # Anchor point
+            fill="white",  # Text color
+            tags="entry_text"  # Tag for the text
+        )
+
     def on_select(self, evt):
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
+        self.display_entry_over_canvas(value)
         self.update_canvas(value)
 
-    def get_images(self, elemid_str):
-        images = []
-        elemid = Id[elemid_str]
-        if elemid == Id.FLOOR:
-            for color in Color:
-                floor = Elem(elemid, color=color)
-                images.append(self.gfx.floor(floor))
-        elif elemid == Id.WALL:
-            for color in Color:
-                wall = Elem(elemid, color=color)
-                images.append(self.gfx.wall(wall))
-        elif elemid == Id.EXIT:
-            for color in Color:
-                if color == Color.GREY:
-                    continue
-                exit = Elem(elemid, color=color)
-                images.append(self.gfx.exit(exit))
-        elif elemid == Id.WATER:
-            images.append(self.gfx.water())
-        elif elemid == Id.FIRE:
-            images.append(self.gfx.fire())
-        elif elemid == Id.TRICK_WALL:
-            for rule in TrickWallRule:
-                subimages = []
-                for color in Color:
-                    elem = Elem(elemid, rule=rule, color=color)
-                    subimages.append(self.gfx.trick_wall(elem))
-                images.append(subimages)
-        return images
+    def get_images(self, elib_entry):
+        return [self.gfx.provide(elem) for elem in ELIB[elib_entry]]
 
 
 if __name__ == "__main__":

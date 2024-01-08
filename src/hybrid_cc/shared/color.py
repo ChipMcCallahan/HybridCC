@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Color(Enum):
-    GREY = "#808080"
+    GREY = "#CCCCCC"
     RED = "#FF0000"
     GREEN = "#008000"
     BLUE = "#0000FF"
