@@ -19,6 +19,12 @@ class Colorizer:
         Returns:
             Image.Image: The colorized and brightness-adjusted image.
         """
+        if not color:
+            return base_img.copy()
+
+        if hasattr(color, "name"):
+            color = color.name.lower()
+
         if not isinstance(base_img, Image.Image):
             raise TypeError("base_img must be a PIL Image instance")
 

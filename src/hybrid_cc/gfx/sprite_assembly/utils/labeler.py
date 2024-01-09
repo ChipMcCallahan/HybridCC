@@ -44,6 +44,8 @@ class Labeler:
         return x, y
 
     def label(self, label, p=5, color="white"):
+        label = str(label) if isinstance(label, int) else label
+        color = color or "white"
         label_image = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
         label_draw = ImageDraw.Draw(label_image)
 

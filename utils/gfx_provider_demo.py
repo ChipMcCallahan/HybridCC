@@ -4,7 +4,7 @@ from itertools import cycle
 from tkinter import Listbox, Canvas
 from PIL import ImageTk
 
-from hybrid_cc.gfx.gfx_provider_old import GfxProvider
+from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.levelset import Elem
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.button_rule import ButtonRule
@@ -48,7 +48,7 @@ ELIB.update(
             for c in
             Color],
         "TRAP_SHUT_128": [
-            Elem(Id.TRAP, color=c, rule=TrapRule.SHUT, channel=128) for c in
+            Elem(Id.TRAP, color=c, rule=TrapRule.SHUT, channel=1) for c in
             Color],
         "GRAVEL": [Elem(Id.GRAVEL)],
         "POP_UP_WALL": [Elem(Id.POP_UP_WALL, color=c) for c in Color],

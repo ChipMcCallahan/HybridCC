@@ -45,4 +45,4 @@ class Id(Enum):
     PLAYER = (Layer.MOB, 6)
 
     def layer(self):
-        return self.value
+        return self.value[0]
