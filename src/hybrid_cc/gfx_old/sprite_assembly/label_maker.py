@@ -2,9 +2,6 @@ import importlib.resources
 
 from PIL import Image, ImageDraw
 
-from hybrid_cc.gfx.gfx_utils import colorize
-
-
 class LabelMaker:
     def __init__(self, *, text_color, bg_color, position):
         with importlib.resources.path("hybrid_cc.art",

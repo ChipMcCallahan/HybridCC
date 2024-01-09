@@ -4,7 +4,7 @@ from itertools import cycle
 from tkinter import Listbox, Canvas
 from PIL import ImageTk
 
-from hybrid_cc.gfx.gfx_provider import GfxProvider
+from hybrid_cc.gfx.gfx_provider_old import GfxProvider
 from hybrid_cc.levelset import Elem
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.button_rule import ButtonRule

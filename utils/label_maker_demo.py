@@ -2,18 +2,19 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
 
-from hybrid_cc.gfx.label_maker import LabelMaker
+from hybrid_cc.gfx.sprite_assembly.utils.labeler import Labeler
 
 
 class LabelMakerDemo:
     def __init__(self, root):
+        self.scaled_image_label = None
         self.count = 0
         self.root = root
+        self.labeler = Labeler()
         root.title("LabelMaker Demo")
 
         # Defaults
         default_text_color = "yellow"
-        default_bg_color = "black"
         default_position = 5
         default_label_text = "128"
 
@@ -30,16 +31,6 @@ class LabelMakerDemo:
                                                    "white", "black"])
         text_color_dropdown.pack()
         text_color_dropdown.bind("<<ComboboxSelected>>", self.update_label)
-
-        # Background color dropdown
-        tk.Label(left_frame, text="Background Color:").pack()
-        self.bg_color_var = tk.StringVar(value=default_bg_color)
-        bg_color_dropdown = ttk.Combobox(left_frame,
-                                         textvariable=self.bg_color_var,
-                                         values=["red", "green", "blue",
-                                                 "white", "black"])
-        bg_color_dropdown.pack()
-        bg_color_dropdown.bind("<<ComboboxSelected>>", self.update_label)
 
         # Position input box
         tk.Label(left_frame, text="Position (1-9):").pack()
@@ -60,23 +51,17 @@ class LabelMakerDemo:
         self.image_label = tk.Label(root)
         self.image_label.pack(side="right", fill="both", expand=True)
 
-        # Initialize LabelMaker
-        self.label_maker = LabelMaker(text_color=default_text_color,
-                                      bg_color=default_bg_color,
-                                      position=default_position
-                                      )
-
         # Generate initial label
         self.update_label()
 
     def update_label(self, event=None):
-        # Update LabelMaker attributes
-        self.label_maker.text_color = self.text_color_var.get()
-        self.label_maker.bg_color = self.bg_color_var.get()
-        self.label_maker.position = int(self.position_var.get())
-
         # Generate and display the label
-        label_image = self.label_maker.make(self.label_text_var.get())
+        label_image = self.labeler.label(self.label_text_var.get(),
+                                         int(self.position_var.get()),
+                                         self.text_color_var.get())
+        bg_image = Image.new("RGBA", (32, 32), "cyan")
+        bg_image.paste(label_image, (0, 0), label_image)
+        label_image = bg_image
         self.count += 1
 
         tk_image = ImageTk.PhotoImage(label_image)
@@ -89,7 +74,7 @@ class LabelMakerDemo:
         scaled_tk_image = ImageTk.PhotoImage(scaled_image)
 
         # Check if the second image label exists, else create it
-        if hasattr(self, 'scaled_image_label'):
+        if self.scaled_image_label:
             self.scaled_image_label.configure(image=scaled_tk_image)
         else:
             self.scaled_image_label = tk.Label(self.root,

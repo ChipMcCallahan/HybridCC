@@ -3,8 +3,8 @@ import importlib.resources
 from cc_tools import CC2SpriteSet
 from PIL import Image
 
-from hybrid_cc.gfx.gfx_utils import colorize
-from hybrid_cc.gfx.label_maker import LabelMaker
+from hybrid_cc.gfx.sprite_assembly.gfx_utils import colorize
+from hybrid_cc.gfx.sprite_assembly.label_maker import LabelMaker
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
