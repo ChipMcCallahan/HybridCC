@@ -1,8 +1,12 @@
 from PIL import Image
 
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
+from hybrid_cc.shared.space_rule import SpaceRule
+from hybrid_cc.shared.thief_rule import ThiefRule
 from hybrid_cc.shared.trap_rule import TrapRule
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
+
+CURRENT_STATE = "current_state"
 
 
 class TerrainGfx:
@@ -13,25 +17,33 @@ class TerrainGfx:
         # Always label SE corner for Terrain layer
         return self.assembler.label_se(label, color)
 
-    def floor(self, elem):
+    def space(self, elem, **kwargs):
+        rule = elem.rule or SpaceRule.DEFAULT
+        if rule == SpaceRule.DEFAULT:
+            return Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+        index = [SpaceRule.SOLID_BELOW, SpaceRule.MAYBE_SOLID_BELOW,
+                 SpaceRule.DEADLY_BELOW].index(rule)
+        return self.assembler.custom(index + 40)
+
+    def floor(self, elem, **kwargs):
         base = self.assembler.cc2("FLOOR")
         return self.assembler.colorize(base, elem.color)
 
-    def wall(self, elem):
+    def wall(self, elem, **kwargs):
         base = self.assembler.cc2("WALL")
         return self.assembler.colorize(base, elem.color)
 
-    def exit(self, elem):
+    def exit(self, elem, **kwargs):
         base = self.assembler.cc2_series("EXIT", 4)
         return [self.assembler.colorize(frame, elem.color) for frame in base]
 
-    def water(self, elem):
+    def water(self, elem, **kwargs):
         return self.assembler.cc2_series("WATER", 4)
 
-    def fire(self, elem):
+    def fire(self, elem, **kwargs):
         return self.assembler.cc2_series("FIRE", 4)
 
-    def trick_wall(self, elem):
+    def trick_wall(self, elem, **kwargs):
         index = [
             TrickWallRule.BECOMES_FLOOR,
             TrickWallRule.BECOMES_WALL,
@@ -43,14 +55,14 @@ class TerrainGfx:
         base = self.assembler.custom(index)
         return self.assembler.colorize(base, elem.color)
 
-    def dirt(self, elem):
+    def dirt(self, elem, **kwargs):
         base = self.assembler.custom(10)
         return self.assembler.colorize(base, elem.color)
 
-    def ice(self, elem):
+    def ice(self, elem, **kwargs):
         return self.assembler.cc2("ICE")
 
-    def force(self, elem):
+    def force(self, elem, **kwargs):
         if elem.direction:
             base = self.assembler.cc2(f"FORCE_N")
             frames = [self.assembler.cc2(f"FORCE_{elem.direction.name}")]
@@ -75,23 +87,30 @@ class TerrainGfx:
             frames = self.assembler.cc2_series(f"FORCE_RANDOM", 8)
         return [self.assembler.colorize(frame, elem.color) for frame in frames]
 
-    def teleport(self, elem):
+    def teleport(self, elem, **kwargs):
         frames = [self.assembler.custom(i) for i in range(6, 10)]
         return [self.assembler.colorize(frame, elem.color) for frame in frames]
 
-    def trap(self, elem):
-        base = self.assembler.cc2(
-            "TRAP_SHUT" if elem.rule == TrapRule.SHUT else "TRAP")
+    def trap(self, elem, **kwargs):
+        current_state = kwargs.get(CURRENT_STATE, 0)
+        index = [TrapRule.STARTS_OPEN, TrapRule.STARTS_SHUT].index(elem.rule)
+        name = ["TRAP", "TRAP_SHUT"][(index + current_state) % 2]
+        base = self.assembler.cc2(name)
         colored = self.assembler.colorize(base, elem.color)
         if elem.channel:
             label = self.label(elem.channel, elem.color)
             return self.assembler.stack(colored, label)
         return colored
 
-    def gravel(self, elem):
+    def thief(self, elem, **kwargs):
+        if elem.rule == ThiefRule.KEYS:
+            return self.assembler.cc2("KEY_THIEF")
+        return self.assembler.cc2("THIEF")
+
+    def gravel(self, elem, **kwargs):
         return self.assembler.custom(11)
 
-    def pop_up_wall(self, elem):
+    def pop_up_wall(self, elem, **kwargs):
         base = self.assembler.cc2("POP_UP_WALL")
         colored = self.assembler.colorize(base, elem.color)
         if elem.count and elem.count > 1:
@@ -99,7 +118,7 @@ class TerrainGfx:
             return self.assembler.stack(colored, label)
         return colored
 
-    def stepping_stone(self, elem):
+    def stepping_stone(self, elem, **kwargs):
         top = self.assembler.custom(12)
         bottom = self.fire(elem) if elem.rule == "fire" else self.water(elem)
         combined = []
@@ -110,10 +129,10 @@ class TerrainGfx:
             return [self.assembler.stack(frame, label) for frame in combined]
         return combined
 
-    def hint(self, elem):
+    def hint(self, elem, **kwargs):
         return self.assembler.cc2("HINT")
 
-    def cloner(self, elem):
+    def cloner(self, elem, **kwargs):
         cloner = self.assembler.cc2("CLONER")
         d = elem.direction
         processed = self.assembler.colorize(cloner, elem.color)

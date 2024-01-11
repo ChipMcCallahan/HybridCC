@@ -2,28 +2,35 @@
 library."""
 from PIL import ImageOps, ImageEnhance, Image, ImageColor
 
+# How much brightness increase to apply to various colors so they look right.
+BRIGHTNESS_ADJUSTMENTS = {
+    "grey": 2.0,
+    "green": 1.7,
+}
+DEFAULT_BRIGHTNESS = 1.5
+
 
 class Colorizer:
     """A class for colorizing images with specified color and brightness."""
 
     @staticmethod
-    def colorize(base_img, color, brightness=1.5):
+    def colorize(base_img, color):
         """
         Apply a color and brightness to a grayscale image.
 
         Parameters:
             base_img (Image.Image): The original image to be colorized.
             color (str or tuple): The color to apply.
-            brightness (float): The brightness factor to apply.
 
         Returns:
             Image.Image: The colorized and brightness-adjusted image.
         """
-        if not color:
-            return base_img.copy()
+        color = color or "grey"
 
         if hasattr(color, "name"):
             color = color.name.lower()
+
+        brightness = BRIGHTNESS_ADJUSTMENTS.get(color, DEFAULT_BRIGHTNESS)
 
         if not isinstance(base_img, Image.Image):
             raise TypeError("base_img must be a PIL Image instance")

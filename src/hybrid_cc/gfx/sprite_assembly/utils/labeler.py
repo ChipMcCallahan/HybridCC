@@ -11,6 +11,7 @@ LETTER_WIDTH = {
     "M": 5,
     "W": 5,
     "N": 5,
+    "+": 5,
     "Q": 4
 }
 
@@ -85,9 +86,11 @@ class Labeler:
 
     def char(self, c):
         c = str(c) if isinstance(c, int) else c
-        assert len(c) == 1 and (c.isdigit() or c.isupper())
+        assert len(c) == 1 and (c.isdigit() or c.isupper() or c in "+")
         if c.isupper():
             i = ord(c) - ord('A')
+        elif c == "+":
+            i = 36
         else:
             i = 26 + int(c)
 
@@ -97,6 +100,6 @@ class Labeler:
         tile = self.letters.crop((x, y, x + 5, y + 5))
         if c == "Q":
             return tile.crop((0+1, 0, 5, 5))
-        if c not in "MNW":
+        if c not in "MNW+":
             return tile.crop((0+1, 0, 5-1, 5))
         return tile
