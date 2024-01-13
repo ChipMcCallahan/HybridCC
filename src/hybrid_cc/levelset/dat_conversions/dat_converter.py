@@ -1,0 +1,90 @@
+from collections import defaultdict
+
+from cc_tools import DATHandler, CC1
+
+from hybrid_cc.levelset import Level, Levelset, MapCell
+from hybrid_cc.levelset.dat_conversions.cell_converter import CellConverter
+from hybrid_cc.shared import Id
+from hybrid_cc.shared.color import Color
+
+
+class DATConverter:
+    @staticmethod
+    def convert_levelset(dat_file_name):
+        cc1_levels = DATHandler.read(dat_file_name).levels
+        new_levelset = Levelset(dat_file_name)
+
+        current_group = []
+
+        def create_new_level_from_current_group():
+            if not current_group:
+                return
+            new_levelset.levels.append(
+                DATConverter.convert_level(*current_group))
+
+        for cc1_level in cc1_levels:
+            # Untitled levels are interpreted as z-layers on top of the
+            # last titled level.
+            if cc1_level.title == "":
+                current_group.append(cc1_level)
+            else:
+                create_new_level_from_current_group()
+                current_group = [cc1_level]
+
+        # Don't forget to process the last group
+        create_new_level_from_current_group()
+
+        return new_levelset
+
+    @staticmethod
+    def convert_level(*cc1_levels):
+        """
+        Method to create a Level instance from a CC1 level format.
+        """
+        x_size, y_size, z_size = 32, 32, len(cc1_levels)
+        level = Level(x_size, y_size, z_size)
+        level.title = cc1_levels[0].title
+        level.time = cc1_levels[0].time
+        level.chips[Color.GREY] = sum(
+            cc1_level.chips for cc1_level in cc1_levels)
+
+        channels = {}
+        next_trap = 1
+        next_cloner = 1
+        for z, cc1_level in enumerate(cc1_levels):
+            for src, dst in cc1_level.traps.items():
+                x1, y1 = src % 32, src // 32
+                x2, y2 = dst % 32, dst // 32
+                source = (x1, y1, z)
+                target = (x2, y2, z)
+                if target in channels:
+                    channel = channels[target]
+                else:
+                    channel = next_trap
+                    next_trap += 1
+                channels[target] = f"T{channel}"
+                channels[source] = f"T{channel}"
+            for src, dst in cc1_level.cloners.items():
+                x1, y1 = src % 32, src // 32
+                x2, y2 = dst % 32, dst // 32
+                source = (x1, y1, z)
+                target = (x2, y2, z)
+                if target in channels:
+                    channel = channels[target]
+                else:
+                    channel = next_cloner
+                    next_cloner += 1
+                channels[target] = f"C{channel}"
+                channels[source] = f"C{channel}"
+
+        for i in range(x_size):
+            for j in range(y_size):
+                for k in range(z_size):
+                    p = (i, j, k)
+                    cc1_cell = cc1_levels[k].at(j * 32 + i)
+                    cell = CellConverter.convert(cc1_cell,
+                                                 channels.get(p, None))
+                    if cell.pickup.id == Id.CHIP and cell.pickup.color:
+                        level.chips[cell.pickup.color] = level.chips.get(
+                            cell.pickup.color, 0) + 1
+                    level.put(p, cell)

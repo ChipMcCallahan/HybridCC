@@ -13,6 +13,7 @@ from hybrid_cc.shared.force_rule import ForceRule
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.space_rule import SpaceRule
+from hybrid_cc.shared.stepping_stone_rule import SteppingStoneRule
 from hybrid_cc.shared.thief_rule import ThiefRule
 from hybrid_cc.shared.toggle_wall_rule import ToggleWallRule
 from hybrid_cc.shared.tool_rule import ToolRule
@@ -45,12 +46,12 @@ ELIB.update(
                          c in
                          Color],
         "TELEPORT": [Elem(Id.TELEPORT, color=c) for c in Color],
-        "TRAP_OPEN": [Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN) for c in
+        "TRAP_OPEN": [Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT) for c in
                       Color],
         "TRAP_SHUT": [Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT) for c in
                       Color],
         "TRAP_OPEN_1": [
-            Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN, channel=1)
+            Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1)
             for c in
             Color],
         "TRAP_SHUT_128": [
@@ -58,7 +59,7 @@ ELIB.update(
             in
             Color],
         "TRAP_TOGGLED_SHUT": [
-            (Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN, channel=1),
+            (Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1),
              {CURRENT_STATE: 1}) for c in Color],
         "TRAP_TOGGLED_OPEN": [
             (Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1),
@@ -68,10 +69,13 @@ ELIB.update(
         "POP_UP_WALL_COUNT": [Elem(Id.POP_UP_WALL, color=c, count=2) for c
                               in
                               Color],
-        "STEPPING_STONE": [Elem(Id.STEPPING_STONE, rule="fire"),
-                           Elem(Id.STEPPING_STONE, rule="fire", count=2),
-                           Elem(Id.STEPPING_STONE, rule="water"),
-                           Elem(Id.STEPPING_STONE, rule="water", count=2)],
+        "STEPPING_STONE": [Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE),
+                           Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE,
+                                count=2),
+                           Elem(Id.STEPPING_STONE,
+                                rule=SteppingStoneRule.WATER),
+                           Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.WATER,
+                                count=2)],
         "HINT": [Elem(Id.HINT)],
         "CLONER_N": [Elem(Id.CLONER, color=c, direction=Direction.N) for c
                      in
@@ -113,7 +117,7 @@ ELIB.update(
             for c in Color],
         "HOLD_ALL_BUTTON_CHANNEL": [
             Elem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c,
-                 channel="POOP")
+                 channel="HELLO")
             for c in Color],
         "DPAD_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.DPAD, color=c) for c
                         in
@@ -228,7 +232,8 @@ ELIB.update(
         "PLAYER": [
             Elem(Id.PLAYER, direction=Direction[d]) for d in "NESW"],
         "PLAYER_SWIM": [
-            (Elem(Id.PLAYER, direction=Direction[d]), {"swimming": True}) for d in "NESW"
+            (Elem(Id.PLAYER, direction=Direction[d]), {"swimming": True}) for d
+            in "NESW"
         ],
         "PLAYER_PUSH": [
             (Elem(Id.PLAYER, direction=Direction[d]), {"pushing": True}) for d

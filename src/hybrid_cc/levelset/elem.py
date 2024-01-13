@@ -33,48 +33,59 @@ class Elem:
         return hash(items)
 
     def get(self, arg, default=None):
-        """
-        Retrieves the value associated with the specified argument.
-        Returns None if the argument does not exist in args.
-        """
+        """Get the value for arg, or default if not exists."""
         return self.kwargs.get(arg, default)
+
+    def set(self, arg, val):
+        """Set the value for arg."""
+        self.kwargs[arg] = val
 
     @property
     def color(self):
-        """
-        Retrieves the color associated with the element.
-        Returns None if the color is not specified.
-        """
+        """Gets the color of the element."""
         return self.get('color')
+
+    @color.setter
+    def color(self, value):
+        """Sets the color of the element."""
+        self.set('color', value)
 
     @property
     def rule(self):
-        """
-        Retrieves the rule associated with the element.
-        Returns None if the rule is not specified.
-        """
+        """Gets the rule of the element."""
         return self.get('rule')
+
+    @rule.setter
+    def rule(self, value):
+        """Sets the rule of the element."""
+        self.set('rule', value)
 
     @property
     def count(self):
-        """
-        Retrieves the count associated with the element.
-        Returns None if the count is not specified.
-        """
+        """Gets the count of the element."""
         return self.get('count')
+
+    @count.setter
+    def count(self, value):
+        """Sets the count of the element."""
+        self.set('count', value)
 
     @property
     def channel(self):
-        """
-        Retrieves the channel associated with the element.
-        Returns None if the channel is not specified.
-        """
+        """Gets the channel of the element."""
         return self.get('channel')
+
+    @channel.setter
+    def channel(self, value):
+        """Sets the channel of the element."""
+        self.set('channel', value)
 
     @property
     def direction(self):
-        """
-        Retrieves the direction associated with the element.
-        Returns None if the direction is not specified.
-        """
+        """Gets the direction of the element."""
         return self.get('direction')
+
+    @direction.setter
+    def direction(self, value):
+        """Sets the direction of the element."""
+        self.set('direction', value)

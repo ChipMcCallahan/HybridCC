@@ -2,5 +2,5 @@ from enum import Enum
 
 
 class TrapRule(Enum):
-    STARTS_OPEN = 1
+    DEFAULT = 1
     STARTS_SHUT = 2

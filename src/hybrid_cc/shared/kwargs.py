@@ -1,0 +1,6 @@
+DIRECTION = "direction"
+RULE = "rule"
+COLOR = "color"
+COUNT = "count"
+CHANNEL = "channel"
+SIDES = "sides"

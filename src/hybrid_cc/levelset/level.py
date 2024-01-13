@@ -18,7 +18,7 @@ class Level:
     and querying cell states, checking if a position is within the level's
     bounds, and creating levels from other level formats.
     """
-    def __init__(self, title, x_size, y_size, z_size):
+    def __init__(self, x_size=32, y_size=32, z_size=1):
         """
         Initialize a new Level instance.
 
@@ -27,10 +27,16 @@ class Level:
         :param y_size: The size along the y-axis.
         :param z_size: The size along the z-axis.
         """
+        self.author = ""
         self.title = title
         self._x_size = x_size
         self._y_size = y_size
         self._z_size = z_size
+        self.chips = {}  # map from color enum to count
+        self.time = 0
+        self.hints = {}  # map from position to string
+        self.hint = ""  # default hint if not in dict
+
         self.map = [[[None for _ in range(x_size)] for _ in range(y_size)] for _
                     in range(z_size)]
 
@@ -56,36 +62,16 @@ class Level:
                     0 <= y < self.y_size and
                     0 <= z < self.z_size)
 
-    def set_cell(self, p, value):
-        """
-        Set the contents of the cell at the specified (x, y, z) coordinate.
-
-        :param p: (x, y, z) coordinate of the cell.
-        :param value: The value to set the cell to.
-        """
+    def put(self, p, value):
+        """Set the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
         x, y, z = p
         self.map[z][y][x] = value
 
-    @classmethod
-    def create_from_cc1_levels(cls, *cc1_levels):
-        """
-        Factory method to create a Level instance from a CC1 level format.
-        """
-        x_size, y_size, z_size = 32, 32, len(cc1_levels)
-        title = cc1_levels[0].title
-        level = Level(title, x_size, y_size, z_size)
-
-        def add_cell(i, j, k):
-            cc1_level = cc1_levels[k]
-            cc1_cell = cc1_level.at((i, j))
-            top, bottom = cc1_cell.top, cc1_cell.bottom
-
-        for _i in range(x_size):
-            for _j in range(y_size):
-                for _k in range(z_size):
-                    add_cell(_i, _j, _k)
-
-
-        #TODO: convert the level elements
+    def get(self, p, value):
+        """Get the contents of the cell at location p."""
+        if self.is_oob(p):
+            raise ValueError("Coordinates out of bounds")
+        x, y, z = p
+        return self.map[z][y][x]
