@@ -1,3 +1,4 @@
+import logging
 from typing import Dict
 
 from cc_tools import CC1
@@ -72,10 +73,6 @@ class CellConverter:
     def convert(cc1_cell, channel=None):
         cell = MapCell()
 
-        # cell.sides is a list, this allows PANEL to coexist with CORNER, e.g.
-        def add_sides(sides):
-            cell.sides = [sides] + (cell.sides or [])
-
         def populate(top, bottom=CC1.FLOOR):
 
             if top == CC1.FLOOR:
@@ -112,8 +109,7 @@ class CellConverter:
                     sides += CC1.dirs(bottom)
                     sides = ''.join(set(sides))
                 kwargs[SIDES] = sides
-                # cell.sides is a list, this allows CORNER and PANEL to coexist
-                add_sides(Elem(Id.PANEL, **kwargs))
+                cell.add_sides(Elem(Id.PANEL, **kwargs))
 
             elif top == CC1.BLOCK:
                 kwargs = CellConverter.colorize(bottom)
@@ -123,17 +119,20 @@ class CellConverter:
 
             elif top == CC1.DIRT:
                 kwargs = CellConverter.colorize(bottom)
-                cell.mob = Elem(Id.DIRT, **kwargs)
+                cell.terrain = Elem(Id.DIRT, **kwargs)
 
             elif top in CC1.ice():
                 if top != CC1.ICE:
-                    add_sides(Elem(Id.CORNER, sides=CC1.dirs(top)))
+                    cell.add_sides(
+                        Elem(Id.CORNER, sides=CC1.dirs(top.reverse())))
                 # doubled corners yield just the corner
                 if top != bottom or top == CC1.ICE:
                     cell.terrain = Elem(Id.ICE)
 
             elif top in CC1.forces():
                 kwargs = CellConverter.colorize(bottom)
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.GREEN
                 if top == CC1.FORCE_RANDOM:
                     kwargs[RULE] = ForceRule.RANDOM
                 else:
@@ -145,6 +144,8 @@ class CellConverter:
 
             elif top == CC1.EXIT:
                 kwargs = CellConverter.colorize(bottom)
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.BLUE
                 cell.terrain = Elem(Id.EXIT, **kwargs)
 
             elif top in CC1.doors():
@@ -163,8 +164,8 @@ class CellConverter:
                     kwargs[RULE] = (TrickWallRule.PASS_THRU
                                     if top == CC1.BLUE_WALL_FAKE
                                     else TrickWallRule.SOLID)
-                if not kwargs[COLOR]:
-                    kwargs = {COLOR: Color.BLUE}
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.BLUE
                 cell.terrain = Elem(Id.TRICK_WALL, **kwargs)
 
             elif top == CC1.NOT_USED_0:
@@ -195,6 +196,8 @@ class CellConverter:
 
             elif top in CC1.toggles():
                 kwargs = CellConverter.colorize(bottom)
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.GREEN
                 kwargs[RULE] = (ToggleWallRule.STARTS_OPEN
                                 if top == CC1.TOGGLE_FLOOR
                                 else ToggleWallRule.STARTS_SHUT)
@@ -203,13 +206,15 @@ class CellConverter:
             elif top == CC1.TELEPORT:
                 kwargs = CellConverter.colorize(
                     bottom) or CellConverter.channelize(bottom)
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.BLUE
                 cell.terrain = Elem(Id.TELEPORT, **kwargs)
 
             elif top == CC1.BOMB:
                 kwargs = CellConverter.colorize(bottom)
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.RED
                 cell.pickup = Elem(Id.BOMB, **kwargs)
-                if kwargs:
-                    return
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
@@ -265,6 +270,8 @@ class CellConverter:
             elif top == CC1.CLONER:
                 kwargs = (CellConverter.colorize(bottom) or
                           CellConverter.channelize(bottom))
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color.RED
                 if channel:
                     kwargs[CHANNEL] = channel
                 cell.terrain = Elem(Id.CLONER, **kwargs)
@@ -320,7 +327,10 @@ class CellConverter:
                     RULE: MonsterRule[rule],
                     DIRECTION: Direction[direction]
                 }
+                logging.debug(kwargs)
                 cell.mob = Elem(Id.MONSTER, **kwargs)
+                if bottom not in CC1.mobs():
+                    populate(bottom)
 
             elif top in CC1.tanks():
                 kwargs = {}
@@ -343,6 +353,8 @@ class CellConverter:
                 else:
                     kwargs = CellConverter.colorize(
                         bottom) or CellConverter.channelize(bottom)
+                    if COLOR not in kwargs:
+                        kwargs[COLOR] = Color.BLUE
                     kwargs[DIRECTION] = Direction[CC1.dirs(top)]
                     cell.mob = Elem(Id.TANK, **kwargs)
                     if bottom not in CC1.mobs():
@@ -378,7 +390,7 @@ class CellConverter:
                         CC1.mobs()):
                     populate(bottom)
 
-            elif top == CC1.players():
+            elif top in CC1.players():
                 kwargs = {
                     DIRECTION: Direction[CC1.dirs(top)]
                 }

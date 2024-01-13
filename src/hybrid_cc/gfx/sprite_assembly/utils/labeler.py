@@ -74,7 +74,7 @@ class Labeler:
         # Paste each image into the combined image
         x_offset = 0
         for img in letter_images:
-            combined_img.paste(img, (x_offset, 0))
+            combined_img.paste(img, (x_offset, 0), img)
             x_offset += img.width + 1  # 1 pixel space between letters
 
         colored_img = Colorizer.colorize(combined_img, color)

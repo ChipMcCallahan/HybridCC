@@ -1,3 +1,5 @@
+import logging
+
 from hybrid_cc.gfx.sprite_assembly.mob_gfx import MobGfx
 from hybrid_cc.gfx.sprite_assembly.pickup_gfx import PickupGfx
 from hybrid_cc.gfx.sprite_assembly.sides_gfx import SidesGfx
@@ -52,3 +54,9 @@ class GfxProvider:
             return result
 
         raise ValueError("No Gfx Could be provided.")
+
+    def provide_one(self, obj, **kwargs):
+        frames = self.provide(obj, **kwargs)
+        if isinstance(frames, list):
+            return frames[0]
+        return frames

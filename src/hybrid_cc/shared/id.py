@@ -40,7 +40,6 @@ class Id(Enum):
     CORNER = (Layer.SIDES, 1)
 
     DIRT_BLOCK = (Layer.MOB, 0)
-    DIRECTIONAL_BLOCK = (Layer.MOB, 1)
     ICE_BLOCK = (Layer.MOB, 2)
     MONSTER = (Layer.MOB, 3)
     TANK = (Layer.MOB, 4)

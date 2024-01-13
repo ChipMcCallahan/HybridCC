@@ -15,12 +15,17 @@ class MapCell:
         Initializes a MapCell with an empty dictionary to store layer values.
         """
         self.layers = {}
+        self._sides = []
 
-    def set(self, layer, value):
+    def set(self, layer, elem):
         """
         Sets the value for a given layer.
         """
-        self.layers[layer] = value
+        if layer != elem.id.layer():
+            raise ValueError(
+                f"Layer {layer} mismatch: {elem} had "
+                f"layer {elem.id.layer()}.")
+        self.layers[layer] = elem
 
     def get(self, layer):
         """
@@ -60,13 +65,21 @@ class MapCell:
 
     @property
     def sides(self):
-        """Gets the SIDES layer for this MapCell."""
-        return self.get(Layer.SIDES)
+        """Gets the sides list for this MapCell."""
+        return self._sides
 
-    @sides.setter
-    def sides(self, value):
-        """Sets the SIDES layer for this MapCell."""
-        self.set(Layer.SIDES, value)
+    def add_sides(self, new_sides):
+        """Add new sides to the list. new_sides can be a single item or a
+        list of items"""
+        if isinstance(new_sides, list):
+            self._sides.extend(new_sides)
+        else:
+            self._sides.append(new_sides)
+        for elem in self._sides:
+            if elem.id.layer() != Layer.SIDES:
+                raise ValueError(
+                    f"Layer {Layer.SIDES} mismatch: {elem} had "
+                    f"layer {elem.id.layer()}.")
 
     @property
     def mob(self):
@@ -74,6 +87,19 @@ class MapCell:
         return self.get(Layer.MOB)
 
     @mob.setter
-    def mob(self, value):
+    def mob(self, elem):
         """Sets the MOB layer for this MapCell."""
-        self.set(Layer.MOB, value)
+        self.set(Layer.MOB, elem)
+
+    def get_elem_by_id(self, eid):
+        here = self.get(eid.layer)
+        return here if here.id == eid else None
+
+    def contains(self, eid):
+        return self.get_elem_by_id(eid) is not None
+
+    def contains_any(self, *eids):
+        for eid in eids:
+            if self.contains(eid):
+                return True
+        return False

@@ -44,6 +44,12 @@ class TerrainGfx:
         return self.assembler.cc2_series("FIRE", 4)
 
     def trick_wall(self, elem, **kwargs):
+        rule = elem.rule
+        if not kwargs.get("show_secrets"):
+            if rule in (TrickWallRule.PERMANENTLY_INVISIBLE,
+                        TrickWallRule.INVISIBLE_BECOMES_WALL):
+                return self.floor(elem, **kwargs)
+            rule = TrickWallRule.BECOMES_WALL
         index = [
             TrickWallRule.BECOMES_FLOOR,
             TrickWallRule.BECOMES_WALL,
@@ -51,7 +57,7 @@ class TerrainGfx:
             TrickWallRule.SOLID,
             TrickWallRule.PERMANENTLY_INVISIBLE,
             TrickWallRule.INVISIBLE_BECOMES_WALL
-        ].index(elem.rule)
+        ].index(rule)
         base = self.assembler.custom(index)
         return self.assembler.colorize(base, elem.color)
 
@@ -88,12 +94,16 @@ class TerrainGfx:
         return [self.assembler.colorize(frame, elem.color) for frame in frames]
 
     def teleport(self, elem, **kwargs):
+        floor = self.floor(elem, **kwargs)
         frames = [self.assembler.custom(i) for i in range(6, 10)]
-        return [self.assembler.colorize(frame, elem.color) for frame in frames]
+        colored = [self.assembler.colorize(frame, elem.color) for frame in
+                   frames]
+        return [self.assembler.stack(floor, frame) for frame in colored]
 
     def trap(self, elem, **kwargs):
         current_state = kwargs.get(CURRENT_STATE, 0)
-        index = [TrapRule.DEFAULT, TrapRule.STARTS_SHUT].index(elem.rule)
+        index = [TrapRule.DEFAULT, TrapRule.STARTS_SHUT].index(
+            elem.rule or TrapRule.DEFAULT)
         name = ["TRAP", "TRAP_SHUT"][(index + current_state) % 2]
         base = self.assembler.cc2(name)
         colored = self.assembler.colorize(base, elem.color)
@@ -135,8 +145,11 @@ class TerrainGfx:
     def cloner(self, elem, **kwargs):
         cloner = self.assembler.cc2("CLONER")
         d = elem.direction
-        processed = self.assembler.colorize(cloner, elem.color)
+        colored = self.assembler.colorize(cloner, elem.color)
         if d:
             arrow = self.assembler.cc2(f"CLONER_ARROW_{d.name}")
-            processed.paste(arrow, (0, 0), arrow)
-        return processed
+            colored.paste(arrow, (0, 0), arrow)
+        if elem.channel:
+            label = self.label(elem.channel, elem.color)
+            return self.assembler.stack(colored, label)
+        return colored

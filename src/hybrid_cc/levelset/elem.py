@@ -89,3 +89,16 @@ class Elem:
     def direction(self, value):
         """Sets the direction of the element."""
         self.set('direction', value)
+
+    def __repr__(self):
+        """
+        Generates an unambiguous string representation of the element.
+        """
+        return f"Elem(id={self.id!r}, kwargs={self.kwargs!r})"
+
+    def __str__(self):
+        """
+        Generates a readable string representation of the element.
+        """
+        kwargs_str = ", ".join(f"{key}={value}" for key, value in self.kwargs.items())
+        return f"Elem with ID: {self.id}, Properties: {kwargs_str}"

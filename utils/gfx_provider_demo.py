@@ -202,11 +202,11 @@ ELIB.update(
         ],
         "DIRT_BLOCK": [Elem(Id.DIRT_BLOCK, color=c) for c in Color],
         "DIRT_BLOCK_TRANSPARENT": [
-            (Elem(Id.DIRT_BLOCK, color=c), {"transparent": True}) for c in
+            (Elem(Id.DIRT_BLOCK, color=c), {"show_secrets": True}) for c in
             Color
         ],
         "ICE_BLOCK": [Elem(Id.ICE_BLOCK),
-                      (Elem(Id.ICE_BLOCK), {"transparent": True})],
+                      (Elem(Id.ICE_BLOCK), {"show_secrets": True})],
         "TEETH": [
             Elem(Id.MONSTER, rule=MonsterRule.TEETH, direction=Direction[d]) for
             d in "NESW"],

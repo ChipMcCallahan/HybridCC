@@ -28,7 +28,7 @@ class Level:
         :param z_size: The size along the z-axis.
         """
         self.author = ""
-        self.title = title
+        self.title = ""
         self._x_size = x_size
         self._y_size = y_size
         self._z_size = z_size
@@ -36,6 +36,7 @@ class Level:
         self.time = 0
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
+        self.movement = []
 
         self.map = [[[None for _ in range(x_size)] for _ in range(y_size)] for _
                     in range(z_size)]
@@ -55,6 +56,11 @@ class Level:
         """Returns the size of this level's z dimension."""
         return self._z_size
 
+    @property
+    def size(self):
+        """Returns the size of this level's x, y, z dimensions."""
+        return self.x_size, self.y_size, self.z_size
+
     def is_oob(self, p):
         """Returns whether the position p is out of bounds on this level."""
         x, y, z = p
@@ -69,7 +75,7 @@ class Level:
         x, y, z = p
         self.map[z][y][x] = value
 
-    def get(self, p, value):
+    def get(self, p):
         """Get the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")

@@ -12,13 +12,13 @@ class MobGfx:
 
     def dirt_block(self, elem, **kwargs):
         base = self.assembler.custom(38)
-        if kwargs.get("transparent"):
+        if kwargs.get("show_secrets"):
             base = self.assembler.transparencize(base)
         return self.assembler.colorize(base, elem.color)
 
     def ice_block(self, elem, **kwargs):
         base = self.assembler.custom(39)
-        if kwargs.get("transparent"):
+        if kwargs.get("show_secrets"):
             base = self.assembler.transparencize(base)
         return self.assembler.colorize(base, Color.CYAN)
 
@@ -61,7 +61,8 @@ class MobGfx:
 
     def tank(self, elem, **kwargs):
         d = elem.direction.name
-        return self.assembler.cc2_series(f"TANK_{d}", 2)
+        base = self.assembler.cc2_series(f"TANK_{d}", 2)
+        return [self.assembler.colorize(frame, elem.color) for frame in base]
 
     def player(self, elem, **kwargs):
         d = elem.direction.name
