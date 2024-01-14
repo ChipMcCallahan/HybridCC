@@ -3,7 +3,7 @@ from typing import Dict
 
 from cc_tools import CC1
 
-from hybrid_cc.levelset import Elem, MapCell
+from hybrid_cc.levelset import LevelElem, LevelCell
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
@@ -71,36 +71,36 @@ class CellConverter:
 
     @staticmethod
     def convert(cc1_cell, channel=None):
-        cell = MapCell()
+        cell = LevelCell()
 
         def populate(top, bottom=CC1.FLOOR):
 
             if top == CC1.FLOOR:
                 kwargs = CellConverter.colorize(bottom)
-                cell.terrain = Elem(Id.FLOOR, **kwargs)
+                cell.terrain = LevelElem(Id.FLOOR, **kwargs)
 
             elif top == CC1.WALL:
                 kwargs = CellConverter.colorize(bottom)
-                cell.terrain = Elem(Id.WALL, **kwargs)
+                cell.terrain = LevelElem(Id.WALL, **kwargs)
 
             elif top == CC1.CHIP:
                 kwargs = CellConverter.colorize(bottom) or CellConverter.count(
                     bottom)
-                cell.pickup = Elem(Id.CHIP, **kwargs)
+                cell.pickup = LevelElem(Id.CHIP, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
 
             elif top == CC1.WATER:
-                cell.terrain = Elem(Id.WATER)
+                cell.terrain = LevelElem(Id.WATER)
 
             elif top == CC1.FIRE:
-                cell.terrain = Elem(Id.FIRE)
+                cell.terrain = LevelElem(Id.FIRE)
 
             elif top == CC1.INV_WALL_PERM:
                 kwargs = CellConverter.colorize(bottom)
                 kwargs[RULE] = TrickWallRule.PERMANENTLY_INVISIBLE
-                cell.terrain = Elem(Id.TRICK_WALL, **kwargs)
+                cell.terrain = LevelElem(Id.TRICK_WALL, **kwargs)
 
             elif top in CC1.panels():
                 kwargs = CellConverter.colorize(bottom)
@@ -109,25 +109,27 @@ class CellConverter:
                     sides += CC1.dirs(bottom)
                     sides = ''.join(set(sides))
                 kwargs[SIDES] = sides
-                cell.add_sides(Elem(Id.PANEL, **kwargs))
+                cell.add_sides(LevelElem(Id.PANEL, **kwargs))
 
-            elif top == CC1.BLOCK:
+            elif top in CC1.blocks():
                 kwargs = CellConverter.colorize(bottom)
-                cell.mob = Elem(Id.DIRT_BLOCK, **kwargs)
+                if top in CC1.clone_blocks():
+                    kwargs[DIRECTION] = Direction[CC1.dirs(top)]
+                cell.mob = LevelElem(Id.DIRT_BLOCK, **kwargs)
                 if bottom in CC1.valid().difference(CC1.mobs()):
                     populate(bottom)
 
             elif top == CC1.DIRT:
                 kwargs = CellConverter.colorize(bottom)
-                cell.terrain = Elem(Id.DIRT, **kwargs)
+                cell.terrain = LevelElem(Id.DIRT, **kwargs)
 
             elif top in CC1.ice():
                 if top != CC1.ICE:
                     cell.add_sides(
-                        Elem(Id.CORNER, sides=CC1.dirs(top.reverse())))
+                        LevelElem(Id.CORNER, sides=CC1.dirs(top.reverse())))
                 # doubled corners yield just the corner
                 if top != bottom or top == CC1.ICE:
-                    cell.terrain = Elem(Id.ICE)
+                    cell.terrain = LevelElem(Id.ICE)
 
             elif top in CC1.forces():
                 kwargs = CellConverter.colorize(bottom)
@@ -137,22 +139,19 @@ class CellConverter:
                     kwargs[RULE] = ForceRule.RANDOM
                 else:
                     kwargs[DIRECTION] = Direction[CC1.dirs(top)]
-                cell.terrain = Elem(Id.FORCE, **kwargs)
-
-            elif top in CC1.clone_blocks():
-                pass
+                cell.terrain = LevelElem(Id.FORCE, **kwargs)
 
             elif top == CC1.EXIT:
                 kwargs = CellConverter.colorize(bottom)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.BLUE
-                cell.terrain = Elem(Id.EXIT, **kwargs)
+                cell.terrain = LevelElem(Id.EXIT, **kwargs)
 
             elif top in CC1.doors():
                 kwargs = CellConverter.colorize(bottom) or CellConverter.count(
                     bottom)
                 kwargs[COLOR] = Color[top.name.split("_")[0]]
-                cell.terrain_mod = Elem(Id.DOOR, **kwargs)
+                cell.terrain_mod = LevelElem(Id.DOOR, **kwargs)
 
             elif top in (CC1.BLUE_WALL_FAKE, CC1.BLUE_WALL_REAL):
                 kwargs = CellConverter.colorize(bottom)
@@ -166,7 +165,7 @@ class CellConverter:
                                     else TrickWallRule.SOLID)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.BLUE
-                cell.terrain = Elem(Id.TRICK_WALL, **kwargs)
+                cell.terrain = LevelElem(Id.TRICK_WALL, **kwargs)
 
             elif top == CC1.NOT_USED_0:
                 pass
@@ -175,11 +174,11 @@ class CellConverter:
                 kwargs = {
                     RULE: ThiefRule.KEYS if top == bottom else ThiefRule.TOOLS
                 }
-                cell.terrain = Elem(Id.THIEF, **kwargs)
+                cell.terrain = LevelElem(Id.THIEF, **kwargs)
 
             elif top == CC1.SOCKET:
                 kwargs = CellConverter.colorize(bottom)
-                cell.terrain_mod = Elem(Id.SOCKET, **kwargs)
+                cell.terrain_mod = LevelElem(Id.SOCKET, **kwargs)
                 if kwargs:
                     return
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
@@ -201,20 +200,20 @@ class CellConverter:
                 kwargs[RULE] = (ToggleWallRule.STARTS_OPEN
                                 if top == CC1.TOGGLE_FLOOR
                                 else ToggleWallRule.STARTS_SHUT)
-                cell.terrain_mod = Elem(Id.TOGGLE_WALL, **kwargs)
+                cell.terrain_mod = LevelElem(Id.TOGGLE_WALL, **kwargs)
 
             elif top == CC1.TELEPORT:
                 kwargs = CellConverter.colorize(
                     bottom) or CellConverter.channelize(bottom)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.BLUE
-                cell.terrain = Elem(Id.TELEPORT, **kwargs)
+                cell.terrain = LevelElem(Id.TELEPORT, **kwargs)
 
             elif top == CC1.BOMB:
                 kwargs = CellConverter.colorize(bottom)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.RED
-                cell.pickup = Elem(Id.BOMB, **kwargs)
+                cell.pickup = LevelElem(Id.BOMB, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
@@ -241,18 +240,18 @@ class CellConverter:
                     kwargs[COLOR] = kwargs.get(COLOR, Color.TAN)
                     if channel:
                         kwargs[CHANNEL] = channel
-                cell.terrain = Elem(Id.TRAP, **kwargs)
+                cell.terrain = LevelElem(Id.TRAP, **kwargs)
 
             elif top == CC1.INV_WALL_APP:
                 kwargs = CellConverter.colorize(bottom)
                 kwargs[RULE] = TrickWallRule.INVISIBLE_BECOMES_WALL
-                cell.terrain = Elem(Id.TRICK_WALL, **kwargs)
+                cell.terrain = LevelElem(Id.TRICK_WALL, **kwargs)
 
             elif top == CC1.GRAVEL:
                 if bottom == CC1.GRAVEL:
-                    cell.terrain = Elem(Id.SPACE)
+                    cell.terrain = LevelElem(Id.SPACE)
                 else:
-                    cell.terrain = Elem(Id.GRAVEL)
+                    cell.terrain = LevelElem(Id.GRAVEL)
 
             elif top == CC1.POP_UP_WALL:
                 kwargs = CellConverter.colorize(bottom) or CellConverter.count(
@@ -262,10 +261,10 @@ class CellConverter:
                 # behavior.
                 if cell.mob:
                     kwargs[COUNT] = 2
-                cell.terrain = Elem(Id.POP_UP_WALL, **kwargs)
+                cell.terrain = LevelElem(Id.POP_UP_WALL, **kwargs)
 
             elif top == CC1.HINT:
-                cell.terrain = Elem(Id.HINT)
+                cell.terrain = LevelElem(Id.HINT)
 
             elif top == CC1.CLONER:
                 kwargs = (CellConverter.colorize(bottom) or
@@ -274,12 +273,12 @@ class CellConverter:
                     kwargs[COLOR] = Color.RED
                 if channel:
                     kwargs[CHANNEL] = channel
-                cell.terrain = Elem(Id.CLONER, **kwargs)
+                cell.terrain = LevelElem(Id.CLONER, **kwargs)
 
             elif top == CC1.DROWN_CHIP:
                 kwargs = CellConverter.count(bottom)
                 kwargs[RULE] = SteppingStoneRule.WATER
-                cell.terrain = Elem(Id.STEPPING_STONE, **kwargs)
+                cell.terrain = LevelElem(Id.STEPPING_STONE, **kwargs)
 
             elif top == CC1.BURNED_CHIP0:
                 pass
@@ -287,7 +286,7 @@ class CellConverter:
             elif top == CC1.BURNED_CHIP1:
                 kwargs = CellConverter.count(bottom)
                 kwargs[RULE] = SteppingStoneRule.FIRE
-                cell.terrain = Elem(Id.STEPPING_STONE, **kwargs)
+                cell.terrain = LevelElem(Id.STEPPING_STONE, **kwargs)
 
             elif top == CC1.NOT_USED_1:
                 pass
@@ -296,7 +295,7 @@ class CellConverter:
                 pass
 
             elif top == CC1.NOT_USED_3:
-                cell.mob = Elem(Id.ICE_BLOCK)
+                cell.mob = LevelElem(Id.ICE_BLOCK)
                 if bottom in CC1.valid().difference(CC1.mobs()):
                     populate(bottom)
 
@@ -327,7 +326,7 @@ class CellConverter:
                     RULE: MonsterRule[rule],
                     DIRECTION: Direction[direction]
                 }
-                cell.mob = Elem(Id.MONSTER, **kwargs)
+                cell.mob = LevelElem(Id.MONSTER, **kwargs)
                 if bottom not in CC1.mobs():
                     populate(bottom)
 
@@ -348,14 +347,14 @@ class CellConverter:
                         offset += 4
                     kwargs[COLOR] = list(Color)[offset + 1]
                     kwargs[DIRECTION] = Direction[d]
-                    cell.mob = Elem(Id.ROBOT, **kwargs)
+                    cell.mob = LevelElem(Id.ROBOT, **kwargs)
                 else:
                     kwargs = CellConverter.colorize(
                         bottom) or CellConverter.channelize(bottom)
                     if COLOR not in kwargs:
                         kwargs[COLOR] = Color.BLUE
                     kwargs[DIRECTION] = Direction[CC1.dirs(top)]
-                    cell.mob = Elem(Id.TANK, **kwargs)
+                    cell.mob = LevelElem(Id.TANK, **kwargs)
                     if bottom not in CC1.mobs():
                         populate(bottom)
 
@@ -374,7 +373,7 @@ class CellConverter:
                     kwargs.update(CellConverter.colorize(bottom))
                 elif bottom in NUMBER_CODE:
                     kwargs.update(CellConverter.count(bottom))
-                cell.pickup = Elem(Id.KEY, **kwargs)
+                cell.pickup = LevelElem(Id.KEY, **kwargs)
                 if top not in CC1.valid().difference(CC1.mobs()).difference(
                         CC1.pickups()):
                     populate(bottom)
@@ -384,7 +383,7 @@ class CellConverter:
                 if top == bottom:
                     kwargs[RULE] = ToolRule.ITEM_BARRIER
                 eid = Id[top.name]
-                cell.pickup = Elem(eid, **kwargs)
+                cell.pickup = LevelElem(eid, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
@@ -393,13 +392,13 @@ class CellConverter:
                 kwargs = {
                     DIRECTION: Direction[CC1.dirs(top)]
                 }
-                cell.mob = Elem(Id.PLAYER, **kwargs)
+                cell.mob = LevelElem(Id.PLAYER, **kwargs)
                 if bottom not in CC1.mobs():
                     populate(bottom)
 
         populate(cc1_cell.top, cc1_cell.bottom)
         if not cell.terrain:
-            cell.terrain = Elem(Id.FLOOR)
+            cell.terrain = LevelElem(Id.FLOOR)
         return cell
 
     @staticmethod
@@ -491,4 +490,4 @@ class CellConverter:
                 # act as toggles for tan elements, so assign otherwise
                 kwargs[CHANNEL] = channel or "NONE"
                 kwargs[COLOR] = Color.TAN
-        cell.terrain_mod = Elem(Id.BUTTON, **kwargs)
+        cell.terrain_mod = LevelElem(Id.BUTTON, **kwargs)

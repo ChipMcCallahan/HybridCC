@@ -2,6 +2,7 @@ from PIL import Image
 
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.shared.space_rule import SpaceRule
+from hybrid_cc.shared.stepping_stone_rule import SteppingStoneRule
 from hybrid_cc.shared.thief_rule import ThiefRule
 from hybrid_cc.shared.trap_rule import TrapRule
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
@@ -130,7 +131,8 @@ class TerrainGfx:
 
     def stepping_stone(self, elem, **kwargs):
         top = self.assembler.custom(12)
-        bottom = self.fire(elem) if elem.rule == "fire" else self.water(elem)
+        bottom = self.fire(
+            elem) if elem.rule == SteppingStoneRule.FIRE else self.water(elem)
         combined = []
         for frame in bottom:
             combined.append(self.assembler.stack(frame, top))

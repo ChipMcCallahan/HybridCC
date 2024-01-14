@@ -1,7 +1,7 @@
 """
 Module for serialization classes associated with levelsets.
 """
-from .elem import Elem
+from .level_elem import LevelElem
 from .level import Level
 from .levelset import Levelset
-from .map_cell import MapCell
+from .level_cell import LevelCell

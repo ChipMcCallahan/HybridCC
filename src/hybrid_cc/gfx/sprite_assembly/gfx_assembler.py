@@ -36,9 +36,9 @@ class GfxAssembler:
         """Pass-through method to stack images."""
         return Stacker.stack(*images)
 
-    def colorize(self, base_img, color):
+    def colorize(self, base_img, color, brightness=None):
         """Pass-through method to colorize an image."""
-        return Colorizer.colorize(base_img, color)
+        return Colorizer.colorize(base_img, color, brightness)
 
     def label_center(self, label, color="white"):
         """Label the image in the center."""

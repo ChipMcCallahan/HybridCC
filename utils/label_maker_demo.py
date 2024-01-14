@@ -55,10 +55,13 @@ class LabelMakerDemo:
         self.update_label()
 
     def update_label(self, event=None):
-        # Generate and display the label
-        label_image = self.labeler.label(self.label_text_var.get(),
-                                         int(self.position_var.get()),
-                                         self.text_color_var.get())
+        if self.position_var.get().isdigit():
+            # Generate and display the label
+            label_image = self.labeler.label(self.label_text_var.get(),
+                                             int(self.position_var.get()),
+                                             self.text_color_var.get())
+        else:
+            label_image = Image.new("RGBA", (32, 32), "cyan")
         bg_image = Image.new("RGBA", (32, 32), "cyan")
         bg_image.paste(label_image, (0, 0), label_image)
         label_image = bg_image

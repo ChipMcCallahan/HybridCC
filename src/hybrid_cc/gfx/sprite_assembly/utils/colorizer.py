@@ -14,23 +14,15 @@ class Colorizer:
     """A class for colorizing images with specified color and brightness."""
 
     @staticmethod
-    def colorize(base_img, color):
-        """
-        Apply a color and brightness to a grayscale image.
-
-        Parameters:
-            base_img (Image.Image): The original image to be colorized.
-            color (str or tuple): The color to apply.
-
-        Returns:
-            Image.Image: The colorized and brightness-adjusted image.
-        """
+    def colorize(base_img, color, brightness=None):
+        """Apply a color and brightness to a grayscale image."""
         color = color or "grey"
 
         if hasattr(color, "name"):
             color = color.name.lower()
 
-        brightness = BRIGHTNESS_ADJUSTMENTS.get(color, DEFAULT_BRIGHTNESS)
+        brightness = (brightness or
+                      BRIGHTNESS_ADJUSTMENTS.get(color, DEFAULT_BRIGHTNESS))
 
         if not isinstance(base_img, Image.Image):
             raise TypeError("base_img must be a PIL Image instance")

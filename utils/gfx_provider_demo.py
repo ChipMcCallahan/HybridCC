@@ -5,7 +5,7 @@ from tkinter import Listbox, Canvas
 from PIL import ImageTk, Image
 
 from hybrid_cc.gfx.gfx_provider import GfxProvider
-from hybrid_cc.levelset import Elem
+from hybrid_cc.levelset import LevelElem
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
@@ -22,221 +22,253 @@ from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
 CURRENT_STATE = "current_state"
 ELIB = {
-    "SPACE": [Elem(Id.SPACE, rule=r) for r in SpaceRule],
-    "FLOOR": [Elem(Id.FLOOR, color=c) for c in Color],
-    "WALL": [Elem(Id.WALL, color=c) for c in Color],
-    "EXIT": [Elem(Id.EXIT, color=c) for c in Color],
-    "WATER": [Elem(Id.WATER)],
-    "FIRE": [Elem(Id.FIRE)],
-    "DIRT": [Elem(Id.DIRT, color=c) for c in Color],
-    "ICE": [Elem(Id.ICE)],
+    "SPACE": [LevelElem(Id.SPACE, rule=r) for r in SpaceRule],
+    "FLOOR": [LevelElem(Id.FLOOR, color=c) for c in Color],
+    "WALL": [LevelElem(Id.WALL, color=c) for c in Color],
+    "EXIT": [LevelElem(Id.EXIT, color=c) for c in Color],
+    "WATER": [LevelElem(Id.WATER)],
+    "FIRE": [LevelElem(Id.FIRE)],
+    "DIRT": [LevelElem(Id.DIRT, color=c) for c in Color],
+    "ICE": [LevelElem(Id.ICE)],
 }
 
 for r in TrickWallRule:
-    ELIB[f"TRICK_WALL_{r.name}"] = [Elem(Id.TRICK_WALL, rule=r, color=c) for c
-                                    in Color]
+    ELIB[f"TRICK_WALL_{r.name}"] = [
+        (LevelElem(Id.TRICK_WALL, rule=r, color=c), {"show_secrets": True}) for
+        c in Color]
 
 for d in "NESW":
-    ELIB[f"FORCE_{d}"] = [Elem(Id.FORCE, direction=Direction[d], color=c) for c
+    ELIB[f"FORCE_{d}"] = [LevelElem(Id.FORCE, direction=Direction[d], color=c)
+                          for c
                           in Color]
 
 ELIB.update(
     {
-        "FORCE_RANDOM": [Elem(Id.FORCE, rule=ForceRule.RANDOM, color=c) for
+        "FORCE_RANDOM": [LevelElem(Id.FORCE, rule=ForceRule.RANDOM, color=c) for
                          c in
                          Color],
-        "TELEPORT": [Elem(Id.TELEPORT, color=c) for c in Color],
-        "TRAP_OPEN": [Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT) for c in
+        "TELEPORT": [LevelElem(Id.TELEPORT, color=c) for c in Color],
+        "TRAP_OPEN": [LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT) for c
+                      in
                       Color],
-        "TRAP_SHUT": [Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT) for c in
+        "TRAP_SHUT": [LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT) for
+                      c in
                       Color],
         "TRAP_OPEN_1": [
-            Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1)
+            LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1)
             for c in
             Color],
         "TRAP_SHUT_128": [
-            Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1) for c
+            LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1)
+            for c
             in
             Color],
         "TRAP_TOGGLED_SHUT": [
-            (Elem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1),
+            (LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1),
              {CURRENT_STATE: 1}) for c in Color],
         "TRAP_TOGGLED_OPEN": [
-            (Elem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1),
+            (LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1),
              {CURRENT_STATE: 1}) for c in Color],
-        "GRAVEL": [Elem(Id.GRAVEL)],
-        "POP_UP_WALL": [Elem(Id.POP_UP_WALL, color=c) for c in Color],
-        "POP_UP_WALL_COUNT": [Elem(Id.POP_UP_WALL, color=c, count=2) for c
+        "GRAVEL": [LevelElem(Id.GRAVEL)],
+        "POP_UP_WALL": [LevelElem(Id.POP_UP_WALL, color=c) for c in Color],
+        "POP_UP_WALL_COUNT": [LevelElem(Id.POP_UP_WALL, color=c, count=2) for c
                               in
                               Color],
-        "STEPPING_STONE": [Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE),
-                           Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE,
-                                count=2),
-                           Elem(Id.STEPPING_STONE,
-                                rule=SteppingStoneRule.WATER),
-                           Elem(Id.STEPPING_STONE, rule=SteppingStoneRule.WATER,
-                                count=2)],
-        "HINT": [Elem(Id.HINT)],
-        "CLONER_N": [Elem(Id.CLONER, color=c, direction=Direction.N) for c
+        "STEPPING_STONE": [
+            LevelElem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE),
+            LevelElem(Id.STEPPING_STONE, rule=SteppingStoneRule.FIRE,
+                      count=2),
+            LevelElem(Id.STEPPING_STONE,
+                      rule=SteppingStoneRule.WATER),
+            LevelElem(Id.STEPPING_STONE, rule=SteppingStoneRule.WATER,
+                      count=2)],
+        "HINT": [LevelElem(Id.HINT)],
+        "CLONER_N": [LevelElem(Id.CLONER, color=c, direction=Direction.N) for c
                      in
                      Color],
-        "CLONER_E": [Elem(Id.CLONER, color=c, direction=Direction.E) for c
+        "CLONER_E": [LevelElem(Id.CLONER, color=c, direction=Direction.E) for c
                      in
                      Color],
-        "CLONER_S": [Elem(Id.CLONER, color=c, direction=Direction.S) for c
+        "CLONER_S": [LevelElem(Id.CLONER, color=c, direction=Direction.S) for c
                      in
                      Color],
-        "CLONER_W": [Elem(Id.CLONER, color=c, direction=Direction.W) for c
+        "CLONER_W": [LevelElem(Id.CLONER, color=c, direction=Direction.W) for c
                      in
                      Color],
-        "DOOR": [Elem(Id.DOOR, color=c) for c in Color],
-        "DOOR_COUNT": [Elem(Id.DOOR, color=c, count=99) for c in Color],
-        "THIEF": [Elem(Id.THIEF, rule=ThiefRule.TOOLS),
-                  Elem(Id.THIEF, rule=ThiefRule.KEYS)],
-        "SOCKET": [Elem(Id.SOCKET, color=c) for c in Color],
-        "SOCKET_COUNT": [Elem(Id.SOCKET, color=c, count=99) for c in Color],
+        "DOOR": [LevelElem(Id.DOOR, color=c) for c in Color],
+        "DOOR_COUNT": [LevelElem(Id.DOOR, color=c, count=99) for c in Color],
+        "THIEF": [LevelElem(Id.THIEF, rule=ThiefRule.TOOLS),
+                  LevelElem(Id.THIEF, rule=ThiefRule.KEYS)],
+        "SOCKET": [LevelElem(Id.SOCKET, color=c) for c in Color],
+        "SOCKET_COUNT": [LevelElem(Id.SOCKET, color=c, count=99) for c in
+                         Color],
         "TOGGLE_BUTTON_0": [
-            (Elem(Id.BUTTON, rule=ButtonRule.TOGGLE, color=c),
+            (LevelElem(Id.BUTTON, rule=ButtonRule.TOGGLE, color=c),
              {CURRENT_STATE: 0}) for c in Color],
         "TOGGLE_BUTTON_1": [
-            (Elem(Id.BUTTON, rule=ButtonRule.TOGGLE, color=c),
+            (LevelElem(Id.BUTTON, rule=ButtonRule.TOGGLE, color=c),
              {CURRENT_STATE: 1}) for c in Color],
         "TOGGLE_BUTTON_CHANNEL": [
-            Elem(Id.BUTTON, rule=ButtonRule.TOGGLE, channel="HI", color=c)
+            LevelElem(Id.BUTTON, rule=ButtonRule.TOGGLE, channel="HI", color=c)
             for c
             in Color],
         "HOLD_ONE_BUTTON": [
-            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c)
+            LevelElem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c)
             for c in Color],
         "HOLD_ONE_BUTTON_CHANNEL": [
-            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c,
-                 channel="P51")
+            LevelElem(Id.BUTTON, rule=ButtonRule.HOLD_ONE, color=c,
+                      channel="P51")
             for c in Color],
         "HOLD_ALL_BUTTON": [
-            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c)
+            LevelElem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c)
             for c in Color],
         "HOLD_ALL_BUTTON_CHANNEL": [
-            Elem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c,
-                 channel="HELLO")
+            LevelElem(Id.BUTTON, rule=ButtonRule.HOLD_ALL, color=c,
+                      channel="HELLO")
             for c in Color],
-        "DPAD_BUTTON": [Elem(Id.BUTTON, rule=ButtonRule.DPAD, color=c) for c
+        "DPAD_BUTTON": [LevelElem(Id.BUTTON, rule=ButtonRule.DPAD, color=c) for
+                        c
                         in
                         Color],
         "DPAD_BUTTON_CHANNEL": [
-            Elem(Id.BUTTON, rule=ButtonRule.DPAD, color=c, channel=841) for
+            LevelElem(Id.BUTTON, rule=ButtonRule.DPAD, color=c, channel=841) for
             c in
             Color],
-        "BOMB": [Elem(Id.BOMB, color=c) for c in Color],
-        "KEY_DEFAULT": [Elem(Id.KEY, color=c, rule=KeyRule.DEFAULT) for c in
+        "BOMB": [LevelElem(Id.BOMB, color=c) for c in Color],
+        "KEY_DEFAULT": [LevelElem(Id.KEY, color=c, rule=KeyRule.DEFAULT) for c
+                        in
                         Color],
         "KEY_DEFAULT_INF": [
-            Elem(Id.KEY, color=c, rule=KeyRule.DEFAULT, count="+") for c in
+            LevelElem(Id.KEY, color=c, rule=KeyRule.DEFAULT, count="+") for c in
             Color],
-        "KEY_FRAGILE": [Elem(Id.KEY, color=c, rule=KeyRule.FRAGILE) for c in
+        "KEY_FRAGILE": [LevelElem(Id.KEY, color=c, rule=KeyRule.FRAGILE) for c
+                        in
                         Color],
         "KEY_FRAGILE_COUNT": [
-            Elem(Id.KEY, color=c, rule=KeyRule.FRAGILE, count=32) for c in
+            LevelElem(Id.KEY, color=c, rule=KeyRule.FRAGILE, count=32) for c in
             Color],
-        "KEY_ACTING_DIRT": [Elem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT)
+        "KEY_ACTING_DIRT": [LevelElem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT)
                             for c in Color],
         "KEY_ACTING_DIRT_INF": [
-            Elem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT, count="+") for
+            LevelElem(Id.KEY, color=c, rule=KeyRule.ACTING_DIRT, count="+") for
             c in Color],
-        "FLIPPERS": [Elem(Id.FLIPPERS),
-                     Elem(Id.FLIPPERS, rule=ToolRule.ITEM_BARRIER),
-                     Elem(Id.FLIPPERS, count='+'),
-                     Elem(Id.FLIPPERS, rule=ToolRule.ITEM_BARRIER, count='+'),
-                     ],
-        "FIRE_BOOTS": [Elem(Id.FIRE_BOOTS),
-                       Elem(Id.FIRE_BOOTS, rule=ToolRule.ITEM_BARRIER),
-                       Elem(Id.FIRE_BOOTS, count='+'),
-                       Elem(Id.FIRE_BOOTS, rule=ToolRule.ITEM_BARRIER,
-                            count='+'),
-                       ],
-        "SKATES": [Elem(Id.SKATES),
-                   Elem(Id.SKATES, rule=ToolRule.ITEM_BARRIER),
-                   Elem(Id.SKATES, count='+'),
-                   Elem(Id.SKATES, rule=ToolRule.ITEM_BARRIER, count='+'),
-                   ],
-        "SUCTION_BOOTS": [Elem(Id.SUCTION_BOOTS),
-                          Elem(Id.SUCTION_BOOTS, rule=ToolRule.ITEM_BARRIER),
-                          Elem(Id.SUCTION_BOOTS, count='+'),
-                          Elem(Id.SUCTION_BOOTS, rule=ToolRule.ITEM_BARRIER,
+        "FLIPPERS": [LevelElem(Id.FLIPPERS),
+                     LevelElem(Id.FLIPPERS, rule=ToolRule.ITEM_BARRIER),
+                     LevelElem(Id.FLIPPERS, count='+'),
+                     LevelElem(Id.FLIPPERS, rule=ToolRule.ITEM_BARRIER,
                                count='+'),
+                     ],
+        "FIRE_BOOTS": [LevelElem(Id.FIRE_BOOTS),
+                       LevelElem(Id.FIRE_BOOTS, rule=ToolRule.ITEM_BARRIER),
+                       LevelElem(Id.FIRE_BOOTS, count='+'),
+                       LevelElem(Id.FIRE_BOOTS, rule=ToolRule.ITEM_BARRIER,
+                                 count='+'),
+                       ],
+        "SKATES": [LevelElem(Id.SKATES),
+                   LevelElem(Id.SKATES, rule=ToolRule.ITEM_BARRIER),
+                   LevelElem(Id.SKATES, count='+'),
+                   LevelElem(Id.SKATES, rule=ToolRule.ITEM_BARRIER, count='+'),
+                   ],
+        "SUCTION_BOOTS": [LevelElem(Id.SUCTION_BOOTS),
+                          LevelElem(Id.SUCTION_BOOTS,
+                                    rule=ToolRule.ITEM_BARRIER),
+                          LevelElem(Id.SUCTION_BOOTS, count='+'),
+                          LevelElem(Id.SUCTION_BOOTS,
+                                    rule=ToolRule.ITEM_BARRIER,
+                                    count='+'),
                           ],
         "TOGGLE_WALL_0_0": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c),
-             {CURRENT_STATE: 0}) for c in Color],
+            (
+            LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c),
+            {CURRENT_STATE: 0}) for c in Color],
         "TOGGLE_WALL_1_0": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c),
-             {CURRENT_STATE: 0}) for c in Color],
+            (
+            LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c),
+            {CURRENT_STATE: 0}) for c in Color],
         "TOGGLE_WALL_0_1": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c),
-             {CURRENT_STATE: 1}) for c in Color],
+            (
+            LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c),
+            {CURRENT_STATE: 1}) for c in Color],
         "TOGGLE_WALL_1_1": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c),
-             {CURRENT_STATE: 1}) for c in Color],
+            (
+            LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c),
+            {CURRENT_STATE: 1}) for c in Color],
         "TOGGLE_WALL_CHANNEL": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c,
-                  channel=133),
+            (LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_OPEN, color=c,
+                       channel=133),
              {CURRENT_STATE: 1}) for c in Color],
         "TOGGLE_WALL_CHANNEL_2": [
-            (Elem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c,
-                  channel=133),
+            (LevelElem(Id.TOGGLE_WALL, rule=ToggleWallRule.STARTS_SHUT, color=c,
+                       channel=133),
              {CURRENT_STATE: 1}) for c in Color],
         "PANEL_WALL_GREY": [
-            Elem(Id.PANEL, sides=s) for s in (
+            LevelElem(Id.PANEL, sides=s) for s in (
                 "n", "s", "e", "w", "ne", "nw", "se", "sw", "ns", "ew", "nes",
                 "esw", "swn", "wne", "nesw")],
         "PANEL_WALL_RED": [
-            Elem(Id.PANEL, sides=s, color=Color.RED) for s in (
+            LevelElem(Id.PANEL, sides=s, color=Color.RED) for s in (
                 "n", "s", "e", "w", "ne", "nw", "se", "sw", "ns", "ew", "nes",
                 "esw", "swn", "wne", "nesw")
         ],
         "CORNERS_GREY": [
-            Elem(Id.CORNER, sides=s) for s in ("se", "sw", "nw", "ne")
+            LevelElem(Id.CORNER, sides=s) for s in ("se", "sw", "nw", "ne")
         ],
         "CORNERS_CYAN": [
-            Elem(Id.CORNER, sides=s, color=Color.CYAN) for s in
+            LevelElem(Id.CORNER, sides=s, color=Color.CYAN) for s in
             ("se", "sw", "nw", "ne")
         ],
-        "DIRT_BLOCK": [Elem(Id.DIRT_BLOCK, color=c) for c in Color],
+        "DIRT_BLOCK": [LevelElem(Id.DIRT_BLOCK, color=c) for c in Color],
         "DIRT_BLOCK_TRANSPARENT": [
-            (Elem(Id.DIRT_BLOCK, color=c), {"show_secrets": True}) for c in
+            (LevelElem(Id.DIRT_BLOCK, color=c), {"show_secrets": True}) for c in
             Color
         ],
-        "ICE_BLOCK": [Elem(Id.ICE_BLOCK),
-                      (Elem(Id.ICE_BLOCK), {"show_secrets": True})],
+        "ICE_BLOCK": [LevelElem(Id.ICE_BLOCK),
+                      (LevelElem(Id.ICE_BLOCK), {"show_secrets": True})],
         "TEETH": [
-            Elem(Id.MONSTER, rule=MonsterRule.TEETH, direction=Direction[d]) for
+            LevelElem(Id.MONSTER, rule=MonsterRule.TEETH,
+                      direction=Direction[d]) for
             d in "NESW"],
-        "BLOB": [Elem(Id.MONSTER, rule=MonsterRule.BLOB, direction=Direction[d])
-                 for d in "NESW"],
+        "BLOB": [
+            LevelElem(Id.MONSTER, rule=MonsterRule.BLOB, direction=Direction[d])
+            for d in "NESW"],
         "FIREBALL": [
-            Elem(Id.MONSTER, rule=MonsterRule.FIREBALL, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.FIREBALL,
+                      direction=Direction[d])
             for d in "NESW"],
         "GLIDER": [
-            Elem(Id.MONSTER, rule=MonsterRule.GLIDER, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.GLIDER,
+                      direction=Direction[d])
             for d in "NESW"],
-        "ANT": [Elem(Id.MONSTER, rule=MonsterRule.ANT, direction=Direction[d])
-                for d in "NESW"],
-        "PARAMECIUM": [Elem(Id.MONSTER, rule=MonsterRule.PARAMECIUM,
-                            direction=Direction[d]) for d in "NESW"],
-        "BALL": [Elem(Id.MONSTER, rule=MonsterRule.BALL, direction=Direction[d])
-                 for d in "NESW"],
+        "ANT": [
+            LevelElem(Id.MONSTER, rule=MonsterRule.ANT, direction=Direction[d])
+            for d in "NESW"],
+        "PARAMECIUM": [LevelElem(Id.MONSTER, rule=MonsterRule.PARAMECIUM,
+                                 direction=Direction[d]) for d in "NESW"],
+        "BALL": [
+            LevelElem(Id.MONSTER, rule=MonsterRule.BALL, direction=Direction[d])
+            for d in "NESW"],
         "WALKER": [
-            Elem(Id.MONSTER, rule=MonsterRule.WALKER, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.WALKER,
+                      direction=Direction[d])
             for d in "NESW"],
-        "TANK": [
-            Elem(Id.TANK, direction=Direction[d]) for d in "NESW"],
+        "TANK_N": [
+            LevelElem(Id.TANK, direction=Direction.N, color=c) for c in Color],
+        "TANK_E": [
+            LevelElem(Id.TANK, direction=Direction.E, color=c) for c in Color],
+        "TANK_S": [
+            LevelElem(Id.TANK, direction=Direction.S, color=c) for c in Color],
+        "TANK_W": [
+            LevelElem(Id.TANK, direction=Direction.W, color=c) for c in Color],
         "PLAYER": [
-            Elem(Id.PLAYER, direction=Direction[d]) for d in "NESW"],
+            LevelElem(Id.PLAYER, direction=Direction[d]) for d in "NESW"],
         "PLAYER_SWIM": [
-            (Elem(Id.PLAYER, direction=Direction[d]), {"swimming": True}) for d
+            (LevelElem(Id.PLAYER, direction=Direction[d]), {"swimming": True})
+            for d
             in "NESW"
         ],
         "PLAYER_PUSH": [
-            (Elem(Id.PLAYER, direction=Direction[d]), {"pushing": True}) for d
+            (LevelElem(Id.PLAYER, direction=Direction[d]), {"pushing": True})
+            for d
             in "NESW"
         ]
     }

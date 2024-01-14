@@ -200,10 +200,12 @@ class CC1LevelViewer(tk.Tk):
 
 
 if __name__ == "__main__":
-    # Define the logging format to include the file name, function name, and line number
+    # Define the logging format to include the file name, function name,
+    # and line number
     log_format = '%(filename)s - %(funcName)s - Line %(lineno)d - %(message)s'
 
-    # Set up logging to use the format defined above and output to the console at the DEBUG level
+    # Set up logging to use the format defined above and output to the
+    # console at the DEBUG level
     logging.basicConfig(level=logging.DEBUG, format=log_format)
 
     app = CC1LevelViewer()

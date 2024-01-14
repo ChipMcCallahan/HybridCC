@@ -1,10 +1,10 @@
 """
-Module for the MapCell class, representing a cell in a map with various attributes.
+Module for the LevelCell class, representing a cell in a map with various attributes.
 """
 from hybrid_cc.shared import Layer
 
 
-class MapCell:
+class LevelCell:
     """
     Represents a cell in a map as a simple wrapper around a dictionary.
     Allows setting and getting values based on Layer enum.
@@ -12,7 +12,7 @@ class MapCell:
 
     def __init__(self):
         """
-        Initializes a MapCell with an empty dictionary to store layer values.
+        Initializes a LevelCell with an empty dictionary to store layer values.
         """
         self.layers = {}
         self._sides = []
@@ -35,37 +35,37 @@ class MapCell:
 
     @property
     def terrain(self):
-        """Gets the TERRAIN layer for this MapCell."""
+        """Gets the TERRAIN layer."""
         return self.get(Layer.TERRAIN)
 
     @terrain.setter
     def terrain(self, value):
-        """Sets the TERRAIN layer for this MapCell."""
+        """Sets the TERRAIN layer."""
         self.set(Layer.TERRAIN, value)
 
     @property
     def terrain_mod(self):
-        """Gets the TERRAIN_MOD layer for this MapCell."""
+        """Gets the TERRAIN_MOD layer."""
         return self.get(Layer.TERRAIN_MOD)
 
     @terrain_mod.setter
     def terrain_mod(self, value):
-        """Sets the TERRAIN_MOD layer for this MapCell."""
+        """Sets the TERRAIN_MOD layer."""
         self.set(Layer.TERRAIN_MOD, value)
 
     @property
     def pickup(self):
-        """Gets the PICKUP layer for this MapCell."""
+        """Gets the PICKUP layer."""
         return self.get(Layer.PICKUP)
 
     @pickup.setter
     def pickup(self, value):
-        """Sets the PICKUP layer for this MapCell."""
+        """Sets the PICKUP layer."""
         self.set(Layer.PICKUP, value)
 
     @property
     def sides(self):
-        """Gets the sides list for this MapCell."""
+        """Gets the sides list."""
         return self._sides
 
     def add_sides(self, new_sides):
@@ -83,12 +83,12 @@ class MapCell:
 
     @property
     def mob(self):
-        """Gets the MOB layer for this MapCell."""
+        """Gets the MOB layer."""
         return self.get(Layer.MOB)
 
     @mob.setter
     def mob(self, elem):
-        """Sets the MOB layer for this MapCell."""
+        """Sets the MOB layer."""
         self.set(Layer.MOB, elem)
 
     def get_elem_by_id(self, eid):

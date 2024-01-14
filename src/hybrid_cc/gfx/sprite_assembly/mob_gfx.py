@@ -33,7 +33,7 @@ class MobGfx:
         return series
 
     def blob(self, elem, **kwargs):
-        return self.assembler.cc2("BLOB") #TODO: handle animation
+        return self.assembler.cc2("BLOB")  # TODO: handle animation
 
     def fireball(self, elem, **kwargs):
         frames = self.assembler.cc2_series("FIREBALL", 4)
@@ -57,12 +57,13 @@ class MobGfx:
         return frames + [frames[i] for i in (3, 2, 1)]
 
     def walker(self, elem, **kwargs):
-        return self.assembler.cc2("WALKER") #TODO: handle animation
+        return self.assembler.cc2("WALKER")  # TODO: handle animation
 
     def tank(self, elem, **kwargs):
         d = elem.direction.name
         base = self.assembler.cc2_series(f"TANK_{d}", 2)
-        return [self.assembler.colorize(frame, elem.color) for frame in base]
+        return [self.assembler.colorize(frame, elem.color, brightness=3) for
+                frame in base]
 
     def player(self, elem, **kwargs):
         d = elem.direction.name

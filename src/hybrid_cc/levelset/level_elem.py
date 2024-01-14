@@ -4,7 +4,7 @@ or application with an associated Id and a set of arguments.
 """
 
 
-class Elem:
+class LevelElem:
     """
     An immutable element in a game or application.
 
@@ -73,7 +73,7 @@ class Elem:
 
     def __eq__(self, other):
         """Check equality with another Elem instance."""
-        if not isinstance(other, Elem):
+        if not isinstance(other, LevelElem):
             return False
         return (self._id, self._direction, self._rule, self._count, self._color,
                 self._channel, self._sides) == \
