@@ -11,6 +11,7 @@ from hybrid_cc.shared import Layer
 class GfxProvider:
     def __init__(self):
         self.cache = {}
+        self.cache_misses = 0
         self.terrain_gfx = TerrainGfx()
         self.terrain_mod_gfx = TerrainModGfx()
         self.pickup_gfx = PickupGfx()
@@ -36,6 +37,10 @@ class GfxProvider:
         # Check if the item is in the cache
         if cache_key in self.cache:
             return self.cache[cache_key]
+
+        self.cache_misses += 1
+        if self.cache_misses % 10000 == 0:
+            logging.warning(f"{self.cache_misses} cache misses so far")
 
         eid = obj.id if hasattr(obj, "id") else None
         layer = eid.layer() if hasattr(eid, "layer") else None

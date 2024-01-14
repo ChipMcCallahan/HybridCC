@@ -6,99 +6,96 @@ or application with an associated Id and a set of arguments.
 
 class Elem:
     """
-    A basic element in a game or application.
+    An immutable element in a game or application.
 
-    Attributes:
-        id (Id): An enum representing the type of the element.
-        kwargs (dict): A dictionary of arguments associated with the element.
+    Attributes: id (Id): An enum representing the type of the element.
+    direction, rule, count, color, channel, sides: Various attributes of the
+    element.
     """
 
-    def __init__(self, _id, **kwargs):
+    def __init__(self, _id, direction=None, rule=None, count=None, color=None,
+                 channel=None, sides=None):
         """
         Initializes a new instance of the Elem class.
         """
-        self.id = _id
-        self.kwargs = kwargs
-
-    def __hash__(self):
-        """
-        Generates a hash value based on the id and kwargs of the element.
-
-        Returns:
-            int: A hash value representing the element.
-        """
-        # Create a tuple of all the key-value pairs in kwargs, plus the id
-        # Sort the items to ensure consistent ordering
-        items = tuple(sorted(self.kwargs.items())) + (self.id,)
-        return hash(items)
-
-    def get(self, arg, default=None):
-        """Get the value for arg, or default if not exists."""
-        return self.kwargs.get(arg, default)
-
-    def set(self, arg, val):
-        """Set the value for arg."""
-        self.kwargs[arg] = val
+        self._id = _id
+        self._direction = direction
+        self._rule = rule
+        self._count = count
+        self._color = color
+        self._channel = channel
+        self._sides = sides
 
     @property
-    def color(self):
-        """Gets the color of the element."""
-        return self.get('color')
-
-    @color.setter
-    def color(self, value):
-        """Sets the color of the element."""
-        self.set('color', value)
-
-    @property
-    def rule(self):
-        """Gets the rule of the element."""
-        return self.get('rule')
-
-    @rule.setter
-    def rule(self, value):
-        """Sets the rule of the element."""
-        self.set('rule', value)
-
-    @property
-    def count(self):
-        """Gets the count of the element."""
-        return self.get('count')
-
-    @count.setter
-    def count(self, value):
-        """Sets the count of the element."""
-        self.set('count', value)
-
-    @property
-    def channel(self):
-        """Gets the channel of the element."""
-        return self.get('channel')
-
-    @channel.setter
-    def channel(self, value):
-        """Sets the channel of the element."""
-        self.set('channel', value)
+    def id(self):
+        """Gets the id of the element."""
+        return self._id
 
     @property
     def direction(self):
         """Gets the direction of the element."""
-        return self.get('direction')
+        return self._direction
 
-    @direction.setter
-    def direction(self, value):
-        """Sets the direction of the element."""
-        self.set('direction', value)
+    @property
+    def rule(self):
+        """Gets the rule of the element."""
+        return self._rule
+
+    @property
+    def count(self):
+        """Gets the count of the element."""
+        return self._count
+
+    @property
+    def color(self):
+        """Gets the color of the element."""
+        return self._color
+
+    @property
+    def channel(self):
+        """Gets the channel of the element."""
+        return self._channel
+
+    @property
+    def sides(self):
+        """Gets the sides of the element."""
+        return self._sides
+
+    def __hash__(self):
+        """
+        Generates a hash value based on the attributes of the element.
+
+        Returns:
+            int: A hash value representing the element.
+        """
+        return hash((self._id, self._direction, self._rule, self._count,
+                     self._color, self._channel, self._sides))
+
+    def __eq__(self, other):
+        """Check equality with another Elem instance."""
+        if not isinstance(other, Elem):
+            return False
+        return (self._id, self._direction, self._rule, self._count, self._color,
+                self._channel, self._sides) == \
+            (other._id, other._direction, other._rule, other._count,
+             other._color, other._channel, other._sides)
 
     def __repr__(self):
         """
         Generates an unambiguous string representation of the element.
         """
-        return f"Elem(id={self.id!r}, kwargs={self.kwargs!r})"
+        return (
+            f"Elem(id={self._id!r}, direction={self._direction!r}, rule={self._rule!r}, "
+            f"count={self._count!r}, color={self._color!r}, channel={self._channel!r}, sides={self._sides!r})")
 
     def __str__(self):
         """
         Generates a readable string representation of the element.
         """
-        kwargs_str = ", ".join(f"{key}={value}" for key, value in self.kwargs.items())
-        return f"Elem with ID: {self.id}, Properties: {kwargs_str}"
+        attributes = [f"direction={self._direction}", f"rule={self._rule}",
+                      f"count={self._count}",
+                      f"color={self._color}", f"channel={self._channel}",
+                      f"sides={self._sides}"]
+        attributes_str = ", ".join(
+            attr for attr in attributes if attr.split('=')[1] != 'None')
+        return f"Elem with ID: {self._id}, Properties: {attributes_str}"

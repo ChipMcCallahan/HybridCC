@@ -1,5 +1,7 @@
 import logging
+import os
 import tkinter as tk
+from importlib import resources
 from tkinter import filedialog, Menu
 from PIL import ImageTk
 import importlib.resources
@@ -34,9 +36,9 @@ class CC1LevelViewer(tk.Tk):
         self.level_imager = LevelImager()
         self.view_menu = None
 
-        package = 'hybrid_cc.sets.dat'
-        package_dir = importlib.resources.files(package)
-        file_path = package_dir / "CCLP1.dat"
+        self.package = 'hybrid_cc.sets.dat'
+        self.package_dir = importlib.resources.files(self.package)
+        file_path = self.package_dir / "CCLP1.dat"
 
         if file_path:
             self.level_set = DATConverter.convert_levelset(file_path)
@@ -130,10 +132,7 @@ class CC1LevelViewer(tk.Tk):
         self.display_level()
 
     def load_level_set(self):
-        # Use importlib.resources to get the package directory
-        with importlib.resources.path('cc_tools.sets.dat', '') as package_dir:
-            file_path = filedialog.askopenfilename(
-                initialdir=str(package_dir))  # Use the package directory path
+        file_path = filedialog.askopenfilename()
 
         if file_path:
             self.current_level_index = 0
@@ -201,8 +200,11 @@ class CC1LevelViewer(tk.Tk):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(filename)s - %(funcName)s - '
-                               'Line %(lineno)d - %(message)s')
+    # Define the logging format to include the file name, function name, and line number
+    log_format = '%(filename)s - %(funcName)s - Line %(lineno)d - %(message)s'
+
+    # Set up logging to use the format defined above and output to the console at the DEBUG level
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
+
     app = CC1LevelViewer()
     app.mainloop()

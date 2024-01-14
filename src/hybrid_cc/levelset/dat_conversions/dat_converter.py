@@ -37,7 +37,6 @@ class DATConverter:
         # Don't forget to process the last group
         create_new_level_from_current_group()
 
-        logging.info(f"{len(new_levelset.levels)} levels converted.")
         return new_levelset
 
     @staticmethod

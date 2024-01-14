@@ -327,7 +327,6 @@ class CellConverter:
                     RULE: MonsterRule[rule],
                     DIRECTION: Direction[direction]
                 }
-                logging.debug(kwargs)
                 cell.mob = Elem(Id.MONSTER, **kwargs)
                 if bottom not in CC1.mobs():
                     populate(bottom)

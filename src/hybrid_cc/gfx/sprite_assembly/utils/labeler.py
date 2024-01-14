@@ -21,6 +21,8 @@ class Labeler:
         with importlib.resources.path("hybrid_cc.art",
                                       "letters5x5.png") as path:
             self.letters = Image.open(path)
+        self.chars = {}
+        self.labels = {}
 
     @staticmethod
     def _calculate_position(text_width, p):
@@ -45,6 +47,10 @@ class Labeler:
         return x, y
 
     def label(self, label, p=5, color="white"):
+        key = (label, p, color)
+        if key in self.labels:
+            return self.labels[key]
+
         label = str(label) if isinstance(label, int) else label
         color = color or "white"
         label_image = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
@@ -82,9 +88,12 @@ class Labeler:
         # Paste text_image onto label_image
         label_image.paste(colored_img,(x + 1, y + 1), colored_img)
 
+        self.labels[key] = label_image
         return label_image
 
     def char(self, c):
+        if c in self.chars:
+            return self.chars[c]
         c = str(c) if isinstance(c, int) else c
         assert len(c) == 1 and (c.isdigit() or c.isupper() or c in "+")
         if c.isupper():
@@ -99,7 +108,8 @@ class Labeler:
 
         tile = self.letters.crop((x, y, x + 5, y + 5))
         if c == "Q":
-            return tile.crop((0+1, 0, 5, 5))
-        if c not in "MNW+":
-            return tile.crop((0+1, 0, 5-1, 5))
+            tile = tile.crop((0+1, 0, 5, 5))
+        elif c not in "MNW+":
+            tile = tile.crop((0+1, 0, 5-1, 5))
+        self.chars[c] = tile
         return tile
