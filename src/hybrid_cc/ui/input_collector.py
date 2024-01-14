@@ -23,24 +23,24 @@ class InputCollector:
 
     def __init__(self):
         """
-        Initializes the InputCollector with empty lists for pressed_keys and unpressed_keys.
+        Initializes the InputCollector with empty lists for pressed_keys and
+        unpressed_keys.
         """
         self.pressed_keys = []
         self.released_keys = []
 
-    def capture_keypress_events(self, events):
-        """
-        Captures keypress events from Pygame and updates the pressed and unpressed keys lists.
+    def capture_keypress_events(self, events, pressed):
+        for k, v in self.key_map.items():
+            if pressed[k] and v not in self.pressed_keys:
+                self.pressed_keys.append(v)
+            if (not pressed[k]
+                    and v in self.pressed_keys
+                    and v not in self.released_keys):
+                self.released_keys.append(v)
 
-        Args:
-            events (list): A list of Pygame events to process.
-        """
-        for event in events:
-            if event.type == pygame.KEYDOWN and event.key in self.key_map:
-                self.pressed_keys.append(self.key_map[event.key])
-
-            elif event.type == pygame.KEYUP and event.key in self.key_map:
-                self.released_keys.append(self.key_map[event.key])
+    def reset(self):
+        self.pressed_keys = []
+        self.released_keys = []
 
     @property
     def key_map(self):
