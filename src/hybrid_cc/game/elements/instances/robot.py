@@ -1,5 +1,7 @@
-from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.elements.mob import Mob
+from hybrid_cc.shared import Id
 
 
 class Robot(Mob):
-    pass
+    def __init__(self):
+        super().__init__(Id.ROBOT)
