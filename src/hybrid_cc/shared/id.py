@@ -4,6 +4,8 @@ from hybrid_cc.shared.layer import Layer
 
 
 class Id(Enum):
+    DEFAULT = (Layer.UNKNOWN, 0)
+
     SPACE = (Layer.TERRAIN, 0)
     FLOOR = (Layer.TERRAIN, 1)
     WALL = (Layer.TERRAIN, 2)
