@@ -16,3 +16,21 @@ class Elem(ABC):
     @property
     def layer(self):
         return self._id.layer()
+
+    # --------------------------------------------------------------------------
+    # PLANNING PHASE
+    # --------------------------------------------------------------------------
+
+    # --------------------------------------------------------------------------
+    # INSTANCE BOOKKEEPING
+    # --------------------------------------------------------------------------
+
+    # By default, elems all share a single instance. So when cloning (copying)
+    # across the map, we just repeat the same element.
+    def clone(self):
+        """Make a clone of this element. Default is to return same instance."""
+        return self
+
+    # --------------------------------------------------------------------------
+    # ACCESS RULES
+    # --------------------------------------------------------------------------

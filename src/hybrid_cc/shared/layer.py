@@ -8,7 +8,3 @@ class Layer(Enum):
     PICKUP = 3
     MOB = 4
     SIDES = 5
-    N = 6
-    S = 7
-    E = 8
-    W = 9

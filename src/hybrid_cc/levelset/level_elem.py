@@ -2,6 +2,8 @@
 This module contains the Elem class, which represents a basic element in a game
 or application with an associated Id and a set of arguments.
 """
+from hybrid_cc.shared.kwargs import SIDES, DIRECTION, RULE, COUNT, COLOR, \
+    CHANNEL
 
 
 class LevelElem:
@@ -25,6 +27,17 @@ class LevelElem:
         self._color = color
         self._channel = channel
         self._sides = sides
+
+    @property
+    def get_kwargs(self):
+        return {
+            DIRECTION: self.direction,
+            RULE: self.rule,
+            COUNT: self.count,
+            COLOR: self.color,
+            CHANNEL: self.channel,
+            SIDES: self.sides
+        }
 
     @property
     def id(self):
