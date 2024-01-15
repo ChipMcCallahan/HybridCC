@@ -13,21 +13,25 @@ class Cell:
     # -----------
     # BOOKKEEPING
     # -----------
-    def add(self, _id, **kwargs):
-        layer = _id.layer()
+    def construct(self, _id, **kwargs):
+        elem = ElemFactory.construct_at(self.position, _id, **kwargs)
+        self.add(elem)
+        return elem
+
+    def destruct(self, elem, **kwargs):
+        self.remove(elem.id)
+        return ElemFactory.destruct_at(self.position, elem.id, **kwargs)
+
+    def add(self, elem):
+        layer = elem.id.layer()
         set_layer = getattr(self, f"set_{layer.name.lower()}")
-        elem = ElemFactory.construct_at(_id, **kwargs)
         set_layer(elem)
 
     def remove(self, _id):
         layer = _id.layer()
         remove_method_name = f"remove_{layer.name.lower()}"
-        if hasattr(self, remove_method_name):
-            method = getattr(self, remove_method_name)
-            return method(_id)
-        else:
-            raise AttributeError(f"Remove method for '{layer.name}' not "
-                                 f"implemented")
+        method = getattr(self, remove_method_name)
+        return method(_id)
 
     # -----------
     # TERRAIN

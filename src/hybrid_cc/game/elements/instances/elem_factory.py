@@ -30,10 +30,20 @@ class ElemFactory:
 
     @classmethod
     def construct_at(cls, pos, _id, **kwargs):
+        instance_class = cls.get_class(_id)
+        constructor = getattr(instance_class, "construct_at")
+        return constructor(pos, **kwargs)
+
+    @classmethod
+    def destruct_at(cls, pos, _id, **kwargs):
+        instance_class = cls.get_class(_id)
+        destructor = getattr(instance_class, "destruct_at")
+        return destructor(pos, **kwargs)
+
+    @classmethod
+    def get_class(cls, _id):
         if not cls.id_to_class:
             raise TypeError(f"ElemFactory was not initialized!")
         if _id not in cls.id_to_class:
             raise TypeError(f"Id {_id} was not found in Elem class registry.")
-        instance_class = cls.id_to_class[_id]
-        factory = getattr(instance_class, "construct_at")
-        return factory(pos, **kwargs)
+        return cls.id_to_class[_id]
