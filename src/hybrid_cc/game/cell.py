@@ -1,7 +1,8 @@
 
 
 class Cell:
-    def __init__(self):
+    def __init__(self, position):
+        self.position = position
         self.terrain = None
         self.terrain_mod = None
         self.pickup = None
@@ -14,7 +15,7 @@ class Cell:
     def add(self, _id, **kwargs):
         layer = _id.layer()
         method = getattr(self, f"set_{layer.name.lower()}")
-        method(_id, **kwargs)
+        method()
 
     def remove(self, _id):
         layer = _id.layer()
@@ -29,8 +30,8 @@ class Cell:
     # -----------
     # TERRAIN
     # -----------
-    def set_terrain(self, _id, **kwargs):
-        self.terrain = (_id, kwargs)
+    def set_terrain(self, elem):
+        self.terrain = elem
 
     def get_terrain(self):
         return self.terrain

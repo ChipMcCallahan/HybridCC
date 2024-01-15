@@ -1,6 +1,4 @@
-from abc import ABC, abstractmethod
-
-from hybrid_cc.shared import Id
+from abc import ABC
 
 
 # ABC enforces that all subclasses must implement @abstractmethod methods.

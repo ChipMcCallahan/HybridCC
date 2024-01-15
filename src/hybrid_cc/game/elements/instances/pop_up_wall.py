@@ -3,10 +3,16 @@ from hybrid_cc.shared import Id
 
 
 class PopUpWall(Elem):
-    instances = {}
+    instance = None
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__(Id.POP_UP_WALL)
+
+    @classmethod
+    def new(cls, **kwargs):
+        if not cls.instance:
+            cls.instance = cls(**kwargs)
+        return cls.instance
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE

@@ -3,10 +3,16 @@ from hybrid_cc.shared import Id
 
 
 class Floor(Elem):
-    instances = {}
+    instance = None
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__(Id.FLOOR)
+
+    @classmethod
+    def new(cls, **kwargs):
+        if not cls.instance:
+            cls.instance = cls(**kwargs)
+        return cls.instance
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE
