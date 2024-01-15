@@ -10,10 +10,15 @@ class Bomb(Elem):
         super().__init__(Id.BOMB)
 
     @classmethod
-    def new(cls, **kwargs):
+    def construct_at(cls, pos, **kwargs):
         if not cls.instance:
             cls.instance = cls(**kwargs)
         return cls.instance
+
+    @classmethod
+    def destruct_at(cls, pos, **kwargs):
+        pass
+
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------

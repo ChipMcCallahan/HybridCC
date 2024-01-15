@@ -9,28 +9,20 @@ class Robot(Mob):
         super().__init__(Id.ROBOT)
 
     @classmethod
-    def new(cls, **kwargs):
+    def construct_at(cls, pos, **kwargs):
         if not cls.instance:
             cls.instance = cls(**kwargs)
         return cls.instance
+
+    @classmethod
+    def destruct_at(cls, pos, **kwargs):
+        pass
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
     def do_planning(self):
-        raise NotImplementedError("Implement or remove.")
-
-    # --------------------------------------------------------------------------
-    # INSTANCE BOOKKEEPING
-    # --------------------------------------------------------------------------
-    def construct_at(self, position):
-        raise NotImplementedError("Implement or remove.")
-
-    def destruct_at(self, position):
-        raise NotImplementedError("Implement or remove.")
-
-    def clone(self):
         raise NotImplementedError("Implement or remove.")
 
     # --------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
 
 
 class Cell:
@@ -14,8 +15,9 @@ class Cell:
     # -----------
     def add(self, _id, **kwargs):
         layer = _id.layer()
-        method = getattr(self, f"set_{layer.name.lower()}")
-        method()
+        set_layer = getattr(self, f"set_{layer.name.lower()}")
+        elem = ElemFactory.construct_at(_id, **kwargs)
+        set_layer(elem)
 
     def remove(self, _id):
         layer = _id.layer()

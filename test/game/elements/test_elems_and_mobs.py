@@ -37,12 +37,13 @@ class TestElemsAndMobs(unittest.TestCase):
         print(f"Instantiated {len(instantiated)} elems: {instantiated}")
         print(f"Smoke tests for Mob & Non-Mob layer & parent classes pass.")
         print(f"No name mismatches between ids and class names.")
+
     def test_instantiate_from_parent(self):
         ElemFactory.initialize()
         for _id in Id:
             if _id == Id.DEFAULT:
                 continue
-            result = ElemFactory.new(_id)
+            result = ElemFactory.construct_at(_id)
             self.assertIsNotNone(result)
 
 

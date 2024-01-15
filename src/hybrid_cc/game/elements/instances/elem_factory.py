@@ -29,11 +29,11 @@ class ElemFactory:
                                     f"'{name}' was not found in Id enum")
 
     @classmethod
-    def new(cls, _id, **kwargs):
+    def construct_at(cls, pos, _id, **kwargs):
         if not cls.id_to_class:
             raise TypeError(f"ElemFactory was not initialized!")
         if _id not in cls.id_to_class:
             raise TypeError(f"Id {_id} was not found in Elem class registry.")
         instance_class = cls.id_to_class[_id]
-        factory = getattr(instance_class, "new")
-        return factory(**kwargs)
+        factory = getattr(instance_class, "construct_at")
+        return factory(pos, **kwargs)
