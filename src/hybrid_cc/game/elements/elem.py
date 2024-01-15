@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 
 # ABC enforces that all subclasses must implement @abstractmethod methods.
@@ -15,19 +15,17 @@ class Elem(ABC):
     def layer(self):
         return self._id.layer()
 
+    @abstractmethod
+    def construct_at(self, pos, **kwargs):
+        pass
+
+    @abstractmethod
+    def destruct_at(self, pos, **kwargs):
+        pass
+
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
-
-    # --------------------------------------------------------------------------
-    # INSTANCE BOOKKEEPING
-    # --------------------------------------------------------------------------
-
-    # By default, elems all share a single instance. So when cloning (copying)
-    # across the map, we just repeat the same element.
-    def clone(self):
-        """Make a clone of this element. Default is to return same instance."""
-        return self
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
