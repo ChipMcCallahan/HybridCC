@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, SIDES
 
 class Corner(Elem):
     kwarg_filter = (COLOR, SIDES)  # Retain these kwargs only.
-    class_id = Id.CORNER
     instances = {}
 
     def __init__(self, **kwargs):

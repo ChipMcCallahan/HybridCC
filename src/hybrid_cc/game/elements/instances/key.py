@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, RULE, COUNT
 
 class Key(Elem):
     kwarg_filter = (COLOR, RULE, COUNT)  # Retain these kwargs only.
-    class_id = Id.KEY
     instances = {}
 
     def __init__(self, **kwargs):

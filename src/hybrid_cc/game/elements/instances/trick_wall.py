@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, RULE
 
 class TrickWall(Elem):
     kwarg_filter = (COLOR, RULE)  # Retain these kwargs only.
-    class_id = Id.TRICK_WALL
     instances = {}
 
     def __init__(self, **kwargs):

@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import RULE, COUNT
 
 class Flippers(Elem):
     kwarg_filter = (RULE, COUNT)  # Retain these kwargs only.
-    class_id = Id.BUTTON
     instances = {}
 
     def __init__(self, **kwargs):

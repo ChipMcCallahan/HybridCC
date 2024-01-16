@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR
 
 class DirtBlock(Mob):
     kwarg_filter = (COLOR,)  # Retain these kwargs only.
-    class_id = Id.DIRT_BLOCK
     instances = {}
 
     def __init__(self, **kwargs):

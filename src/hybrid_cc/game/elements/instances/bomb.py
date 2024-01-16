@@ -6,7 +6,6 @@ from hybrid_cc.shared.kwargs import COLOR
 
 class Bomb(Elem):
     kwarg_filter = (COLOR,)  # Retain the COLOR kwarg, drop the rest.
-    class_id = Id.BOMB
     instances = {}
 
     def __init__(self, **kwargs):

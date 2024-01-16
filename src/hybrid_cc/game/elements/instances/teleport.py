@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, CHANNEL
 
 class Teleport(Elem):
     kwarg_filter = (COLOR, CHANNEL)  # Retain these kwargs only.
-    class_id = Id.TELEPORT
     instances = {}
 
     def __init__(self, **kwargs):

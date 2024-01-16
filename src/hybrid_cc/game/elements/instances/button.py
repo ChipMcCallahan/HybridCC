@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
 
 class Button(Elem):
     kwarg_filter = (COLOR, RULE, CHANNEL)  # Retain these kwargs only.
-    class_id = Id.BUTTON
     instances = {}
 
     def __init__(self, **kwargs):

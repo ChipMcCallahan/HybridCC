@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import RULE, COUNT
 
 class SteppingStone(Elem):
     kwarg_filter = (RULE, COUNT)  # Retain these kwargs only.
-    class_id = Id.STEPPING_STONE
     instances = {}
 
     def __init__(self, **kwargs):

@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, COUNT
 
 class PopUpWall(Elem):
     kwarg_filter = (COLOR, COUNT)  # Retain these kwargs only.
-    class_id = Id.POP_UP_WALL
     instances = {}
 
     def __init__(self, **kwargs):

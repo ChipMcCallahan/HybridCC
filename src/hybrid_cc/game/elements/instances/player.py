@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import DIRECTION
 
 class Player(Mob):
     kwarg_filter = (DIRECTION,)  # Retain these kwargs only.
-    class_id = Id.PLAYER
     instances = {}
 
     def __init__(self, **kwargs):

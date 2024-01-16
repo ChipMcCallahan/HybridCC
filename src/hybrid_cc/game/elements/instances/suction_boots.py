@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COUNT, RULE
 
 class SuctionBoots(Elem):
     kwarg_filter = (RULE, COUNT)  # Retain these kwargs only.
-    class_id = Id.SUCTION_BOOTS
     instances = {}
 
     def __init__(self, **kwargs):

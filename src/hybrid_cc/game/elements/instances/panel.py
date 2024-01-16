@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, SIDES
 
 class Panel(Elem):
     kwarg_filter = (COLOR, SIDES)  # Retain these kwargs only.
-    class_id = Id.PANEL
     instances = {}
 
     def __init__(self, **kwargs):

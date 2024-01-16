@@ -4,7 +4,10 @@ from hybrid_cc.game.elements import instances
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared import Id, Layer
+from hybrid_cc.shared import Id, Layer, Direction
+from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.kwargs import COLOR, DIRECTION, RULE, COUNT, CHANNEL, \
+    SIDES
 
 
 class TestElemsAndMobs(unittest.TestCase):
@@ -38,13 +41,33 @@ class TestElemsAndMobs(unittest.TestCase):
         print(f"Smoke tests for Mob & Non-Mob layer & parent classes pass.")
         print(f"No name mismatches between ids and class names.")
 
-    def test_instantiate_from_parent(self):
+    def test_instantiate(self):
         ElemFactory.initialize()
+
+        kwargs = {
+            COLOR: Color.RED,
+            DIRECTION: Direction.N,
+            RULE: "test_rule",
+            COUNT: 33,
+            CHANNEL: 44,
+            SIDES: "NEWS"
+        }
+
         for _id in Id:
             if _id == Id.DEFAULT:
                 continue
-            result = ElemFactory.construct_at(_id)
+            result = ElemFactory.construct_at((0, 0, 0), _id, **kwargs)
+
+            # Assert something was returned.
             self.assertIsNotNone(result)
+
+            # Assert the instance has the correct id.
+            self.assertEqual(_id, result.id)
+
+            # Assert only the filtered kwargs remain
+            in_filter = set(result.__class__.kwarg_filter)
+            in_kwargs = set(result._kwargs)
+            self.assertEqual(in_kwargs, in_filter)
 
 
 if __name__ == '__main__':

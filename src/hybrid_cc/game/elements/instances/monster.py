@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import RULE, DIRECTION
 
 class Monster(Mob):
     kwarg_filter = (RULE, DIRECTION)  # Retain these kwargs only.
-    class_id = Id.MONSTER
     instances = {}
 
     def __init__(self, **kwargs):

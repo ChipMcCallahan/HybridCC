@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR
 
 class Floor(Elem):
     kwarg_filter = (COLOR,)  # Retain these kwargs only.
-    class_id = Id.FLOOR
     instances = {}
 
     def __init__(self, **kwargs):

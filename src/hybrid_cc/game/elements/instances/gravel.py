@@ -4,7 +4,6 @@ from hybrid_cc.shared import Id
 
 class Gravel(Elem):
     kwarg_filter = tuple()  # Retain these kwargs only.
-    class_id = Id.GRAVEL
     instances = {}
 
     def __init__(self, **kwargs):
