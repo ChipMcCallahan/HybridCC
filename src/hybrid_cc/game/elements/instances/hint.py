@@ -3,16 +3,19 @@ from hybrid_cc.shared import Id
 
 
 class Hint(Elem):
-    instance = None
+    kwarg_filter = tuple()  # Retain these kwargs only.
+    class_id = Id.HINT
+    instances = {}
 
     def __init__(self, **kwargs):
-        super().__init__(Id.HINT)
+        super().__init__(**kwargs)
 
     @classmethod
     def construct_at(cls, pos, **kwargs):
-        if not cls.instance:
-            cls.instance = cls(**kwargs)
-        return cls.instance
+        lookup_key = cls.class_lookup_key(**kwargs)
+        if lookup_key not in cls.instances:
+            cls.instances[lookup_key] = cls(**kwargs)
+        return cls.instances[lookup_key]
 
     @classmethod
     def destruct_at(cls, pos, **kwargs):

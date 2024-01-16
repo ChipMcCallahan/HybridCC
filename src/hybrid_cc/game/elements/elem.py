@@ -1,15 +1,28 @@
 from abc import ABC, abstractmethod
 
+from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR, COUNT, \
-    CHANNEL, SIDES
+    CHANNEL, SIDES, Kwargs
 
 
 # ABC enforces that all subclasses must implement @abstractmethod methods.
 class Elem(ABC):
-    def __init__(self, _id, **kwargs):
+    class_id = Id.DEFAULT
+    kwargs_filter = (DIRECTION, COLOR, COUNT, CHANNEL, RULE, SIDES)
+
+    def __init__(self, **kwargs):
         super().__init__()
-        self._id = _id
+        self._id = self.__class__.class_id
         self._kwargs = kwargs
+
+    @classmethod
+    def class_lookup_key(cls, **kwargs):
+        return Kwargs.to_tuple(id=cls.class_id,
+                               **Kwargs.filter(cls.kwargs_filter, **kwargs))
+
+    @property
+    def lookup_key(self):
+        return self.__class__.class_lookup_key(**self._kwargs)
 
     @property
     def id(self):

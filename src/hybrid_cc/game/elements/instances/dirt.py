@@ -1,18 +1,22 @@
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.kwargs import COLOR
 
 
 class Dirt(Elem):
-    instance = None
+    kwarg_filter = (COLOR,)  # Retain these kwargs only.
+    class_id = Id.DIRT
+    instances = {}
 
     def __init__(self, **kwargs):
-        super().__init__(Id.DIRT)
+        super().__init__(**kwargs)
 
     @classmethod
     def construct_at(cls, pos, **kwargs):
-        if not cls.instance:
-            cls.instance = cls(**kwargs)
-        return cls.instance
+        lookup_key = cls.class_lookup_key(**kwargs)
+        if lookup_key not in cls.instances:
+            cls.instances[lookup_key] = cls(**kwargs)
+        return cls.instances[lookup_key]
 
     @classmethod
     def destruct_at(cls, pos, **kwargs):
