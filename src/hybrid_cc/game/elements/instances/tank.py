@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import COLOR, CHANNEL, DIRECTION
 
 class Tank(Mob):
     kwarg_filter = (COLOR, CHANNEL, DIRECTION)  # Retain these kwargs only.
-    instances = {}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

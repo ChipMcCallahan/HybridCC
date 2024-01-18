@@ -36,6 +36,11 @@ class Cell:
         method = getattr(self, remove_method_name)
         return method(_id)
 
+    def get_elems(self):
+        return [e for e in (self.terrain, self.terrain_mod,
+                            self.pickup, self.mob)
+                + tuple(self.sides.values()) if e]
+
     # -----------
     # TERRAIN
     # -----------
@@ -54,8 +59,8 @@ class Cell:
     # -----------
     # TERRAIN MOD
     # -----------
-    def set_terrain_mod(self, _id, **kwargs):
-        self.terrain_mod = (_id, kwargs)
+    def set_terrain_mod(self, elem):
+        self.terrain_mod = elem
 
     def get_terrain_mod(self):
         return self.terrain_mod
@@ -69,8 +74,8 @@ class Cell:
     # -----------
     # PICKUP
     # -----------
-    def set_pickup(self, _id, **kwargs):
-        self.pickup = (_id, kwargs)
+    def set_pickup(self, elem):
+        self.pickup = elem
 
     def get_pickup(self):
         return self.pickup
@@ -84,8 +89,8 @@ class Cell:
     # -----------
     # MOB
     # -----------
-    def set_mob(self, _id, **kwargs):
-        self.mob = (_id, kwargs)
+    def set_mob(self, elem):
+        self.mob = elem
 
     def get_mob(self):
         return self.mob
@@ -99,8 +104,8 @@ class Cell:
     # -----------
     # SIDES
     # -----------
-    def set_sides(self, _id, **kwargs):
-        self.sides[_id] = (_id, kwargs)
+    def set_sides(self, elem):
+        self.sides[elem.id] = elem
 
     def get_sides(self):
         return self.sides

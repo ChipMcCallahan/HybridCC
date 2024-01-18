@@ -5,7 +5,6 @@ from hybrid_cc.shared.kwargs import RULE
 
 class Thief(Elem):
     kwarg_filter = (RULE,)  # Retain these kwargs only.
-    instances = {}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

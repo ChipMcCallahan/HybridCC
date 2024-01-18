@@ -18,7 +18,7 @@ class Elem(ABC):
 
     @classmethod
     def class_lookup_key(cls, **kwargs):
-        return Kwargs.to_tuple(id=cls.class_id,
+        return Kwargs.to_tuple(id=Id.from_class_name(cls.__name__),
                                **Kwargs.filter(cls.kwarg_filter, **kwargs))
 
     @property
@@ -35,7 +35,7 @@ class Elem(ABC):
 
     @property
     def direction(self):
-        return self._kwargs[DIRECTION]
+        return self._kwargs.get(DIRECTION)
 
     @direction.setter
     def direction(self, value):
@@ -43,7 +43,7 @@ class Elem(ABC):
 
     @property
     def rule(self):
-        return self._kwargs[RULE]
+        return self._kwargs.get(RULE)
 
     @rule.setter
     def rule(self, value):
@@ -51,7 +51,7 @@ class Elem(ABC):
 
     @property
     def color(self):
-        return self._kwargs[COLOR]
+        return self._kwargs.get(COLOR)
 
     @color.setter
     def color(self, value):
@@ -59,7 +59,7 @@ class Elem(ABC):
 
     @property
     def count(self):
-        return self._kwargs[COUNT]
+        return self._kwargs.get(COUNT)
 
     @count.setter
     def count(self, value):
@@ -67,7 +67,7 @@ class Elem(ABC):
 
     @property
     def channel(self):
-        return self._kwargs[CHANNEL]
+        return self._kwargs.get(CHANNEL)
 
     @channel.setter
     def channel(self, value):
@@ -75,7 +75,7 @@ class Elem(ABC):
 
     @property
     def sides(self):
-        return self._kwargs[SIDES]
+        return self._kwargs.get(SIDES)
 
     @sides.setter
     def sides(self, value):
@@ -91,3 +91,6 @@ class Elem(ABC):
     @classmethod
     def destruct_at(cls, pos, **kwargs):
         pass
+
+    def __hash__(self):
+        return hash(self.lookup_key)

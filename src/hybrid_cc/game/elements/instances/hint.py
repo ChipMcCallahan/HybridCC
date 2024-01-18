@@ -4,7 +4,6 @@ from hybrid_cc.shared import Id
 
 class Hint(Elem):
     kwarg_filter = tuple()  # Retain these kwargs only.
-    instances = {}
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
