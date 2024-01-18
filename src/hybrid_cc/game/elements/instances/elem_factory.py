@@ -18,15 +18,8 @@ class ElemFactory:
 
             # Check if it's a class but not this class.
             if element_class is not cls and isinstance(element_class, type):
-                # Convert from CamelCase to SNAKE_CASE to match Id.
-                name = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', attribute_name)
-                name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', name).upper()
-                try:
-                    _id = Id[name]
-                    cls.id_to_class[_id] = element_class
-                except KeyError:
-                    raise TypeError(f"Instance class was {element_class}, but "
-                                    f"'{name}' was not found in Id enum")
+                _id = Id.from_class_name(attribute_name)
+                cls.id_to_class[_id] = element_class
 
     @classmethod
     def construct_at(cls, pos, _id, **kwargs):
@@ -35,10 +28,10 @@ class ElemFactory:
         return constructor(pos, **kwargs)
 
     @classmethod
-    def destruct_at(cls, pos, _id, **kwargs):
+    def destruct_at(cls, pos, _id):
         instance_class = cls.get_class(_id)
         destructor = getattr(instance_class, "destruct_at")
-        return destructor(pos, **kwargs)
+        return destructor(pos)
 
     @classmethod
     def get_class(cls, _id):

@@ -1,5 +1,4 @@
-import re
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR, COUNT, \
@@ -10,15 +9,11 @@ from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR, COUNT, \
 class Elem(ABC):
     class_id = Id.DEFAULT
     kwarg_filter = (DIRECTION, COLOR, COUNT, CHANNEL, RULE, SIDES)
+    instances = {}
 
     def __init__(self, **kwargs):
         super().__init__()
-
-        class_name = self.__class__.__name__
-        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', class_name)
-        snake_case = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
-
-        self._id = Id[snake_case.upper()]
+        self._id = Id.from_class_name(self.__class__.__name__)
         self._kwargs = Kwargs.filter(self.__class__.kwarg_filter, **kwargs)
 
     @classmethod
@@ -86,10 +81,13 @@ class Elem(ABC):
     def sides(self, value):
         self._kwargs[SIDES] = value
 
-    @abstractmethod
-    def construct_at(self, pos, **kwargs):
-        pass
+    @classmethod
+    def construct_at(cls, pos, **kwargs):
+        lookup_key = cls.class_lookup_key(**kwargs)
+        if lookup_key not in cls.instances:
+            cls.instances[lookup_key] = cls(**kwargs)
+        return cls.instances[lookup_key]
 
-    @abstractmethod
-    def destruct_at(self, pos, **kwargs):
+    @classmethod
+    def destruct_at(cls, pos, **kwargs):
         pass

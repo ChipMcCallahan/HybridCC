@@ -10,17 +10,6 @@ class Door(Elem):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    @classmethod
-    def construct_at(cls, pos, **kwargs):
-        lookup_key = cls.class_lookup_key(**kwargs)
-        if lookup_key not in cls.instances:
-            cls.instances[lookup_key] = cls(**kwargs)
-        return cls.instances[lookup_key]
-
-    @classmethod
-    def destruct_at(cls, pos, **kwargs):
-        pass
-
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------

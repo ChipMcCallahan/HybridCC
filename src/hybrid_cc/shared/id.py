@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 
 from hybrid_cc.shared.layer import Layer
@@ -50,3 +51,14 @@ class Id(Enum):
 
     def layer(self):
         return self.value[0]
+
+    @staticmethod
+    def from_class_name(class_name):
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', class_name)
+        snake_case = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1)
+        return Id[snake_case.upper()]
+
+    @staticmethod
+    def id_to_class_name(_id):
+        components = _id.name.lower().split('_')
+        return ''.join(x.capitalize() for x in components)

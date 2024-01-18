@@ -1,27 +1,43 @@
-from hybrid_cc.game.elements import instances
+from hybrid_cc.game.cell import Cell
 
 
 class Map:
     def __init__(self, level):
         self.size = level.size
-        self.map = {} # p(x, y, z) to cell
+        self.map = {}
+        x, y, z = self.size
+        for i in range(x):
+            for j in range(y):
+                for k in range(z):
+                    p = (x, y, z)
+                    self.map[p] = Cell(p)
+                    there = level.map[p]
+                    elems = [there.terrain, there.terrain_mod,
+                             there.pickup, there.mob]
+                    if there.sides:
+                        elems += there.sides
+                    for elem in elems:
+                        if elem:
+                            self.construct_at(p, elem.id, **elem.get_kwargs())
 
-    def put(self, p, _id, **kwargs):
+    def get(self, p):
+        """Get the cell at location p."""
+        return self.map[p]
+
+    def construct_at(self, p, _id, **kwargs):
         """Set the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
+        return self.map[p].construct(_id, **kwargs)
 
-        snake_case = _id.name.lower()
-        camel_case = ''.join([w.capitalize() for w in snake_case])
-        class_to_instantiate = getattr(instances, camel_case, None)
+    def destruct_at(self, p, elem_or_id):
+        return self.map[p].destruct(elem_or_id)
 
-        # TODO: make a Cell class
-        # self.map[key] = class_to_instantiate(_id, **kwargs)
+    def simple_add(self, p, elem):
+        return self.map[p].simple_add(elem)
 
-    def get(self, p):
-        """Get the contents of the cell at location p."""
-        x, y, z = p
-        return self.map[z][y][x]
+    def simple_remove(self, p, elem_or_id):
+        return self.map[p].simple_remove(elem_or_id)
 
     def is_oob(self, p):
         """Returns whether the position p is out of bounds on this level."""

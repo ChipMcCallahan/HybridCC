@@ -1,4 +1,5 @@
 from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
+from hybrid_cc.shared import Id
 
 
 class Cell:
@@ -15,19 +16,21 @@ class Cell:
     # -----------
     def construct(self, _id, **kwargs):
         elem = ElemFactory.construct_at(self.position, _id, **kwargs)
-        self.add(elem)
+        self.simple_add(elem)
         return elem
 
-    def destruct(self, elem, **kwargs):
-        self.remove(elem.id)
-        return ElemFactory.destruct_at(self.position, elem.id, **kwargs)
+    def destruct(self, elem_or_id):
+        _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
+        self.simple_remove(_id)
+        return ElemFactory.destruct_at(self.position, _id)
 
-    def add(self, elem):
+    def simple_add(self, elem):
         layer = elem.id.layer()
         set_layer = getattr(self, f"set_{layer.name.lower()}")
-        set_layer(elem)
+        return set_layer(elem)
 
-    def remove(self, _id):
+    def simple_remove(self, elem_or_id):
+        _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
         layer = _id.layer()
         remove_method_name = f"remove_{layer.name.lower()}"
         method = getattr(self, remove_method_name)
