@@ -36,8 +36,7 @@ class Level:
         self.hint = ""  # default hint if not in dict
         self.movement = []
 
-        self.map = [[[None for _ in range(x_size)] for _ in range(y_size)] for _
-                    in range(z_size)]
+        self.map = {}
 
     @property
     def size(self):
@@ -59,12 +58,10 @@ class Level:
         """Set the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
-        x, y, z = p
-        self.map[z][y][x] = value
+        self.map[p] = value
 
     def get(self, p):
         """Get the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
-        x, y, z = p
-        return self.map[z][y][x]
+        return self.map[p]

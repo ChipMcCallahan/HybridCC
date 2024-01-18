@@ -28,7 +28,6 @@ class LevelElem:
         self._channel = channel
         self._sides = sides
 
-    @property
     def get_kwargs(self):
         return {
             DIRECTION: self.direction,

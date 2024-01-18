@@ -1,4 +1,5 @@
 """Gameboard module."""
+from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
 from hybrid_cc.game.map import Map
 
 
@@ -6,6 +7,7 @@ class Gameboard:
     """Gameboard class."""
     def __init__(self, level):
         """Initialize a new Gameboard instance."""
+        ElemFactory.initialize()
         self.map = Map(level)
         self.author = ""
         self.title = ""
