@@ -1,6 +1,7 @@
 from abc import ABC
 
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR, COUNT, \
     CHANNEL, SIDES, Kwargs
 

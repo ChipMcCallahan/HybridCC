@@ -1,8 +1,18 @@
 import logging
-import re
 from hybrid_cc.game.elements import instances
-from hybrid_cc.shared import Id
+from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
+    CHANNEL
 
+DEFAULT_KWARGS = {
+    COLOR: Color.GREY,
+    RULE: None,
+    COUNT: 1,
+    CHANNEL: 0,
+    SIDES: "",
+    DIRECTION: Direction.S
+}
 
 class ElemFactory:
     id_to_class = {}
@@ -23,6 +33,7 @@ class ElemFactory:
 
     @classmethod
     def construct_at(cls, pos, _id, **kwargs):
+        kwargs = cls.assign_kwarg_defaults(**kwargs)
         instance_class = cls.get_class(_id)
         constructor = getattr(instance_class, "construct_at")
         return constructor(pos, **kwargs)
@@ -40,3 +51,10 @@ class ElemFactory:
         if _id not in cls.id_to_class:
             raise TypeError(f"Id {_id} was not found in Elem class registry.")
         return cls.id_to_class[_id]
+
+    @classmethod
+    def assign_kwarg_defaults(cls, **kwargs):
+        new_kwargs = kwargs.copy()
+        for kwarg in (COLOR, RULE, COUNT, CHANNEL, SIDES, DIRECTION):
+            new_kwargs[kwarg] = kwargs.get(kwarg) or DEFAULT_KWARGS[kwarg]
+        return new_kwargs
