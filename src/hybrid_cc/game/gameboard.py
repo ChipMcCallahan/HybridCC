@@ -46,5 +46,8 @@ class Gameboard:
         x, y, z = Player.position or (0, 0, 0)
         x, y = max(x, margin), max(y, margin)
         x = min(x, self.size[0] - margin - 1)
-        y = min(x, self.size[1] - margin - 1)
+        y = min(y, self.size[1] - margin - 1)
         return x, y, z
+
+    def do_logic(self, inputs):
+        pass

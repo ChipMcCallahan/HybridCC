@@ -9,7 +9,7 @@ class Cell:
         self.terrain_mod = None
         self.pickup = None
         self.mob = None
-        self.sides = {}
+        self._sides = {}
 
     # -----------
     # BOOKKEEPING
@@ -39,7 +39,7 @@ class Cell:
     def get_elems(self):
         return [e for e in (self.terrain, self.terrain_mod,
                             self.pickup, self.mob)
-                + tuple(self.sides.values()) if e]
+                + tuple(self._sides.values()) if e]
 
     # -----------
     # TERRAIN
@@ -105,10 +105,10 @@ class Cell:
     # SIDES
     # -----------
     def set_sides(self, elem):
-        self.sides[elem.id] = elem
+        self._sides[elem.id] = elem
 
     def get_sides(self):
-        return self.sides
+        return list(self._sides.values())
 
     def remove_sides(self, _id):
-        self.sides.pop(_id)
+        self._sides.pop(_id)

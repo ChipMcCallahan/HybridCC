@@ -1,5 +1,7 @@
 import pygame
 
+from hybrid_cc.game.gameboard import Gameboard
+from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.ui import InputCollector
 from hybrid_cc.ui.ui_gamestate import UIGamestate
 
@@ -11,6 +13,8 @@ class UIGamestateManager:
         self.inputs = []
         self.input_collector = InputCollector()
         self.state = UIGamestate()
+        self.gameboard = None
+        self.level_set = None
 
     def do_events(self):
         events = pygame.event.get()
@@ -48,6 +52,7 @@ class UIGamestateManager:
             if self.logic_tick % 4 == 0:
                 self.movement_tick += 1
                 self.inputs = self.input_collector.collect()
+                self.gameboard.do_logic(self.inputs)
 
             self.logic_tick += 1  # Increment frame counter
         return True
@@ -64,6 +69,12 @@ class UIGamestateManager:
         elif self.state.is_play:
             self.input_collector.reset()  # don't unpause with a movement queued
             self.state.pause()
+
+    def load_set(self, file_path):
+        self.level_set = DATConverter.convert_levelset(file_path)
+
+    def setup_gameboard(self, lvl):
+        self.gameboard = Gameboard(lvl)
 
     @property
     def is_start(self):

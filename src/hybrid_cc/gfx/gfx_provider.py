@@ -6,6 +6,7 @@ from hybrid_cc.gfx.sprite_assembly.sides_gfx import SidesGfx
 from hybrid_cc.gfx.sprite_assembly.terrain_gfx import TerrainGfx
 from hybrid_cc.gfx.sprite_assembly.terrain_mod_gfx import TerrainModGfx
 from hybrid_cc.shared import Layer
+from hybrid_cc.shared.shared_utils import is_iter
 
 
 class GfxProvider:
@@ -62,6 +63,6 @@ class GfxProvider:
 
     def provide_one(self, id_and_kwargs, **extra_kwargs):
         frames = self.provide(id_and_kwargs, **extra_kwargs)
-        if isinstance(frames, list):
+        if is_iter(frames):
             return frames[0]
         return frames
