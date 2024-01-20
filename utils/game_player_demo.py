@@ -3,7 +3,7 @@ from hybrid_cc.ui import InputCollector
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 
-class UIInputAndStateDemo:
+class GamePlayerDemo:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
@@ -127,5 +127,5 @@ class UIInputAndStateDemo:
 
 
 if __name__ == "__main__":
-    game = UIInputAndStateDemo()
+    game = GamePlayerDemo()
     game.run()

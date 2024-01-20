@@ -93,5 +93,9 @@ class Elem(ABC):
     def destruct_at(cls, pos, **kwargs):
         pass
 
+    @classmethod
+    def reset(cls):
+        cls.instances.clear()
+
     def __hash__(self):
         return hash(self.lookup_key)

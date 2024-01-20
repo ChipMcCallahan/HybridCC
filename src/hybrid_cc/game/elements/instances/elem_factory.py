@@ -1,5 +1,6 @@
 import logging
 from hybrid_cc.game.elements import instances
+from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
@@ -14,6 +15,7 @@ DEFAULT_KWARGS = {
     DIRECTION: Direction.S
 }
 
+
 class ElemFactory:
     id_to_class = {}
 
@@ -22,7 +24,11 @@ class ElemFactory:
 
     @classmethod
     def initialize(cls):
+        # TODO: rethink where & when to initialize. ElemFactory needs to be
+        # initialized once per game session. Elem should probably be reset
+        # once per level. Maybe it doesn't matter.
         logging.info("Initializing ElemFactory...")
+        Elem.reset()
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
 
