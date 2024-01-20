@@ -1,8 +1,11 @@
 from hybrid_cc.game.cell import Cell
+from hybrid_cc.game.elem_handler import ElemHandler
+from hybrid_cc.shared import Id
 
 
 class Map:
     def __init__(self, level):
+        self.elems = ElemHandler()
         self.size = level.size
         self.map = {}
         x, y, z = self.size
@@ -28,16 +31,20 @@ class Map:
         """Set the contents of the cell at location p."""
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
-        return self.map[p].construct(_id, **kwargs)
+        elem = self.elems.construct_at(p, _id, **kwargs)
+        self.map[p].add(elem)
+        return elem
 
     def destruct_at(self, p, elem_or_id):
-        return self.map[p].destruct(elem_or_id)
+        _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
+        self.map[p].remove(_id)
+        self.elems.destruct_at(p, _id)
 
     def simple_add(self, p, elem):
-        return self.map[p].simple_add(elem)
+        return self.map[p].add(elem)
 
     def simple_remove(self, p, elem_or_id):
-        return self.map[p].simple_remove(elem_or_id)
+        return self.map[p].remove(elem_or_id)
 
     def is_oob(self, p):
         """Returns whether the position p is out of bounds on this level."""

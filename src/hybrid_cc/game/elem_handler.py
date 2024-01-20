@@ -66,7 +66,7 @@ class ElemHandler:
     def destruct_at(self, pos, _id):
         instance_class = self.get_class(_id)
         destructor = getattr(instance_class, "destruct_at")
-        return destructor(pos)
+        destructor(pos)
 
     def get_class(self, _id):
         if not self.id_to_class:

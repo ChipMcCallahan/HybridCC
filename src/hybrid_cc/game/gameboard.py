@@ -17,7 +17,7 @@ class Gameboard:
         self.time = 0
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
-        self.movement = []
+        self.movement = level.movement
 
     @property
     def size(self):
@@ -52,4 +52,5 @@ class Gameboard:
     def do_logic(self, inputs):
         pass
         #  planning
+
         #  execution

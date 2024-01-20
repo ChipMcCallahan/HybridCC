@@ -15,27 +15,17 @@ class Cell:
     # -----------
     # BOOKKEEPING
     # -----------
-    def construct(self, _id, **kwargs):
-        elem = self._elems.construct_at(self.position, _id, **kwargs)
-        self.simple_add(elem)
-        return elem
-
-    def destruct(self, elem_or_id):
-        _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
-        self.simple_remove(_id)
-        return self._elems.destruct_at(self.position, _id)
-
-    def simple_add(self, elem):
+    def add(self, elem):
         layer = elem.id.layer()
         set_layer = getattr(self, f"set_{layer.name.lower()}")
-        return set_layer(elem)
+        set_layer(elem)
 
-    def simple_remove(self, elem_or_id):
+    def remove(self, elem_or_id):
         _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
         layer = _id.layer()
         remove_method_name = f"remove_{layer.name.lower()}"
         method = getattr(self, remove_method_name)
-        return method(_id)
+        method(_id)
 
     def get_elems(self):
         return [e for e in (self.terrain, self.terrain_mod,
@@ -54,8 +44,6 @@ class Cell:
     def remove_terrain(self, _id):
         if self.terrain and self.terrain.id == _id:
             self.terrain = None
-            return True
-        return False
 
     # -----------
     # TERRAIN MOD
@@ -69,8 +57,6 @@ class Cell:
     def remove_terrain_mod(self, _id):
         if self.terrain_mod and self.terrain_mod.id == _id:
             self.terrain_mod = None
-            return True
-        return False
 
     # -----------
     # PICKUP
@@ -84,8 +70,6 @@ class Cell:
     def remove_pickup(self, _id):
         if self.pickup and self.pickup.id == _id:
             self.pickup = None
-            return True
-        return False
 
     # -----------
     # MOB
@@ -99,8 +83,6 @@ class Cell:
     def remove_mob(self, _id):
         if self.mob and self.mob.id == _id:
             self.mob = None
-            return True
-        return False
 
     # -----------
     # SIDES
