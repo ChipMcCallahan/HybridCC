@@ -1,5 +1,5 @@
 """Gameboard module."""
-from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
+from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.map import Map
 
@@ -8,7 +8,7 @@ class Gameboard:
     """Gameboard class."""
     def __init__(self, level):
         """Initialize a new Gameboard instance."""
-        ElemFactory.init_at_level_load()
+        self.elems = ElemHandler()
         self._size = level.size
         self.map = Map(level)
         self.author = ""
@@ -51,3 +51,5 @@ class Gameboard:
 
     def do_logic(self, inputs):
         pass
+        #  planning
+        #  execution

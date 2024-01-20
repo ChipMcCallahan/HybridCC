@@ -2,7 +2,7 @@ import unittest
 
 from hybrid_cc.game.elements import instances
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
+from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id, Layer, Direction
 from hybrid_cc.shared.color import Color
@@ -15,8 +15,7 @@ class TestElemsAndMobs(unittest.TestCase):
         instantiated = []
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
-            if (isinstance(element_class, type)
-                    and element_class is not ElemFactory):
+            if isinstance(element_class, type):
                 # Instantiate the class if it has a parameterless constructor
                 try:
                     instance = element_class()  # Instantiate the class
@@ -42,7 +41,7 @@ class TestElemsAndMobs(unittest.TestCase):
         print(f"No name mismatches between ids and class names.")
 
     def test_instantiate(self):
-        ElemFactory.init_at_game_load()
+        elems = ElemHandler()
 
         kwargs = {
             COLOR: Color.RED,
@@ -56,7 +55,7 @@ class TestElemsAndMobs(unittest.TestCase):
         for _id in Id:
             if _id == Id.DEFAULT:
                 continue
-            result = ElemFactory.construct_at((0, 0, 0), _id, **kwargs)
+            result = elems.construct_at((0, 0, 0), _id, **kwargs)
 
             # Assert something was returned.
             self.assertIsNotNone(result)

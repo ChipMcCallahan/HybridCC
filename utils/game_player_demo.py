@@ -5,9 +5,7 @@ import os
 import pygame
 import pygame_menu
 
-from hybrid_cc.game.gameboard import Gameboard
 from hybrid_cc.gfx.pygame_gfx_provider import PygameGfxProvider
-from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
@@ -21,7 +19,7 @@ class GamePlayerDemo:
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         self.screen = pygame.display.set_mode((800, 600))
         self.viewport = pygame.Surface((320, 320))
-        pygame.display.set_caption("Input and State Demo")
+        pygame.display.set_caption("Game Player Demo")
         self.font = pygame.font.Font(None, 20)
         self.clock = pygame.time.Clock()
         self.state = UIGamestateManager()
@@ -61,7 +59,7 @@ class GamePlayerDemo:
     def show_level_menu(self):
         def on_select(_lvl):
             self.show_loading()
-            self.state.setup_gameboard(lvl)
+            self.state.setup_gameboard(_lvl)
             self.run_events()
 
         menu = pygame_menu.Menu('Select Level', 800, 600,

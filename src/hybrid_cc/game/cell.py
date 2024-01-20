@@ -1,9 +1,10 @@
-from hybrid_cc.game.elements.instances.elem_factory import ElemFactory
+from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.shared import Id
 
 
 class Cell:
     def __init__(self, position):
+        self._elems = ElemHandler()
         self.position = position
         self.terrain = None
         self.terrain_mod = None
@@ -15,14 +16,14 @@ class Cell:
     # BOOKKEEPING
     # -----------
     def construct(self, _id, **kwargs):
-        elem = ElemFactory.construct_at(self.position, _id, **kwargs)
+        elem = self._elems.construct_at(self.position, _id, **kwargs)
         self.simple_add(elem)
         return elem
 
     def destruct(self, elem_or_id):
         _id = elem_or_id if isinstance(elem_or_id, Id) else elem_or_id.id
         self.simple_remove(_id)
-        return ElemFactory.destruct_at(self.position, _id)
+        return self._elems.destruct_at(self.position, _id)
 
     def simple_add(self, elem):
         layer = elem.id.layer()

@@ -17,64 +17,66 @@ DEFAULT_KWARGS = {
 }
 
 
-class ElemFactory:
-    is_initialized = False
-    id_to_class = {}
+class ElemHandler:
+    _instance = None  # singleton
+
+    def __new__(cls, *args, **kwargs):
+        # Check if an instance already exists
+        if not cls._instance:
+            cls._instance = super(ElemHandler, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self):
-        raise TypeError("Cannot instantiate ElemFactory class.")
+        # Ensure that initialization only happens once
+        if hasattr(self, '_initialized') and self._initialized:
+            return
 
-    @classmethod
-    def init_at_game_load(cls):
-        logging.info(f"Initializing {cls.__name__} at game load...")
+        self.id_to_class = {}
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
 
-            # Check if it's a class but not this class.
-            if element_class is not cls and isinstance(element_class, type):
+            if isinstance(element_class, type):
                 _id = Id.from_class_name(attribute_name)
-                cls.id_to_class[_id] = element_class
-        cls.is_initialized = True
+                self.id_to_class[_id] = element_class
 
-    @classmethod
-    def init_at_level_load(cls):
-        if not cls.is_initialized:
-            cls.init_at_game_load()
-        logging.info(f"Initializing {cls.__name__}...")
+        self._initialized = True  # Mark as initialized
+
+    def init_at_game_load(self):
+        logging.info(f"Initializing {self.__name__} at game load...")
+
+    def init_at_level_load(self):
+        logging.info(f"Initializing {self.__name__}...")
         Elem.init_at_level_load()
         Mob.init_at_level_load()
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
 
             # Check if it's a class but not this class.
-            if element_class is not cls and isinstance(element_class, type):
+            if element_class is not self and isinstance(element_class, type):
                 if hasattr(element_class, "init_at_level_load"):
                     init_elem_cls = getattr(element_class, "init_at_level_load")
                     init_elem_cls()
 
-    @classmethod
-    def construct_at(cls, pos, _id, **kwargs):
-        kwargs = cls.assign_kwarg_defaults(**kwargs)
-        instance_class = cls.get_class(_id)
+    def construct_at(self, pos, _id, **kwargs):
+        kwargs = self.assign_kwarg_defaults(**kwargs)
+        instance_class = self.get_class(_id)
         constructor = getattr(instance_class, "construct_at")
         return constructor(pos, **kwargs)
 
-    @classmethod
-    def destruct_at(cls, pos, _id):
-        instance_class = cls.get_class(_id)
+    def destruct_at(self, pos, _id):
+        instance_class = self.get_class(_id)
         destructor = getattr(instance_class, "destruct_at")
         return destructor(pos)
 
-    @classmethod
-    def get_class(cls, _id):
-        if not cls.id_to_class:
-            raise TypeError(f"ElemFactory was not initialized!")
-        if _id not in cls.id_to_class:
+    def get_class(self, _id):
+        if not self.id_to_class:
+            raise TypeError(f"{self.__name__} was not initialized!")
+        if _id not in self.id_to_class:
             raise TypeError(f"Id {_id} was not found in Elem class registry.")
-        return cls.id_to_class[_id]
+        return self.id_to_class[_id]
 
-    @classmethod
-    def assign_kwarg_defaults(cls, **kwargs):
+    @staticmethod
+    def assign_kwarg_defaults(**kwargs):
         new_kwargs = kwargs.copy()
         for kwarg in (COLOR, RULE, COUNT, CHANNEL, SIDES, DIRECTION):
             new_kwargs[kwarg] = kwargs.get(kwarg) or DEFAULT_KWARGS[kwarg]
