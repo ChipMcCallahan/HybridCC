@@ -1,8 +1,5 @@
-import importlib.resources
-
 import pygame
 
-from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.ui import InputCollector
 from hybrid_cc.ui.ui_gamestate import UIGamestate
 
@@ -15,27 +12,20 @@ class UIGamestateManager:
         self.input_collector = InputCollector()
         self.state = UIGamestate()
 
-        self.package = 'hybrid_cc.sets.dat'
-        self.package_dir = importlib.resources.files(self.package)
-        self.level_index = 0
-        self.level_set = DATConverter.convert_levelset(
-            self.package_dir / "CCLP1.dat")
-
     def do_events(self):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                return False
+                pygame.quit()
+                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F5:
                     self.toggle_pause()
                 if event.key == pygame.K_ESCAPE:
-                    if self.state.load():
-                        pass
-                    elif self.state.select():
-                        pass
-                    elif self.state.start():
+                    if self.state.start():
                         self.reset()
+                    elif self.is_start:
+                        return False
                 if event.key == pygame.K_w:  # Simulate Win condition
                     self.state.win()
                 if event.key == pygame.K_l:  # Simulate Loss condition
@@ -48,13 +38,6 @@ class UIGamestateManager:
                             self.state.is_start):
                         continue
                     elif self.state.start():
-                        self.reset()
-                    elif self.state.select():
-                        pass
-                    elif self.state.is_win and self.state.start():
-                        # TODO: go to next level
-                        self.reset()
-                    elif self.state.is_lose and self.state.start():
                         self.reset()
 
         if self.state.is_play:
@@ -101,11 +84,3 @@ class UIGamestateManager:
     @property
     def is_lose(self):
         return self.state.is_lose
-
-    @property
-    def is_select(self):
-        return self.state.is_select
-
-    @property
-    def is_load(self):
-        return self.state.is_load
