@@ -42,7 +42,7 @@ class TestElemsAndMobs(unittest.TestCase):
         print(f"No name mismatches between ids and class names.")
 
     def test_instantiate(self):
-        ElemFactory.initialize()
+        ElemFactory.init_at_game_load()
 
         kwargs = {
             COLOR: Color.RED,

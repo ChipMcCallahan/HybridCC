@@ -1,3 +1,5 @@
+import logging
+
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL, DIRECTION
@@ -8,6 +10,10 @@ class Tank(Mob):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+    @classmethod
+    def init_at_level_load(cls):
+        logging.info(f"Initializing {cls.__name__}...")
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE

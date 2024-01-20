@@ -1,4 +1,5 @@
 import importlib.resources
+import logging
 import os
 
 import pygame
@@ -10,6 +11,7 @@ from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
 BLACK_THEME.background_color = (0, 0, 0)
+
 
 class UIInputAndStateDemo:
     def __init__(self):
@@ -123,5 +125,13 @@ class UIInputAndStateDemo:
 
 
 if __name__ == "__main__":
+    # Define the logging format to include the file name, function name,
+    # and line number
+    log_format = '%(filename)s - %(funcName)s - Line %(lineno)d - %(message)s'
+
+    # Set up logging to use the format defined above and output to the
+    # console at the DEBUG level
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
+
     game = UIInputAndStateDemo()
     game.run()

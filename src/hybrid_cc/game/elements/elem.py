@@ -1,3 +1,4 @@
+import logging
 from abc import ABC
 
 from hybrid_cc.shared import Id
@@ -10,7 +11,7 @@ from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR, COUNT, \
 class Elem(ABC):
     class_id = Id.DEFAULT
     kwarg_filter = (DIRECTION, COLOR, COUNT, CHANNEL, RULE, SIDES)
-    instances = {}
+    instances = {}  # memoization: map lookup key to instance
 
     def __init__(self, **kwargs):
         super().__init__()
@@ -94,7 +95,8 @@ class Elem(ABC):
         pass
 
     @classmethod
-    def reset(cls):
+    def init_at_level_load(cls):
+        logging.info(f"Initializing {cls.__name__}...")
         cls.instances.clear()
 
     def __hash__(self):

@@ -1,6 +1,7 @@
 import logging
 from hybrid_cc.game.elements import instances
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
@@ -17,18 +18,15 @@ DEFAULT_KWARGS = {
 
 
 class ElemFactory:
+    is_initialized = False
     id_to_class = {}
 
     def __init__(self):
         raise TypeError("Cannot instantiate ElemFactory class.")
 
     @classmethod
-    def initialize(cls):
-        # TODO: rethink where & when to initialize. ElemFactory needs to be
-        # initialized once per game session. Elem should probably be reset
-        # once per level. Maybe it doesn't matter.
-        logging.info("Initializing ElemFactory...")
-        Elem.reset()
+    def init_at_game_load(cls):
+        logging.info(f"Initializing {cls.__name__} at game load...")
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
 
@@ -36,6 +34,23 @@ class ElemFactory:
             if element_class is not cls and isinstance(element_class, type):
                 _id = Id.from_class_name(attribute_name)
                 cls.id_to_class[_id] = element_class
+        cls.is_initialized = True
+
+    @classmethod
+    def init_at_level_load(cls):
+        if not cls.is_initialized:
+            cls.init_at_game_load()
+        logging.info(f"Initializing {cls.__name__}...")
+        Elem.init_at_level_load()
+        Mob.init_at_level_load()
+        for attribute_name in dir(instances):
+            element_class = getattr(instances, attribute_name)
+
+            # Check if it's a class but not this class.
+            if element_class is not cls and isinstance(element_class, type):
+                if hasattr(element_class, "init_at_level_load"):
+                    init_elem_cls = getattr(element_class, "init_at_level_load")
+                    init_elem_cls()
 
     @classmethod
     def construct_at(cls, pos, _id, **kwargs):

@@ -1,78 +1,94 @@
+import importlib.resources
+import logging
+import os
+
 import pygame
-from hybrid_cc.ui import InputCollector
+import pygame_menu
+
+from hybrid_cc.game.gameboard import Gameboard
+from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
+
+BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
+BLACK_THEME.background_color = (0, 0, 0)
 
 
 class GamePlayerDemo:
     def __init__(self):
         pygame.init()
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Input and State Demo")
         self.font = pygame.font.Font(None, 36)
         self.clock = pygame.time.Clock()
-
-        self.input_collector = InputCollector()
-
-        self.logic_tick = 0
-        self.movement_tick = 0
-        self.inputs = []
         self.state = UIGamestateManager()
+        self.package_dir = importlib.resources.files("hybrid_cc.sets.dat")
+        self.level_set = None
+        self.gameboard = None
 
-    def run(self):
+    def show_loading(self):
+        # Display loading screen
+        self.screen.fill((0, 0, 0))
+        font = pygame.font.Font(None, 36)
+        text = font.render('Loading...', True,
+                           (255, 255, 255))  # White text
+        text_rect = text.get_rect(center=(400, 300))  # Center the text
+        self.screen.blit(text, text_rect)
+        pygame.display.flip()  # Update the display
+
+    def get_levelset_files(self):
+        resources = self.package_dir.iterdir()
+        return [f for f in resources if f.suffix.lower() == '.dat']
+
+    def show_levelset_menu(self):
+        def on_select(file_path):
+            self.show_loading()
+            self.level_set = DATConverter.convert_levelset(file_path)
+            self.show_level_menu()
+
+        levelset_files = self.get_levelset_files()
+        menu = pygame_menu.Menu('Load Levelset', 800, 600,
+                                theme=BLACK_THEME)
+
+        for file in levelset_files:
+            menu.add.button(file.name, on_select, file)
+
+        menu.add.button('Exit', self.exit_game)
+        menu.mainloop(self.screen)
+
+    def show_level_menu(self):
+        def on_select(_lvl):
+            self.show_loading()
+            self.gameboard = Gameboard(_lvl)
+            self.run_events()
+
+
+        menu = pygame_menu.Menu('Select Level', 800, 600,
+                                theme=BLACK_THEME)
+
+        for lvl in self.level_set.levels:
+            menu.add.button(lvl.title, on_select, lvl)
+
+        menu.add.button('Back', self.show_levelset_menu)
+        menu.mainloop(self.screen)
+
+    def run_events(self):
         running = True
         while running:
             self.screen.fill((0, 0, 0))  # Clear screen
-
-            events = pygame.event.get()
-            for event in events:
-                if event.type == pygame.QUIT:
-                    running = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_F5:
-                        self.toggle_pause()
-                    if event.key == pygame.K_ESCAPE:
-                        if self.state.load():
-                            pass
-                        elif self.state.select():
-                            pass
-                        elif self.state.start():
-                            self.reset()
-                    if event.key == pygame.K_w:  # Win condition
-                        self.state.win()
-                    if event.key == pygame.K_l:  # Lose condition
-                        self.state.lose()
-                    if event.key in [
-                            pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP,
-                            pygame.K_DOWN]:
-                        self.state.play()
-                    if event.key == pygame.K_RETURN:
-                        if self.state.is_play or self.state.is_pause:
-                            return
-                        elif self.state.start():
-                            self.reset()
-                        elif self.state.select():
-                            pass
-                        elif self.state.is_win and self.state.start():
-                            # TODO: go to next level
-                            self.reset()
-                        elif self.state.is_lose and self.state.start():
-                            self.reset()
-
-            if self.state.is_play:
-                pressed = pygame.key.get_pressed()
-                self.input_collector.capture_keypress_events(events, pressed)
-
-                # Collect inputs at 10Hz (every 4th frame)
-                if self.logic_tick % 4 == 0:
-                    self.movement_tick += 1
-                    self.inputs = self.input_collector.collect()
-
-                self.logic_tick += 1  # Increment frame counter
-
+            running = self.state.do_events()
             self.render_screen()
 
             pygame.display.flip()
             self.clock.tick(40)
+
+    def run(self):
+        self.show_levelset_menu()
+
+    @staticmethod
+    def exit_game():
+        pygame.quit()
+        exit()
 
     def render_centered(self, text, y, color=(255, 255, 255)):
         # Render the text to a surface
@@ -92,40 +108,30 @@ class GamePlayerDemo:
         elif self.state.is_pause:
             self.render_centered("Paused", 280)
         elif self.state.is_play:
-            self.render(f"Logic tick: {self.logic_tick}", 50, 10)
-            self.render(f"Movement tick: {self.movement_tick}", 50, 30)
+            self.render(f"Logic tick: {self.state.logic_tick}", 50, 10)
+            self.render(f"Movement tick: {self.state.movement_tick}", 50, 30)
 
             # Display inputs
-            for i, key in enumerate(self.inputs):
+            for i, key in enumerate(self.state.inputs):
                 self.render(f"{key}", 50, 60 + i * 30)
         elif self.state.is_win:
             self.render_centered("You Win!", 280)
         elif self.state.is_lose:
             self.render_centered("You Lose!", 280)
-        elif self.state.is_load:
-            self.render_centered("Load Levelset", 280)
-        elif self.state.is_select:
-            self.render_centered("Select Level", 280)
 
     def render(self, text, x, y, color=(255, 255, 255)):
         rendered = self.font.render(text, True, color)
         self.screen.blit(rendered, (x, y))
 
-    def reset(self):
-        self.logic_tick = 0
-        self.movement_tick = 0
-        self.inputs = []
-        self.input_collector.reset()
-        self.state.start()
-
-    def toggle_pause(self):
-        if self.state.is_pause:
-            self.state.play()
-        elif self.state.is_play:
-            self.input_collector.reset()  # don't unpause with a movement queued
-            self.state.pause()
-
 
 if __name__ == "__main__":
+    # Define the logging format to include the file name, function name,
+    # and line number
+    log_format = '%(filename)s - %(funcName)s - Line %(lineno)d - %(message)s'
+
+    # Set up logging to use the format defined above and output to the
+    # console at the DEBUG level
+    logging.basicConfig(level=logging.DEBUG, format=log_format)
+
     game = GamePlayerDemo()
     game.run()
