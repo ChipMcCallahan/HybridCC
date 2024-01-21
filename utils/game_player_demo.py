@@ -10,15 +10,13 @@ from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
 BLACK_THEME.background_color = (0, 0, 0)
-VIEWPORT_SIZE = 9
-
+HZ = 40  # 40 IS NORMAL, 80 IS 2x
 
 class GamePlayerDemo:
     def __init__(self):
         pygame.init()
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         self.screen = pygame.display.set_mode((800, 600))
-        self.viewport = pygame.Surface((320, 320))
         pygame.display.set_caption("Game Player Demo")
         self.font = pygame.font.Font(None, 20)
         self.clock = pygame.time.Clock()
@@ -79,7 +77,7 @@ class GamePlayerDemo:
             self.render_screen()
 
             pygame.display.flip()
-            self.clock.tick(40)
+            self.clock.tick(HZ)
 
     def run(self):
         self.show_levelset_menu()
@@ -145,27 +143,40 @@ class GamePlayerDemo:
         surface.blit(rect_surface, (x, y))
 
     def render_viewport(self, centered_text=None):
-        tile_size = 32
-        cx, cy, cz = self.state.gameboard.viewport_center(VIEWPORT_SIZE)
-        margin = VIEWPORT_SIZE // 2
+        viewport_size = 11  # will clip this to 9x9
+        cx, cy, cz = self.state.gameboard.viewport_center(viewport_size)
+        margin = viewport_size // 2
+
+        terrain = {}
+        terrain_mod = {}
+        pickup = {}
+        mob = {}
+        sides = {}
         for i in range(cx - margin, cx + margin + 1):
             for j in range(cy - margin, cy + margin + 1):
+                # relative x & y to viewport
+                x, y = i - cx + margin, j - cy + margin
                 cell = self.state.gameboard.get((i, j, cz))
-                elems = [e for e in [cell.terrain, cell.terrain_mod,
-                                     cell.pickup, cell.mob] + cell.get_sides()
-                         if e is not None]
-                tile_images = [self.gfx.provide_one(elem)
-                               for elem in elems]
-                for img in tile_images:
-                    self.viewport.blit(img,
-                                       ((i - cx + margin) * tile_size + (
-                                                   tile_size // 2),
-                                        (j - cy + margin) * tile_size + (
-                                                    tile_size // 2)))
+                if cell.terrain:
+                    terrain[(x, y)] = cell.terrain
+                if cell.terrain_mod:
+                    terrain_mod[(x, y)] = cell.terrain_mod
+                if cell.pickup:
+                    pickup[(x, y)] = cell.pickup
+                if cell.mob:
+                    mob[(x, y)] = cell.mob
+                if cell.get_sides():
+                    sides[(x, y)] = cell.get_sides()
+
+        viewport = self.gfx.provide_viewport(viewport_size,
+                                             (terrain, terrain_mod,
+                                              pickup, mob, sides),
+                                             self.state.logic_tick)
         if centered_text:
-            self.blit_centered_rect(self.viewport, (320-32, 96))
-            self.render_centered_text(self.viewport, centered_text)
-        self.screen.blit(self.viewport, (240, 140))
+            self.blit_centered_rect(viewport, (320 - 32, 96))
+            self.render_centered_text(viewport, centered_text)
+        self.screen.blit(viewport, (240, 140))
+
 
 
 if __name__ == "__main__":
