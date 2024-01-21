@@ -1,10 +1,8 @@
-from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.shared import Id
 
 
 class Cell:
     def __init__(self, position):
-        self._elems = ElemHandler()
         self.position = position
         self.terrain = None
         self.terrain_mod = None
@@ -27,7 +25,7 @@ class Cell:
         method = getattr(self, remove_method_name)
         method(_id)
 
-    def get_elems(self):
+    def all(self):
         return [e for e in (self.terrain, self.terrain_mod,
                             self.pickup, self.mob)
                 + tuple(self._sides.values()) if e]

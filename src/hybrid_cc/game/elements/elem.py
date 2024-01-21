@@ -90,7 +90,7 @@ class Elem(ABC):
         return cls.instances[lookup_key]
 
     @classmethod
-    def destruct_at(cls, pos, **kwargs):
+    def destruct_at(cls, pos, elem):
         pass
 
     @classmethod

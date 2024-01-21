@@ -18,26 +18,26 @@ class Hint(Elem):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self):
+    def do_planning(self, **kwargs):
         raise NotImplementedError("Implement or remove.")
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, position, other, direction):
+    def test_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, position, other, direction):
+    def test_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_enter(self, position, other, direction):
+    def start_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_exit(self, position, other, direction):
+    def start_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_exit(self, position, other, direction):
+    def finish_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_enter(self, position, other, direction):
+    def finish_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")

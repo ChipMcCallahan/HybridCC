@@ -1,7 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared import Id
+from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.kwargs import DIRECTION
 
 
@@ -26,26 +26,37 @@ class Player(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self):
-        raise NotImplementedError("Implement or remove.")
+    def do_planning(self, inputs="", tick=None, **kwargs):
+        if None not in (tick, self.last_move_tick):
+            if tick - self.last_move_tick <= 1:
+                return
+        return self.mob_id, [Direction[d] for d in inputs]
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, position, other, direction):
+    def test_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, position, other, direction):
+    def test_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_enter(self, position, other, direction):
+    def start_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_exit(self, position, other, direction):
+    def start_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_exit(self, position, other, direction):
+    def finish_exit(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_enter(self, position, other, direction):
+    def finish_enter(self, mob, position, direction):
         raise NotImplementedError("Implement or remove.")
+
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+
+    def finalize_move(self, old_p, new_p, tick):
+        super().finalize_move(old_p, new_p, tick)
+        self.__class__.position = self.position

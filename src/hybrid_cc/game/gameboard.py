@@ -1,23 +1,25 @@
 """Gameboard module."""
-from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.map import Map
+from hybrid_cc.game.move_handler import MoveHandler
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Gameboard:
     """Gameboard class."""
     def __init__(self, level):
         """Initialize a new Gameboard instance."""
-        self.elems = ElemHandler()
         self._size = level.size
         self.map = Map(level)
+        self.elems = self.map.elems
+        self.move_handler = MoveHandler(self.map)
         self.author = ""
         self.title = level.title
         self.chips = {}  # map from color enum to count
         self.time = 0
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
-        self.movement = level.movement
+        self.tick = 0
 
     @property
     def size(self):
@@ -50,7 +52,17 @@ class Gameboard:
         return x, y, z
 
     def do_logic(self, inputs):
-        pass
-        #  planning
+        raw_moves = self.elems.collect_move_plans(inputs, self.tick)
 
-        #  execution
+        moved = set()
+        for move in raw_moves:
+            mob_id, dirs = move
+            mob = self.elems.get_mob(mob_id)
+            if not mob or mob_id in moved:
+                continue
+            for d in dirs:
+                result = self.move_handler.move(mob, d, self.tick)
+                if result == MoveResult.PASS:
+                    moved.add(mob.mob_id)
+                    break
+        self.tick += 1

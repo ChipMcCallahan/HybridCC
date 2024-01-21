@@ -221,7 +221,7 @@ class GameboardInspectorDemo(tk.Tk):
 
     def log_tile_stats(self, x, y):
         print(f"Position ({x}, {y}).")
-        elems = self.gameboard.get((x, y, 0)).get_elems()
+        elems = self.gameboard.get((x, y, 0)).all()
         for elem in elems:
             print(elem.lookup_key)
 
@@ -277,6 +277,7 @@ class GameboardInspectorDemo(tk.Tk):
         # Keep a reference to the cropped image to avoid garbage collection
         self.cropped_img_ref = cropped_img
 
+
 class GameboardImager:
     """Class that creates level images"""
 
@@ -323,8 +324,9 @@ class GameboardImager:
                         for elem in elems]
                     tile_img = self.stacker.stack(*tile_images)
 
-                    if self.show_monster_order and p in gameboard.movement:
-                        index = str(gameboard.movement.index(p))
+                    if (self.show_monster_order and
+                            p in gameboard.move_handler.movement):
+                        index = str(gameboard.move_handler.movement.index(p))
                         tile_img = self.stacker.stack(tile_img,
                                                       self.labeler.label(index,
                                                                          1))

@@ -18,19 +18,7 @@ DEFAULT_KWARGS = {
 
 
 class ElemHandler:
-    _instance = None  # singleton
-
-    def __new__(cls, *args, **kwargs):
-        # Check if an instance already exists
-        if not cls._instance:
-            cls._instance = super(ElemHandler, cls).__new__(cls)
-        return cls._instance
-
     def __init__(self):
-        # Ensure that initialization only happens once
-        if hasattr(self, '_initialized') and self._initialized:
-            return
-
         self.id_to_class = {}
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
@@ -38,8 +26,6 @@ class ElemHandler:
             if isinstance(element_class, type):
                 _id = Id.from_class_name(attribute_name)
                 self.id_to_class[_id] = element_class
-
-        self._initialized = True  # Mark as initialized
 
     def init_at_game_load(self):
         logging.info(f"Initializing {self.__name__} at game load...")
@@ -63,8 +49,9 @@ class ElemHandler:
         constructor = getattr(instance_class, "construct_at")
         return constructor(pos, **kwargs)
 
-    def destruct_at(self, pos, _id):
-        instance_class = self.get_class(_id)
+    @staticmethod
+    def destruct_at(pos, elem):
+        instance_class = elem.__class__
         destructor = getattr(instance_class, "destruct_at")
         destructor(pos)
 
@@ -81,3 +68,32 @@ class ElemHandler:
         for kwarg in (COLOR, RULE, COUNT, CHANNEL, SIDES, DIRECTION):
             new_kwargs[kwarg] = kwargs.get(kwarg) or DEFAULT_KWARGS[kwarg]
         return new_kwargs
+
+    def collect_move_plans(self, inputs, tick):
+        all_move_plans = []
+
+        # Class level plans (e.g. ice, force floor, dpad buttons)
+        for elem_class in self.id_to_class.values():
+            method = getattr(elem_class, "do_class_planning", None)
+            if method:
+                move_plan = method(inputs=inputs, tick=tick)
+                if move_plan:
+                    all_move_plans.append(move_plan)
+
+        # Instance level plans (mobs)
+        for mob_id, mob in Mob.instances.items():
+            method = getattr(mob, "do_planning", None)
+            if method:
+                move_plan = method(inputs=inputs, tick=tick)
+                if move_plan:
+                    all_move_plans.append(move_plan)
+
+        return all_move_plans
+
+    @staticmethod
+    def get_mob(mob_id):
+        return Mob.get_mob(mob_id)
+
+    @staticmethod
+    def exists(mob_id):
+        return Mob.exists(mob_id)

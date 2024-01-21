@@ -24,6 +24,6 @@ class Bomb(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_enter(self, position, other, direction):
+    def finish_enter(self, mob, position, direction):
         return ((DESTROY, self, position),
                 (DESTROY, other, position))

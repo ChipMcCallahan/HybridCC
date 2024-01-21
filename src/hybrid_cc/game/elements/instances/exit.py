@@ -3,6 +3,7 @@ import logging
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Exit(Elem):
@@ -19,26 +20,18 @@ class Exit(Elem):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self):
+    def do_planning(self, **kwargs):
         raise NotImplementedError("Implement or remove.")
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def test_enter(mob, position, direction):
+        if mob.id == Id.PLAYER:
+            return MoveResult.PASS
+        return MoveResult.FAIL
 
-    def test_exit(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, position, other, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def finish_enter(mob, position, direction):
+        print("You Won!")
