@@ -11,6 +11,7 @@ class Player(Mob):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.pushing = False
 
     @classmethod
     def init_at_level_load(cls):
@@ -27,6 +28,7 @@ class Player(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, inputs="", tick=None, **kwargs):
+        self.pushing = False
         if None not in (tick, self.last_move_tick):
             if tick - self.last_move_tick <= 1:
                 return
@@ -58,5 +60,10 @@ class Player(Mob):
     # --------------------------------------------------------------------------
 
     def finalize_move(self, old_p, new_p, tick):
+        self.pushing = False
         super().finalize_move(old_p, new_p, tick)
         self.__class__.position = self.position
+
+    def on_failed_move(self, move_result, d):
+        self.pushing = True
+        self.direction = d

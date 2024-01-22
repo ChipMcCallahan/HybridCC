@@ -39,8 +39,8 @@ class PygameGfxProvider:
         self.cache[cache_key] = pyg_result
         return pyg_result
 
-    def provide_one(self, elem, logic_tick):
-        frames = self.provide(elem)
+    def provide_one(self, elem, logic_tick, **kwargs):
+        frames = self.provide(elem, **kwargs)
         if not is_iter(frames):
             return frames, None
         move_tick = logic_tick // 4
@@ -98,12 +98,15 @@ class PygameGfxProvider:
             for i in range(0, size):
                 for j in range(0, size):
                     elem = layer.get((i, j), None)
+                    kwargs = {}
                     if not elem:
                         continue
                     if isinstance(elem, Player):
                         player_offset = get_player_offset(elem)
                         player_tile = (i, j)
-                    img, offset = self.provide_one(elem, logic_tick)
+                        if elem.pushing:
+                            kwargs["pushing"] = True
+                    img, offset = self.provide_one(elem, logic_tick, **kwargs)
                     offset = offset or (0, 0)
                     x = i + offset[0]
                     y = j + offset[1]

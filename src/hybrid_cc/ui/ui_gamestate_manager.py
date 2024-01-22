@@ -15,6 +15,8 @@ class UIGamestateManager:
         self.state = UIGamestate()
         self.gameboard = None
         self.level_set = None
+        self.level = None
+        self.reset()
 
     def do_events(self):
         events = pygame.event.get()
@@ -53,7 +55,10 @@ class UIGamestateManager:
                 self.movement_tick += 1
                 self.inputs = self.input_collector.collect()
                 self.gameboard.do_logic(self.inputs)
-
+                if self.gameboard.state == Gameboard.State.WIN:
+                    self.state.win()
+                elif self.gameboard.state == Gameboard.State.LOSE:
+                    self.state.lose()
             self.logic_tick += 1  # Increment frame counter
         return True
 
@@ -62,6 +67,7 @@ class UIGamestateManager:
         self.movement_tick = 0
         self.inputs = []
         self.input_collector.reset()
+        self.setup_gameboard()
 
     def toggle_pause(self):
         if self.state.is_pause:
@@ -73,8 +79,13 @@ class UIGamestateManager:
     def load_set(self, file_path):
         self.level_set = DATConverter.convert_levelset(file_path)
 
-    def setup_gameboard(self, lvl):
-        self.gameboard = Gameboard(lvl)
+    def setup_gameboard(self):
+        if self.level:
+            self.gameboard = Gameboard(self.level)
+
+    def set_level(self, level):
+        self.level = level
+        self.reset()
 
     @property
     def is_start(self):

@@ -1,4 +1,6 @@
 """Gameboard module."""
+from enum import Enum
+
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
@@ -7,6 +9,12 @@ from hybrid_cc.shared.move_result import MoveResult
 
 class Gameboard:
     """Gameboard class."""
+
+    class State(Enum):
+        PLAY = 1
+        WIN = 2
+        LOSE = 3
+
     def __init__(self, level):
         """Initialize a new Gameboard instance."""
         self._size = level.size
@@ -16,10 +24,11 @@ class Gameboard:
         self.author = ""
         self.title = level.title
         self.chips = {}  # map from color enum to count
-        self.time = 0
+        self.time = level.time
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
         self.tick = 0
+        self.state = Gameboard.State.PLAY
 
     @property
     def size(self):
@@ -66,3 +75,12 @@ class Gameboard:
                     moved.add(mob.mob_id)
                     break
         self.tick += 1
+        if self.time > 0 and self.time_remaining() == 0:
+            self.transition(Gameboard.State.LOSE)
+
+    def transition(self, state):
+        if self.state == Gameboard.State.PLAY:
+            self.state = state
+
+    def time_remaining(self):
+        return max(self.time - self.tick // 10, 0)

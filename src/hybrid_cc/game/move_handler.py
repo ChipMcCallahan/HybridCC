@@ -8,12 +8,19 @@ class MoveHandler:
     def move(self, mob, d, tick):
         result = self.test_move(mob, d)
         if result != MoveResult.PASS:
-            return result
+            return self.fail_move(mob, result, d)
         result = self.start_move(mob, d)
         if result != MoveResult.PASS:
-            return result
+            return self.fail_move(mob, result, d)
         self.finish_move(mob, d, tick)
         return result
+
+    @staticmethod
+    def fail_move(mob, move_result, d):
+        method = getattr(mob, "on_failed_move", None)
+        if method:
+            method(move_result, d)
+        return move_result
 
     def test_move(self, mob, d):
         return self._do_trial_move(mob, d, 'test')

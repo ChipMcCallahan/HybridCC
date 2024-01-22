@@ -20,7 +20,7 @@ class GamePlayerDemo:
         pygame.display.set_caption("Game Player Demo")
         self.font = pygame.font.Font(None, 20)
         self.clock = pygame.time.Clock()
-        self.state = UIGamestateManager()
+        self.state_mgr = UIGamestateManager()
         self.package_dir = importlib.resources.files("hybrid_cc.sets.dat")
         self.gfx = PygameGfxProvider()
 
@@ -41,7 +41,7 @@ class GamePlayerDemo:
     def show_levelset_menu(self):
         def on_select(file_path):
             self.show_loading()
-            self.state.load_set(file_path)
+            self.state_mgr.load_set(file_path)
             self.show_level_menu()
 
         levelset_files = self.get_levelset_files()
@@ -57,13 +57,13 @@ class GamePlayerDemo:
     def show_level_menu(self):
         def on_select(_lvl):
             self.show_loading()
-            self.state.setup_gameboard(_lvl)
+            self.state_mgr.set_level(_lvl)
             self.run_events()
 
         menu = pygame_menu.Menu('Select Level', 800, 600,
                                 theme=BLACK_THEME)
 
-        for lvl in self.state.level_set.levels:
+        for lvl in self.state_mgr.level_set.levels:
             menu.add.button(lvl.title, on_select, lvl)
 
         menu.add.button('Back', self.show_levelset_menu)
@@ -73,7 +73,7 @@ class GamePlayerDemo:
         running = True
         while running:
             self.screen.fill((0, 0, 0))  # Clear screen
-            running = self.state.do_events()
+            running = self.state_mgr.do_events()
             self.render_screen()
 
             pygame.display.flip()
@@ -106,21 +106,17 @@ class GamePlayerDemo:
         surface.blit(text_surface, (x, y))
 
     def render_screen(self):
-        if self.state.is_start:
-            self.render_viewport(self.state.gameboard.title)
-        elif self.state.is_pause:
+        if self.state_mgr.is_start:
+            self.render_viewport(self.state_mgr.gameboard.title)
+        elif self.state_mgr.is_pause:
             self.render_centered_text(self.screen, "Paused")
-        elif self.state.is_play:
-            self.render_text(f"Logic tick: {self.state.logic_tick}", 50, 10)
-            self.render_text(f"Movement tick: {self.state.movement_tick}", 50,
-                             30)
+        elif self.state_mgr.is_play:
+            self.render_text(f"Time Remaining: "
+                             f"{self.state_mgr.gameboard.time_remaining()}", 50, 10)
             self.render_viewport()
-            # Display inputs
-            for i, key in enumerate(self.state.inputs):
-                self.render_text(f"{key}", 50, 60 + i * 30)
-        elif self.state.is_win:
+        elif self.state_mgr.is_win:
             self.render_viewport("You Win!")
-        elif self.state.is_lose:
+        elif self.state_mgr.is_lose:
             self.render_viewport("You Lose!")
 
     @staticmethod
@@ -144,7 +140,7 @@ class GamePlayerDemo:
 
     def render_viewport(self, centered_text=None):
         viewport_size = 11  # will clip this to 9x9
-        cx, cy, cz = self.state.gameboard.viewport_center(viewport_size)
+        cx, cy, cz = self.state_mgr.gameboard.viewport_center(viewport_size)
         margin = viewport_size // 2
 
         terrain = {}
@@ -156,7 +152,7 @@ class GamePlayerDemo:
             for j in range(cy - margin, cy + margin + 1):
                 # relative x & y to viewport
                 x, y = i - cx + margin, j - cy + margin
-                cell = self.state.gameboard.get((i, j, cz))
+                cell = self.state_mgr.gameboard.get((i, j, cz))
                 if cell.terrain:
                     terrain[(x, y)] = cell.terrain
                 if cell.terrain_mod:
@@ -171,12 +167,11 @@ class GamePlayerDemo:
         viewport = self.gfx.provide_viewport(viewport_size,
                                              (terrain, terrain_mod,
                                               pickup, mob, sides),
-                                             self.state.logic_tick)
+                                             self.state_mgr.logic_tick)
         if centered_text:
             self.blit_centered_rect(viewport, (320 - 32, 96))
             self.render_centered_text(viewport, centered_text)
         self.screen.blit(viewport, (240, 140))
-
 
 
 if __name__ == "__main__":
