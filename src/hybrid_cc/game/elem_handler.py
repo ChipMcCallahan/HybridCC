@@ -1,6 +1,7 @@
 import logging
 from hybrid_cc.game.elements import instances
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
@@ -18,7 +19,7 @@ DEFAULT_KWARGS = {
 
 
 class ElemHandler:
-    def __init__(self):
+    def __init__(self, level):
         self.id_to_class = {}
         for attribute_name in dir(instances):
             element_class = getattr(instances, attribute_name)
@@ -27,11 +28,6 @@ class ElemHandler:
                 _id = Id.from_class_name(attribute_name)
                 self.id_to_class[_id] = element_class
 
-    def init_at_game_load(self):
-        logging.info(f"Initializing {self.__name__} at game load...")
-
-    def init_at_level_load(self):
-        logging.info(f"Initializing {self.__name__}...")
         Elem.init_at_level_load()
         Mob.init_at_level_load()
         for attribute_name in dir(instances):
@@ -43,6 +39,9 @@ class ElemHandler:
                     init_elem_cls = getattr(element_class, "init_at_level_load")
                     init_elem_cls()
 
+        # Element specific initializations.
+        Socket.set_chips_required(level.chips.copy())
+
     def construct_at(self, pos, _id, **kwargs):
         kwargs = self.assign_kwarg_defaults(**kwargs)
         instance_class = self.get_class(_id)
@@ -53,7 +52,7 @@ class ElemHandler:
     def destruct_at(pos, elem):
         instance_class = elem.__class__
         destructor = getattr(instance_class, "destruct_at")
-        destructor(pos)
+        destructor(elem, pos)
 
     def get_class(self, _id):
         if not self.id_to_class:

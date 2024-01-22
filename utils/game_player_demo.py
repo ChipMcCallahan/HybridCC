@@ -12,13 +12,14 @@ BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
 BLACK_THEME.background_color = (0, 0, 0)
 HZ = 40  # 40 IS NORMAL, 80 IS 2x
 
+
 class GamePlayerDemo:
     def __init__(self):
         pygame.init()
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Game Player Demo")
-        self.font = pygame.font.Font(None, 20)
+        self.font = pygame.font.Font(None, 24)
         self.clock = pygame.time.Clock()
         self.state_mgr = UIGamestateManager()
         self.package_dir = importlib.resources.files("hybrid_cc.sets.dat")
@@ -107,12 +108,15 @@ class GamePlayerDemo:
 
     def render_screen(self):
         if self.state_mgr.is_start:
-            self.render_viewport(self.state_mgr.gameboard.title)
+            self.render_view_extras()
+            self.render_viewport()
+            self.blit_centered_rect(self.screen, (400, 96))
+            self.render_centered_text(self.screen,
+                                      self.state_mgr.gameboard.title)
         elif self.state_mgr.is_pause:
             self.render_centered_text(self.screen, "Paused")
         elif self.state_mgr.is_play:
-            self.render_text(f"Time Remaining: "
-                             f"{self.state_mgr.gameboard.time_remaining()}", 50, 10)
+            self.render_view_extras()
             self.render_viewport()
         elif self.state_mgr.is_win:
             self.render_viewport("You Win!")
@@ -137,6 +141,17 @@ class GamePlayerDemo:
         # Blit the rectangle surface onto the provided surface at the
         # calculated position
         surface.blit(rect_surface, (x, y))
+
+    def render_view_extras(self):
+        self.render_text(f"Time Remaining: "
+                         f"{self.state_mgr.gameboard.time_remaining()}", 10,
+                         10)
+        self.render_text(f"Chips Remaining", 10, 50)
+        y_index = 70
+        for color, count in self.state_mgr.gameboard.chips_remaining().items():
+            self.render_text(f"{color.name}: {count}", 10, y_index,
+                             color.value)
+            y_index += 20
 
     def render_viewport(self, centered_text=None):
         viewport_size = 11  # will clip this to 9x9
@@ -171,7 +186,9 @@ class GamePlayerDemo:
         if centered_text:
             self.blit_centered_rect(viewport, (320 - 32, 96))
             self.render_centered_text(viewport, centered_text)
-        self.screen.blit(viewport, (240, 140))
+
+        self.screen.blit(viewport, (400 - (32 * 9) / 2,
+                                    300 - (32 * 9) / 2))
 
 
 if __name__ == "__main__":

@@ -1,9 +1,12 @@
 """Gameboard module."""
 from enum import Enum
 
+from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.elements.instances.player import Player
+from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
+from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -23,7 +26,6 @@ class Gameboard:
         self.move_handler = MoveHandler(self.map)
         self.author = ""
         self.title = level.title
-        self.chips = {}  # map from color enum to count
         self.time = level.time
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
@@ -70,7 +72,8 @@ class Gameboard:
             if not mob or mob_id in moved:
                 continue
             for d in dirs:
-                result = self.move_handler.move(mob, d, self.tick)
+                result, requests = self.move_handler.move(mob, d, self.tick)
+                self.do_requests(requests)
                 if result == MoveResult.PASS:
                     moved.add(mob.mob_id)
                     break
@@ -78,9 +81,29 @@ class Gameboard:
         if self.time > 0 and self.time_remaining() == 0:
             self.transition(Gameboard.State.LOSE)
 
+    def do_requests(self, requests):
+        for request in requests:
+            print(request)
+            if isinstance(request, DestroyRequest):
+                target, pos = request.target, request.pos
+                self.map.destruct_at(pos, target)
+            elif isinstance(request, CreateRequest):
+                pass
+            elif isinstance(request, WinRequest):
+                self.transition(Gameboard.State.WIN)
+
     def transition(self, state):
         if self.state == Gameboard.State.PLAY:
             self.state = state
 
     def time_remaining(self):
         return max(self.time - self.tick // 10, 0)
+
+    @staticmethod
+    def chips_remaining():
+        chips_remaining = {}
+        for color, required in Socket.chips_required.items():
+            collected = Chip.chips_collected.get(color, 0)
+            remaining = max(0, required - collected)
+            chips_remaining[color] = remaining
+        return chips_remaining

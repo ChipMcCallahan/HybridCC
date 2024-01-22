@@ -6,21 +6,33 @@ class MoveHandler:
         self.map = map
 
     def move(self, mob, d, tick):
-        result = self.test_move(mob, d)
+        requests = []
+
+        result, new_requests = self.test_move(mob, d)
+        requests += new_requests or []
         if result != MoveResult.PASS:
-            return self.fail_move(mob, result, d)
-        result = self.start_move(mob, d)
+            result, new_requests = self.fail_move(mob, result, d)
+            requests += new_requests or []
+            return result, requests
+
+        result, new_requests = self.start_move(mob, d)
+        requests += new_requests or []
         if result != MoveResult.PASS:
-            return self.fail_move(mob, result, d)
-        self.finish_move(mob, d, tick)
-        return result
+            result, new_requests = self.fail_move(mob, result, d)
+            requests += new_requests or []
+            return result, requests
+
+        requests += self.finish_move(mob, d, tick) or []
+
+        return result, requests
 
     @staticmethod
     def fail_move(mob, move_result, d):
         method = getattr(mob, "on_failed_move", None)
+        requests = None
         if method:
-            method(move_result, d)
-        return move_result
+            requests = method(move_result, d)
+        return move_result, requests
 
     def test_move(self, mob, d):
         return self._do_trial_move(mob, d, 'test')
@@ -37,7 +49,7 @@ class MoveHandler:
 
         here, there = self.map.get(here_p), self.map.get(there_p)
 
-        result = MoveResult.PASS
+        result, requests = MoveResult.PASS, []
 
         # Process exit
         for elem in here.all():
@@ -45,18 +57,20 @@ class MoveHandler:
                 continue
             method = getattr(elem, f"{phase}_exit", None)
             if method:
-                result = method(mob, here_p, d)
+                result, new_requests = method(mob, here_p, d)
+                requests += new_requests or []
                 if result != MoveResult.PASS:
-                    return result
+                    return result, requests
 
         # Process enter
         for elem in there.all():
             method = getattr(elem, f"{phase}_enter", None)
             if method:
-                result = method(mob, there_p, d)
+                result, new_requests = method(mob, there_p, d)
+                requests += new_requests or []
                 if result != MoveResult.PASS:
-                    return result
-        return result
+                    return result, requests
+        return result, requests
 
     def finish_move(self, mob, d, tick):
         here_p, offset = mob.position, d.value
@@ -68,20 +82,23 @@ class MoveHandler:
 
         here, there = self.map.get(here_p), self.map.get(there_p)
 
+        requests = []
+
         # Process exit
         for elem in here.all():
             if elem is mob:
                 continue
             method = getattr(elem, "finish_exit", None)
             if method:
-                method(mob, here_p, d)
+                requests += method(mob, here_p, d) or []
 
         # Process enter
         for elem in there.all():
             method = getattr(elem, f"finish_enter", None)
             if method:
-                method(mob, there_p, d)
+                requests += method(mob, there_p, d) or []
 
         here.remove(mob)
         there.add(mob)
         mob.finalize_move(here_p, there_p, tick)
+        return requests

@@ -1,6 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import WinRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 from hybrid_cc.shared.move_result import MoveResult
@@ -29,9 +30,10 @@ class Exit(Elem):
     @staticmethod
     def test_enter(mob, position, direction):
         if mob.id == Id.PLAYER:
-            return MoveResult.PASS
-        return MoveResult.FAIL
+            return MoveResult.PASS, None
+        return MoveResult.FAIL, None
 
-    @staticmethod
-    def finish_enter(mob, position, direction):
-        print("You Won!")
+    def finish_enter(self, mob, position, direction):
+        return [
+            WinRequest(color=self.color)
+        ]

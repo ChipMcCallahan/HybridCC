@@ -87,6 +87,8 @@ class CellConverter:
                 kwargs = CellConverter.colorize(bottom) or CellConverter.count(
                     bottom)
                 cell.pickup = LevelElem(Id.CHIP, **kwargs)
+                if kwargs:
+                    populate(CC1.FLOOR, bottom)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
@@ -180,7 +182,7 @@ class CellConverter:
                 kwargs = CellConverter.colorize(bottom)
                 cell.terrain_mod = LevelElem(Id.SOCKET, **kwargs)
                 if kwargs:
-                    return
+                    populate(CC1.FLOOR, bottom)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)

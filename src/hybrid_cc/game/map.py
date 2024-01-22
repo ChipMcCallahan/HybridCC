@@ -8,7 +8,7 @@ from hybrid_cc.shared import Id
 
 class Map:
     def __init__(self, level):
-        self.elems = ElemHandler()
+        self.elems = ElemHandler(level)
         self.size = level.size
         self.monster_order = []
         self.map = {}
