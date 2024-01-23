@@ -70,7 +70,7 @@ class CellConverter:
         return dict()
 
     @staticmethod
-    def convert(cc1_cell, channel=None):
+    def convert(cc1_cell, channel=None, conversion_rules=()):
         cell = LevelCell()
 
         def populate(top, bottom=CC1.FLOOR):
@@ -88,7 +88,10 @@ class CellConverter:
                     bottom)
                 cell.pickup = LevelElem(Id.CHIP, **kwargs)
                 if kwargs:
-                    populate(CC1.FLOOR, bottom)
+                    if "extend-color" in conversion_rules:
+                        populate(CC1.FLOOR, bottom)
+                    return
+
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
@@ -182,7 +185,9 @@ class CellConverter:
                 kwargs = CellConverter.colorize(bottom)
                 cell.terrain_mod = LevelElem(Id.SOCKET, **kwargs)
                 if kwargs:
-                    populate(CC1.FLOOR, bottom)
+                    if "extend-color" in conversion_rules:
+                        populate(CC1.FLOOR, bottom)
+                    return
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)

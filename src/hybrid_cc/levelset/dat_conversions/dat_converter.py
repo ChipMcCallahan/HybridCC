@@ -46,7 +46,9 @@ class DATConverter:
         """
         x_size, y_size, z_size = 32, 32, len(cc1_levels)
         level = Level(x_size, y_size, z_size)
-        level.title = cc1_levels[0].title
+        title_split = cc1_levels[0].title.split("|")
+        level.title = title_split[0]
+        conversion_rules = [] if len(title_split) == 1 else title_split[1:]
         level.time = cc1_levels[0].time
         level.chips[Color.GREY] = sum(
             cc1_level.chips for cc1_level in cc1_levels)
@@ -89,7 +91,8 @@ class DATConverter:
                     p = (i, j, k)
                     cc1_cell = cc1_levels[k].at(j * 32 + i)
                     cell = CellConverter.convert(cc1_cell,
-                                                 channels.get(p, None))
+                                                 channels.get(p, None),
+                                                 conversion_rules)
                     if (cell.pickup and cell.pickup.id == Id.CHIP
                             and cell.pickup.color):
                         level.chips[cell.pickup.color] = level.chips.get(
