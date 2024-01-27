@@ -6,9 +6,11 @@ from PIL import Image
 
 from hybrid_cc.game.elements.instances.exit import Exit
 from hybrid_cc.game.elements.instances.player import Player
+from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.gfx.gfx_provider import GfxProvider
-from hybrid_cc.shared import Direction
+from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.shared_utils import is_iter
+from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
 
 class PygameGfxProvider:
@@ -75,7 +77,7 @@ class PygameGfxProvider:
             return main_surface
         return frame
 
-    def provide_viewport(self, size, layers, logic_tick):
+    def provide_viewport(self, size, layers, logic_tick, top_left_position):
         move_tick = logic_tick // 4
         tick_modulo = logic_tick % 4
         tile_size = 32
@@ -97,6 +99,9 @@ class PygameGfxProvider:
         for layer in layers:
             for i in range(0, size):
                 for j in range(0, size):
+                    position = (top_left_position[0] + i,
+                                top_left_position[1] + j,
+                                top_left_position[2])
                     elem = layer.get((i, j), None)
                     kwargs = {}
                     if not elem:
@@ -106,6 +111,9 @@ class PygameGfxProvider:
                         player_tile = (i, j)
                         if elem.pushing:
                             kwargs["pushing"] = True
+                    if elem.id == Id.TRICK_WALL:
+                        if position in TrickWall.show_secrets_positions:
+                            kwargs["show_secrets"] = True
                     img, offset = self.provide_one(elem, logic_tick, **kwargs)
                     offset = offset or (0, 0)
                     x = i + offset[0]

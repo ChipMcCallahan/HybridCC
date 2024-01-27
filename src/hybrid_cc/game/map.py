@@ -59,9 +59,6 @@ class Map:
             if map_elem:
                 elem = self.construct_at(p, map_elem.id,
                                          **map_elem.get_kwargs())
-                if isinstance(elem, Mob) and p in level.movement:
-                    index = level.movement.index(p)
-                    mob_id = elem.mob_id
 
     def get(self, p):
         """Get the cell at location p."""

@@ -83,12 +83,12 @@ class Gameboard:
 
     def do_requests(self, requests):
         for request in requests:
-            print(request)
             if isinstance(request, DestroyRequest):
                 target, pos = request.target, request.pos
                 self.map.destruct_at(pos, target)
             elif isinstance(request, CreateRequest):
-                pass
+                pos, eid, kwargs = request.pos, request.id, request.kwargs
+                self.map.construct_at(pos, eid, **kwargs)
             elif isinstance(request, WinRequest):
                 self.transition(Gameboard.State.WIN)
 

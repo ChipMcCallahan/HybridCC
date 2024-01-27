@@ -157,6 +157,7 @@ class GamePlayerDemo:
         viewport_size = 11  # will clip this to 9x9
         cx, cy, cz = self.state_mgr.gameboard.viewport_center(viewport_size)
         margin = viewport_size // 2
+        top_left_position = (cx - margin, cy - margin, cz)
 
         terrain = {}
         terrain_mod = {}
@@ -182,7 +183,8 @@ class GamePlayerDemo:
         viewport = self.gfx.provide_viewport(viewport_size,
                                              (terrain, terrain_mod,
                                               pickup, mob, sides),
-                                             self.state_mgr.logic_tick)
+                                             self.state_mgr.logic_tick,
+                                             top_left_position)
         if centered_text:
             self.blit_centered_rect(viewport, (320 - 32, 96))
             self.render_centered_text(viewport, centered_text)

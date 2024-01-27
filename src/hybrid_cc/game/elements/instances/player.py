@@ -12,7 +12,6 @@ class Player(Mob):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pushing = False
-        print(f"init player {self.mob_id}")
 
     @classmethod
     def init_at_level_load(cls):

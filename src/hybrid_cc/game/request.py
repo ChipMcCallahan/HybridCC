@@ -5,9 +5,10 @@ class DestroyRequest:
 
 
 class CreateRequest:
-    def __init__(self, *, target, pos):
-        self.target = target
+    def __init__(self, *, pos, eid, **kwargs):
         self.pos = pos
+        self.id = eid
+        self.kwargs = kwargs
 
 
 class WinRequest:
