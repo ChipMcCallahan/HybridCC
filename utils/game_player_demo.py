@@ -154,37 +154,38 @@ class GamePlayerDemo:
             y_index += 20
 
     def render_viewport(self, centered_text=None):
-        viewport_size = 11  # will clip this to 9x9
-        cx, cy, cz = self.state_mgr.gameboard.viewport_center(viewport_size)
-        margin = viewport_size // 2
-        top_left_position = (cx - margin, cy - margin, cz)
+        # viewport_size = 11  # will clip this to 9x9
+        # cx, cy, cz = self.state_mgr.gameboard.camera.position
+        # margin = viewport_size // 2
+        # top_left_position = (cx - margin, cy - margin, cz)
+        nw, se = self.state_mgr.gameboard.camera.get_tile_bounds(
+            self.state_mgr.logic_tick)
 
         terrain = {}
         terrain_mod = {}
         pickup = {}
         mob = {}
         sides = {}
-        for i in range(cx - margin, cx + margin + 1):
-            for j in range(cy - margin, cy + margin + 1):
-                # relative x & y to viewport
-                x, y = i - cx + margin, j - cy + margin
-                cell = self.state_mgr.gameboard.get((i, j, cz))
+        for i in range(nw[0], se[0] + 1):
+            for j in range(nw[1], se[1] + 1):
+                position = (i, j, 0)
+                cell = self.state_mgr.gameboard.get((i, j, 0))
                 if cell.terrain:
-                    terrain[(x, y)] = cell.terrain
+                    terrain[position] = cell.terrain
                 if cell.terrain_mod:
-                    terrain_mod[(x, y)] = cell.terrain_mod
+                    terrain_mod[position] = cell.terrain_mod
                 if cell.pickup:
-                    pickup[(x, y)] = cell.pickup
+                    pickup[position] = cell.pickup
                 if cell.mob:
-                    mob[(x, y)] = cell.mob
+                    mob[position] = cell.mob
                 if cell.get_sides():
-                    sides[(x, y)] = cell.get_sides()
+                    sides[position] = cell.get_sides()
 
-        viewport = self.gfx.provide_viewport(viewport_size,
-                                             (terrain, terrain_mod,
+        viewport = self.gfx.provide_viewport((terrain, terrain_mod,
                                               pickup, mob, sides),
                                              self.state_mgr.logic_tick,
-                                             top_left_position)
+                                             nw, se,
+                                             self.state_mgr.gameboard.camera)
         if centered_text:
             self.blit_centered_rect(viewport, (320 - 32, 96))
             self.render_centered_text(viewport, centered_text)

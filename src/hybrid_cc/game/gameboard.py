@@ -1,9 +1,11 @@
 """Gameboard module."""
 from enum import Enum
 
+from hybrid_cc.game.camera import Camera
 from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.socket import Socket
+from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
@@ -31,8 +33,8 @@ class Gameboard:
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
         self.tick = 0
-        self.last_player_position = (0, 0, 0)
         self.state = Gameboard.State.PLAY
+        self.camera = Camera(Mob.instances[0], self)
 
     @property
     def size(self):
@@ -56,15 +58,6 @@ class Gameboard:
             raise ValueError("Coordinates out of bounds")
         return self.map.get(p)
 
-    def viewport_center(self, viewport_size=9):
-        margin = viewport_size // 2
-        x, y, z = Player.position or self.last_player_position
-        self.last_player_position = (x, y, z)
-        x, y = max(x, margin), max(y, margin)
-        x = min(x, self.size[0] - margin - 1)
-        y = min(y, self.size[1] - margin - 1)
-        return x, y, z
-
     def do_logic(self, inputs):
         raw_moves = self.elems.collect_move_plans(inputs, self.tick)
 
@@ -83,6 +76,7 @@ class Gameboard:
         self.tick += 1
         if self.time > 0 and self.time_remaining() == 0:
             self.transition(Gameboard.State.LOSE)
+        self.camera.update()
 
     def do_requests(self, requests):
         for request in requests:

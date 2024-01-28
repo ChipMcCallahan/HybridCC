@@ -7,7 +7,6 @@ from hybrid_cc.shared.kwargs import DIRECTION
 
 class Player(Mob):
     kwarg_filter = (DIRECTION,)  # Retain these kwargs only.
-    position = None  # Store position at the class level for easy finding.
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -16,17 +15,6 @@ class Player(Mob):
     @classmethod
     def init_at_level_load(cls):
         logging.info(f"Initializing {cls.__name__}...")
-        cls.position = None
-
-    @classmethod
-    def construct_at(cls, pos, **kwargs):
-        cls.position = pos
-        return super().construct_at(pos, **kwargs)
-
-    @classmethod
-    def destruct_at(cls, elem, pos):
-        super().destruct_at(elem, pos)
-        cls.position = pos
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE
@@ -67,7 +55,6 @@ class Player(Mob):
     def finalize_move(self, old_p, new_p, tick):
         self.pushing = False
         super().finalize_move(old_p, new_p, tick)
-        self.__class__.position = self.position
 
     def on_failed_move(self, move_result, d):
         self.pushing = True

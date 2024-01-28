@@ -45,7 +45,7 @@ class MoveHandler:
         there_p = tuple(a + b for a, b in zip(here_p, offset))
 
         if self.map.is_oob(there_p):
-            return MoveResult.FAIL
+            return MoveResult.FAIL, []
 
         here, there = self.map.get(here_p), self.map.get(there_p)
 

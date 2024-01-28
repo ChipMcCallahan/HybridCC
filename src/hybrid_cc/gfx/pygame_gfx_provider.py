@@ -4,13 +4,12 @@ import math
 import pygame
 from PIL import Image
 
-from hybrid_cc.game.elements.instances.exit import Exit
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
+from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.shared_utils import is_iter
-from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
 FOUR_FRAMES = {Id.WATER, Id.FIRE, Id.EXIT, Id.STEPPING_STONE}
 
@@ -48,7 +47,7 @@ class PygameGfxProvider:
         if not is_iter(frames):
             return frames, None
         move_tick = logic_tick // 4
-        if isinstance(elem, Player) and elem.last_move_tick is not None:
+        if isinstance(elem, Mob) and elem.last_move_tick is not None:
             offset = move_tick - elem.last_move_tick
             if offset < 2:
                 index = offset * 4 + logic_tick % 4
@@ -79,38 +78,26 @@ class PygameGfxProvider:
             return main_surface
         return frame
 
-    def provide_viewport(self, size, layers, logic_tick, top_left_position):
-        move_tick = logic_tick // 4
-        tick_modulo = logic_tick % 4
-        tile_size = 32
-        raw_surface = pygame.Surface((size * tile_size, size * tile_size))
+    def provide_viewport(self, layers, logic_tick, nw_pos, se_pos, camera):
+        w, h = se_pos[0] - nw_pos[0] + 1, se_pos[1] - nw_pos[1] + 1
 
-        player_offset = (0, 0)
-        player_tile = (0, 0)
+        raw_surface = pygame.Surface((w * 32,
+                                      h * 32))
 
-        def get_player_offset(player):
-            stale_time = math.inf
-            if player.last_move_tick is not None:
-                stale_time = move_tick - player.last_move_tick
-            if stale_time >= 2:
-                return 0, 0
-            scale = tile_size - (stale_time * 4 + tick_modulo) * 4
-            offset_x, offset_y, _ = player.direction.reverse().value
-            return offset_x * scale, offset_y * scale
+        # center = (camera.position[0] - top_left_position[0],
+        #           camera.position[1] - top_left_position[1])
+        # camera_offset = tuple(i * 32 for i in
+        #                       camera.get_target_offset(move_tick, tick_modulo))
 
         for layer in layers:
-            for i in range(0, size):
-                for j in range(0, size):
-                    position = (top_left_position[0] + i,
-                                top_left_position[1] + j,
-                                top_left_position[2])
-                    elem = layer.get((i, j), None)
+            for i in range(nw_pos[0], se_pos[0] + 1):
+                for j in range(nw_pos[1], se_pos[1] + 1):
+                    position = (i, j, 0)
+                    elem = layer.get(position, None)
                     kwargs = {}
                     if not elem:
                         continue
                     if isinstance(elem, Player):
-                        player_offset = get_player_offset(elem)
-                        player_tile = (i, j)
                         if elem.pushing:
                             kwargs["pushing"] = True
                     if isinstance(elem, TrickWall):
@@ -118,27 +105,22 @@ class PygameGfxProvider:
                             kwargs["show_secrets"] = True
                     img, offset = self.provide_one(elem, logic_tick, **kwargs)
                     offset = offset or (0, 0)
-                    x = i + offset[0]
-                    y = j + offset[1]
+                    x = i + offset[0] - nw_pos[0]
+                    y = j + offset[1] - nw_pos[1]
                     raw_surface.blit(img,
-                                     (x * tile_size,
-                                      y * tile_size))
+                                     (x * 32,
+                                      y * 32))
 
-        crop_width, crop_height = 9 * tile_size, 9 * tile_size
+        if (w, h) == (9, 9):
+            return raw_surface
 
-        # Calculate player's absolute position on the raw_surface
-        player_abs_x = (player_tile[0] * tile_size) + player_offset[0]
-        player_abs_y = (player_tile[1] * tile_size) + player_offset[1]
-
-        # Calculate the top-left corner for cropping, centered on the player
-        crop_x = player_abs_x - crop_width // 2 + tile_size // 2
-        crop_y = player_abs_y - crop_height // 2 + tile_size // 2
-
-        # Clamp the crop area so it doesn't go out of the raw_surface's bounds
-        crop_x = max(min(crop_x, size * tile_size - crop_width), 0)
-        crop_y = max(min(crop_y, size * tile_size - crop_height), 0)
-
-        # Create a new surface for the cropped area
+        crop_x, crop_y = tuple(
+            i * 32 for i in camera.get_tile_offset(logic_tick))
+        if crop_x < 0:
+            crop_x = 32 + crop_x
+        if crop_y < 0:
+            crop_y = 32 + crop_y
+        crop_width, crop_height = 9 * 32, 9 * 32
         return raw_surface.subsurface((crop_x, crop_y, crop_width, crop_height))
 
     @staticmethod

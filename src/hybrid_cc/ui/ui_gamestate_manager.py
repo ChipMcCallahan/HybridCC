@@ -60,6 +60,8 @@ class UIGamestateManager:
                 elif self.gameboard.state == Gameboard.State.LOSE:
                     self.state.lose()
             self.logic_tick += 1  # Increment frame counter
+        elif self.state.is_win or self.state.is_lose:
+            self.logic_tick += 1
         return True
 
     def reset(self):

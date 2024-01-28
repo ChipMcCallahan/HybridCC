@@ -29,6 +29,7 @@ class Water(Elem):
     def finish_enter(self, mob, position, direction):
         if mob.id == Id.PLAYER:
             return [
+                DestroyRequest(target=mob, pos=position),
                 LoseRequest(cause=self.id)
             ]
         if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:

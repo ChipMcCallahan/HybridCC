@@ -36,5 +36,6 @@ class Fire(Elem):
     def finish_enter(self, mob, position, direction):
         if mob.id == Id.PLAYER:
             return [
+                DestroyRequest(target=mob, pos=position),
                 LoseRequest(cause=self.id)
             ]
