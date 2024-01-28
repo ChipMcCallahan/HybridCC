@@ -1,5 +1,4 @@
 import logging
-import math
 
 import pygame
 from PIL import Image
@@ -7,6 +6,7 @@ from PIL import Image
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
+from hybrid_cc.shared.tag import PUSHING
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.shared_utils import is_iter
@@ -98,8 +98,8 @@ class PygameGfxProvider:
                     if not elem:
                         continue
                     if isinstance(elem, Player):
-                        if elem.pushing:
-                            kwargs["pushing"] = True
+                        if elem.tags[PUSHING]:
+                            kwargs[PUSHING] = True
                     if isinstance(elem, TrickWall):
                         if position in TrickWall.show_secrets_positions:
                             kwargs["show_secrets"] = True

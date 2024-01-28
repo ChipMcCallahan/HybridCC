@@ -4,6 +4,7 @@ from itertools import cycle
 from tkinter import Listbox, Canvas
 from PIL import ImageTk, Image
 
+from hybrid_cc.shared.tag import SWIMMING, PUSHING
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.levelset import LevelElem
 from hybrid_cc.shared import Id, Direction
@@ -262,12 +263,12 @@ ELIB.update(
         "PLAYER": [
             LevelElem(Id.PLAYER, direction=Direction[d]) for d in "NESW"],
         "PLAYER_SWIM": [
-            (LevelElem(Id.PLAYER, direction=Direction[d]), {"swimming": True})
+            (LevelElem(Id.PLAYER, direction=Direction[d]), {SWIMMING: True})
             for d
             in "NESW"
         ],
         "PLAYER_PUSH": [
-            (LevelElem(Id.PLAYER, direction=Direction[d]), {"pushing": True})
+            (LevelElem(Id.PLAYER, direction=Direction[d]), {PUSHING: True})
             for d
             in "NESW"
         ]

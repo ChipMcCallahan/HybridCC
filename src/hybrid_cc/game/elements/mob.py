@@ -10,6 +10,7 @@ class Mob(Elem):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.tags = {}
         self.mob_id = Mob._next_mob_id
         Mob.instances[self.mob_id] = self
         Mob._next_mob_id += 1

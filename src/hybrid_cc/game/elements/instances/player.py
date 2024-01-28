@@ -1,7 +1,8 @@
 import logging
 
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared.tag import PUSHING
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
 
 
@@ -10,7 +11,7 @@ class Player(Mob):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.pushing = False
+        self.tags[PUSHING] = False
 
     @classmethod
     def init_at_level_load(cls):
@@ -21,7 +22,7 @@ class Player(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, inputs="", tick=None, **kwargs):
-        self.pushing = False
+        self.tags[PUSHING] = False
         if None not in (tick, self.last_move_tick):
             if tick - self.last_move_tick <= 1:
                 return
@@ -53,9 +54,9 @@ class Player(Mob):
     # --------------------------------------------------------------------------
 
     def finalize_move(self, old_p, new_p, tick):
-        self.pushing = False
+        self.tags[PUSHING] = False
         super().finalize_move(old_p, new_p, tick)
 
     def on_failed_move(self, move_result, d):
-        self.pushing = True
+        self.tags[PUSHING] = True
         self.direction = d

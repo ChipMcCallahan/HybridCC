@@ -1,3 +1,4 @@
+from hybrid_cc.shared.tag import PUSHING, SWIMMING
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.shared.color import Color
 
@@ -67,8 +68,8 @@ class MobGfx:
 
     def player(self, elem, **kwargs):
         d = elem.direction.name
-        push = kwargs.get("pushing")
-        swim = kwargs.get("swimming")
+        push = kwargs.get(PUSHING)
+        swim = kwargs.get(SWIMMING)
         if push:
             return self.assembler.cc2(f"PLAYER_PUSHING_{d}")
         if swim:
