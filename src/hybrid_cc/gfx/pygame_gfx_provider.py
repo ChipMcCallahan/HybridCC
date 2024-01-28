@@ -12,6 +12,8 @@ from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
+FOUR_FRAMES = {Id.WATER, Id.FIRE, Id.EXIT, Id.STEPPING_STONE}
+
 
 class PygameGfxProvider:
     def __init__(self):
@@ -59,8 +61,8 @@ class PygameGfxProvider:
                 return frame, offset
             else:
                 return frames[0], None
-        if isinstance(elem, Exit):
-            return frames[move_tick % 4], None
+        if elem.id in FOUR_FRAMES:
+            return frames[(move_tick // 2) % 4], None
         return frames[0], None
 
     @staticmethod
@@ -111,7 +113,7 @@ class PygameGfxProvider:
                         player_tile = (i, j)
                         if elem.pushing:
                             kwargs["pushing"] = True
-                    if elem.id == Id.TRICK_WALL:
+                    if isinstance(elem, TrickWall):
                         if position in TrickWall.show_secrets_positions:
                             kwargs["show_secrets"] = True
                     img, offset = self.provide_one(elem, logic_tick, **kwargs)

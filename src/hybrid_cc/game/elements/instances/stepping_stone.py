@@ -1,8 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import CreateRequest, DestroyRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import RULE, COUNT
+from hybrid_cc.shared.stepping_stone_rule import SteppingStoneRule
 
 
 class SteppingStone(Elem):
@@ -24,20 +26,17 @@ class SteppingStone(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
     def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.count > 1:
+            create_request = CreateRequest(eid=self.id,
+                                           pos=position,
+                                           count=self.count - 1,
+                                           rule=self.rule)
+        elif self.rule == SteppingStoneRule.WATER:
+            create_request = CreateRequest(eid=Id.WATER, pos=position)
+        else:
+            create_request = CreateRequest(eid=Id.FIRE, pos=position)
+        return [
+            DestroyRequest(target=self, pos=position),
+            create_request
+        ]

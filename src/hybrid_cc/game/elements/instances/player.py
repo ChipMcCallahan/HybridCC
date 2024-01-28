@@ -23,6 +23,11 @@ class Player(Mob):
         cls.position = pos
         return super().construct_at(pos, **kwargs)
 
+    @classmethod
+    def destruct_at(cls, elem, pos):
+        super().destruct_at(elem, pos)
+        cls.position = pos
+
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------

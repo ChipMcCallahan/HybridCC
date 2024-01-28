@@ -1,8 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import DestroyRequest, CreateRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Dirt(Elem):
@@ -24,20 +26,15 @@ class Dirt(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def test_enter(mob, position, direction):
+        if mob.id == Id.PLAYER or mob.id == Id.ICE_BLOCK:
+            return MoveResult.PASS, None
+        return MoveResult.FAIL, None
 
     def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        return [
+            DestroyRequest(target=self, pos=position),
+            CreateRequest(pos=position, eid=Id.FLOOR, color=self.color)
+        ]

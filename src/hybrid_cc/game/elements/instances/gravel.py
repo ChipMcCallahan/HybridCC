@@ -2,6 +2,7 @@ import logging
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Gravel(Elem):
@@ -23,20 +24,9 @@ class Gravel(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def test_enter(mob, position, direction):
+        if mob.id in (Id.MONSTER, Id.TANK):
+            return MoveResult.FAIL, None
+        return MoveResult.PASS, None

@@ -43,7 +43,7 @@ class Mob(Elem):
         return mob
 
     @classmethod
-    def destruct_at(cls, pos, elem):
+    def destruct_at(cls, elem, pos):
         cls.instances.pop(elem.mob_id)
 
     @classmethod

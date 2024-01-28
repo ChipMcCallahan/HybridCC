@@ -287,10 +287,7 @@ class CellConverter:
                 kwargs[RULE] = SteppingStoneRule.WATER
                 cell.terrain = LevelElem(Id.STEPPING_STONE, **kwargs)
 
-            elif top == CC1.BURNED_CHIP0:
-                pass
-
-            elif top == CC1.BURNED_CHIP1:
+            elif top in (CC1.BURNED_CHIP0, CC1.BURNED_CHIP1):
                 kwargs = CellConverter.count(bottom)
                 kwargs[RULE] = SteppingStoneRule.FIRE
                 cell.terrain = LevelElem(Id.STEPPING_STONE, **kwargs)

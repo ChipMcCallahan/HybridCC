@@ -1,8 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import CreateRequest, DestroyRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, COUNT
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class PopUpWall(Elem):
@@ -24,20 +26,22 @@ class PopUpWall(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def test_enter(mob, position, direction):
+        if mob.id == Id.PLAYER:
+            return MoveResult.PASS, None
+        return MoveResult.FAIL, None
 
     def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.count > 1:
+            create_request = CreateRequest(eid=self.id,
+                                           pos=position, color=self.color,
+                                           count=self.count - 1)
+        else:
+            create_request = CreateRequest(eid=Id.WALL,
+                                           pos=position, color=self.color)
+        return [
+            DestroyRequest(target=self, pos=position),
+            create_request
+        ]

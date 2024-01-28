@@ -1,7 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.monster_rule import MonsterRule
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Fire(Elem):
@@ -23,20 +26,15 @@ class Fire(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+    @staticmethod
+    def test_enter(mob, position, direction):
+        if mob.id == Id.MONSTER and mob.rule != MonsterRule.FIREBALL:
+            return MoveResult.FAIL, None
+        return MoveResult.PASS, None
 
     def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if mob.id == Id.PLAYER:
+            return [
+                LoseRequest(cause=self.id)
+            ]

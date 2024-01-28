@@ -6,7 +6,8 @@ from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
-from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest
+from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
+    LoseRequest
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -30,6 +31,7 @@ class Gameboard:
         self.hints = {}  # map from position to string
         self.hint = ""  # default hint if not in dict
         self.tick = 0
+        self.last_player_position = (0, 0, 0)
         self.state = Gameboard.State.PLAY
 
     @property
@@ -56,7 +58,8 @@ class Gameboard:
 
     def viewport_center(self, viewport_size=9):
         margin = viewport_size // 2
-        x, y, z = Player.position or (0, 0, 0)
+        x, y, z = Player.position or self.last_player_position
+        self.last_player_position = (x, y, z)
         x, y = max(x, margin), max(y, margin)
         x = min(x, self.size[0] - margin - 1)
         y = min(y, self.size[1] - margin - 1)
@@ -91,6 +94,8 @@ class Gameboard:
                 self.map.construct_at(pos, eid, **kwargs)
             elif isinstance(request, WinRequest):
                 self.transition(Gameboard.State.WIN)
+            elif isinstance(request, LoseRequest):
+                self.transition(Gameboard.State.LOSE)
 
     def transition(self, state):
         if self.state == Gameboard.State.PLAY:
