@@ -24,17 +24,18 @@ class Chip(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         pass
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.id == Id.PLAYER:
+        if mob.enters_dirt:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
     def finish_enter(self, mob, position, direction):
-        if mob.id == Id.PLAYER:
+        if mob.collects_chips:
             current = self.chips_collected.get(self.color, 0)
             self.chips_collected[self.color] = current + self.count
 

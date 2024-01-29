@@ -6,14 +6,15 @@ from PIL import Image
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared.tag import PUSHING
+from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.shared_utils import is_iter
+from hybrid_cc.shared.tool_rule import ToolRule
 
-FOUR_FRAMES = {Id.WATER, Id.FIRE, Id.EXIT, Id.STEPPING_STONE}
 
-
+# noinspection PyTypeChecker
 class PygameGfxProvider:
     def __init__(self):
         self.cache = {}
@@ -42,7 +43,22 @@ class PygameGfxProvider:
         self.cache[cache_key] = pyg_result
         return pyg_result
 
-    def provide_one(self, elem, logic_tick, **kwargs):
+    @staticmethod
+    def expand_to_8_frames(frames):
+        num_frames = len(frames)
+        if num_frames == 8:
+            return frames  # Return the original array if it already has 8 frames
+
+        # Calculate the number of times each frame should be repeated
+        repeat_times = 8 // num_frames
+
+        expanded_frames = []
+        for frame in frames:
+            expanded_frames.extend([frame] * repeat_times)
+
+        return expanded_frames
+
+    def provide_one(self, elem, logic_tick=0, **kwargs):
         frames = self.provide(elem, **kwargs)
         if not is_iter(frames):
             return frames, None
@@ -51,6 +67,7 @@ class PygameGfxProvider:
             offset = move_tick - elem.last_move_tick
             if offset < 2:
                 index = offset * 4 + logic_tick % 4
+                frames = self.expand_to_8_frames(frames)
                 frame = self.moving_double(frames[index], index, elem)
                 offset = (0, 0)
                 if elem.direction == Direction.S:
@@ -60,7 +77,7 @@ class PygameGfxProvider:
                 return frame, offset
             else:
                 return frames[0], None
-        if elem.id in FOUR_FRAMES:
+        if len(frames) == 4:
             return frames[(move_tick // 2) % 4], None
         return frames[0], None
 
@@ -84,11 +101,6 @@ class PygameGfxProvider:
         raw_surface = pygame.Surface((w * 32,
                                       h * 32))
 
-        # center = (camera.position[0] - top_left_position[0],
-        #           camera.position[1] - top_left_position[1])
-        # camera_offset = tuple(i * 32 for i in
-        #                       camera.get_target_offset(move_tick, tick_modulo))
-
         for layer in layers:
             for i in range(nw_pos[0], se_pos[0] + 1):
                 for j in range(nw_pos[1], se_pos[1] + 1):
@@ -98,8 +110,7 @@ class PygameGfxProvider:
                     if not elem:
                         continue
                     if isinstance(elem, Player):
-                        if elem.tags[PUSHING]:
-                            kwargs[PUSHING] = True
+                        kwargs.update(elem.tags)
                     if isinstance(elem, TrickWall):
                         if position in TrickWall.show_secrets_positions:
                             kwargs["show_secrets"] = True
@@ -122,6 +133,63 @@ class PygameGfxProvider:
             crop_y = 32 + crop_y
         crop_width, crop_height = 9 * 32, 9 * 32
         return raw_surface.subsurface((crop_x, crop_y, crop_width, crop_height))
+
+    class HashableObject:
+        def __init__(self, **attributes):
+            self.__dict__.update(attributes)
+
+        def __hash__(self):
+            return hash(tuple(sorted(self.__dict__.items())))
+
+        def __eq__(self, other):
+            return (isinstance(other, self.__class__) and
+                    self.__dict__ == other.__dict__)
+
+    floor_elem = HashableObject(id=Id.FLOOR, color=Color.GREY)
+    inventory_elems = {}
+
+    def provide_keys(self):
+        key_counts = getattr(Player.instance, "keys", None)
+        if not key_counts:
+            return
+        keys = []
+        for color in Color:
+            if color in key_counts:
+                keys.append((color, key_counts[color]))
+        raw_surface = pygame.Surface((len(keys) * 32, 32))
+        for index, pair in enumerate(keys):
+            color, count = pair
+            if pair not in self.inventory_elems:
+                elem = self.HashableObject(id=Id.KEY, color=color, count=count,
+                                           rule=KeyRule.DEFAULT)
+                self.inventory_elems[pair] = elem
+            floor_img, _ = self.provide_one(self.floor_elem)
+            key_img, _ = self.provide_one(self.inventory_elems[pair])
+            raw_surface.blit(floor_img, (index * 32, 0))
+            raw_surface.blit(key_img, (index * 32, 0))
+        return raw_surface
+
+    # noinspection PyTypeChecker
+    def provide_tools(self):
+        tool_counts = getattr(Player.instance, "tools", None)
+        if not tool_counts:
+            return
+        tools = []
+        for id in (Id.FLIPPERS, Id.FIRE_BOOTS, Id.SKATES, Id.SUCTION_BOOTS):
+            if id in tool_counts:
+                tools.append((id, tool_counts[id]))
+        raw_surface = pygame.Surface((len(tools) * 32, 32))
+        for index, pair in enumerate(tools):
+            id, count = pair
+            if pair not in self.inventory_elems:
+                elem = self.HashableObject(id=id, count=count,
+                                           rule=ToolRule.DEFAULT)
+                self.inventory_elems[pair] = elem
+            floor_img, _ = self.provide_one(self.floor_elem)
+            tool_img, _ = self.provide_one(self.inventory_elems[pair])
+            raw_surface.blit(floor_img, (index * 32, 0))
+            raw_surface.blit(tool_img, (index * 32, 0))
+        return raw_surface
 
     @staticmethod
     def to_pygame_surface(pil_image: Image):

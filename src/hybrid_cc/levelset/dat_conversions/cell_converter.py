@@ -155,8 +155,12 @@ class CellConverter:
             elif top in CC1.doors():
                 kwargs = CellConverter.colorize(bottom) or CellConverter.count(
                     bottom)
-                kwargs[COLOR] = Color[top.name.split("_")[0]]
+                if COLOR not in kwargs:
+                    kwargs[COLOR] = Color[top.name.split("_")[0]]
                 cell.terrain_mod = LevelElem(Id.DOOR, **kwargs)
+                if bottom in CC1.valid().difference(CC1.pickups()).difference(
+                        CC1.mobs()):
+                    populate(bottom)
 
             elif top in (CC1.BLUE_WALL_FAKE, CC1.BLUE_WALL_REAL):
                 kwargs = CellConverter.colorize(bottom)
@@ -363,7 +367,7 @@ class CellConverter:
                         populate(bottom)
 
             elif top in CC1.keys():
-                kwargs = {}
+                kwargs = CellConverter.count(bottom)
                 color = Color[top.name.split("_")[0]]
                 kwargs[COLOR] = color
                 if color == Color.BLUE:
@@ -378,14 +382,13 @@ class CellConverter:
                 elif bottom in NUMBER_CODE:
                     kwargs.update(CellConverter.count(bottom))
                 cell.pickup = LevelElem(Id.KEY, **kwargs)
-                if top not in CC1.valid().difference(CC1.mobs()).difference(
-                        CC1.pickups()):
+                if bottom not in CC1.mobs():
                     populate(bottom)
 
-            elif top == CC1.boots():
-                kwargs = {}
-                if top == bottom:
-                    kwargs[RULE] = ToolRule.ITEM_BARRIER
+            elif top in CC1.boots():
+                kwargs = {RULE: (ToolRule.ITEM_BARRIER if top == bottom
+                                 else ToolRule.DEFAULT)}
+                kwargs.update(CellConverter.count(bottom))
                 eid = Id[top.name]
                 cell.pickup = LevelElem(eid, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(

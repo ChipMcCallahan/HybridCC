@@ -3,6 +3,8 @@ import logging
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import RULE
+from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.thief_rule import ThiefRule
 
 
 class Thief(Elem):
@@ -25,19 +27,12 @@ class Thief(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if mob.enters_dirt:
+            return MoveResult.PASS, []
+        return MoveResult.FAIL, []
 
     def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.rule == ThiefRule.KEYS:
+            mob.keys.clear()
+        elif self.rule == ThiefRule.TOOLS:
+            mob.tools.clear()

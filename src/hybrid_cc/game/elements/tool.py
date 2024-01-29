@@ -1,0 +1,31 @@
+from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import DestroyRequest, CreateRequest
+from hybrid_cc.shared.kwargs import COUNT, RULE
+from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tool_rule import ToolRule
+
+
+class Tool(Elem):
+    kwarg_filter = (RULE, COUNT)  # Retain these kwargs only.
+
+    def test_enter(self, mob, position, direction):
+        if self.rule == ToolRule.DEFAULT:
+            if mob.enters_dirt:
+                return MoveResult.PASS, []
+            return MoveResult.FAIL, []
+        elif self.rule == ToolRule.ITEM_BARRIER:
+            if mob.tools[self.id] > 0:
+                return MoveResult.FAIL, []
+            return MoveResult.PASS, []
+        else:
+            raise ValueError(f"invalid rule {self.rule}")
+
+    def finish_enter(self, mob, position, direction):
+        if self.rule == ToolRule.DEFAULT and mob.collects_items:
+            mob.tools[self.id] += 1
+            requests = [DestroyRequest(target=self, pos=position)]
+            if self.count > 1:
+                kwargs = {COUNT: self.count - 1, RULE: ToolRule.DEFAULT}
+                requests.append(
+                    CreateRequest(pos=position, eid=self.id, **kwargs))
+            return requests

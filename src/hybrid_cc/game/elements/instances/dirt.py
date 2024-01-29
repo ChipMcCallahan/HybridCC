@@ -29,7 +29,7 @@ class Dirt(Elem):
 
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.id == Id.PLAYER or mob.id == Id.ICE_BLOCK:
+        if mob.enters_dirt:
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 

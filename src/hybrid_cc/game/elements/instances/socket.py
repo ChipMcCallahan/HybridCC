@@ -28,7 +28,7 @@ class Socket(Elem):
     # --------------------------------------------------------------------------
 
     def test_enter(self, mob, position, direction):
-        if mob.id == Id.PLAYER:
+        if mob.enters_dirt:
             chips = Chip.chips_collected.get(self.color, 0)
             if chips >= self.chips_required[self.color]:
                 return MoveResult.PASS, None

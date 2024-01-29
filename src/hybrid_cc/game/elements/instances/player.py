@@ -8,14 +8,22 @@ from hybrid_cc.shared.kwargs import DIRECTION
 
 class Player(Mob):
     kwarg_filter = (DIRECTION,)  # Retain these kwargs only.
+    instance = None
+    collects_chips = True
+    collects_items = True
+    enters_dirt = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tags[PUSHING] = False
+        if self.__class__.instance:
+            raise ValueError("Cannot have more than one Player instance!")
+        self.__class__.instance = self
 
     @classmethod
     def init_at_level_load(cls):
         logging.info(f"Initializing {cls.__name__}...")
+        cls.instance = None
 
     # --------------------------------------------------------------------------
     # PLANNING PHASE

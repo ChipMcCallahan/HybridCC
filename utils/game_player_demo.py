@@ -5,7 +5,10 @@ import os
 import pygame
 import pygame_menu
 
+from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.gfx.pygame_gfx_provider import PygameGfxProvider
+from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.tool_rule import ToolRule
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
@@ -106,6 +109,11 @@ class GamePlayerDemo:
         # surface
         surface.blit(text_surface, (x, y))
 
+    def render_centered_subsurface(self, surface, subsurface, y):
+        w, h = surface.get_size()
+        sw, sh = subsurface.get_size()
+        surface.blit(subsurface, ((w - sw) / 2, y))
+
     def render_screen(self):
         if self.state_mgr.is_start:
             self.render_view_extras()
@@ -152,6 +160,18 @@ class GamePlayerDemo:
             self.render_text(f"{color.name}: {count}", 10, y_index,
                              color.value)
             y_index += 20
+
+        tools = self.gfx.provide_tools()
+        keys = self.gfx.provide_keys()
+
+        margin = 8
+
+        if tools:
+            self.render_centered_subsurface(self.screen, tools,
+                                            444 + 2 * margin)
+        if keys:
+            self.render_centered_subsurface(self.screen, keys,
+                                            444 + 2 * margin + 32 + margin)
 
     def render_viewport(self, centered_text=None):
         # viewport_size = 11  # will clip this to 9x9

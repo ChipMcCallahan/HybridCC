@@ -29,7 +29,7 @@ class Exit(Elem):
     # --------------------------------------------------------------------------
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.id == Id.PLAYER:
+        if mob.enters_dirt:
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 

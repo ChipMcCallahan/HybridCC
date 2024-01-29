@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Direction
@@ -7,6 +8,9 @@ from hybrid_cc.shared import Direction
 class Mob(Elem):
     _next_mob_id = 0
     instances = {}
+    collects_chips = False
+    collects_items = False
+    enters_dirt = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -16,6 +20,8 @@ class Mob(Elem):
         Mob._next_mob_id += 1
         self._position = None
         self.last_move_tick = None
+        self.keys = defaultdict(int)
+        self.tools = defaultdict(int)
 
     def finalize_move(self, old_p, new_p, tick):
         self.position = new_p

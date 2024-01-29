@@ -70,8 +70,8 @@ class MobGfx:
         d = elem.direction.name
         push = kwargs.get(PUSHING)
         swim = kwargs.get(SWIMMING)
-        if push:
-            return self.assembler.cc2(f"PLAYER_PUSHING_{d}")
         if swim:
             return self.assembler.cc2_series(f"PLAYER_SWIMMING_{d}", 2)
+        if push:
+            return self.assembler.cc2(f"PLAYER_PUSHING_{d}")
         return self.assembler.cc2_series(f"PLAYER_{d}", 8)

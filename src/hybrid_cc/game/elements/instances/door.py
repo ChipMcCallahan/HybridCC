@@ -1,8 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import DestroyRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, COUNT
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Door(Elem):
@@ -25,19 +27,19 @@ class Door(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.color in mob.keys:
+            count = mob.keys[self.color]
+            if count == "+" or count >= self.count:
+                return MoveResult.PASS, []
+        return MoveResult.FAIL, []
 
     def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.color in mob.keys:
+            count = mob.keys[self.color]
+            if count != "+" and count >= self.count:
+                mob.keys[self.color] -= self.count
+                if mob.keys[self.color] <= 0:
+                    mob.keys.pop(self.color)
+            return [
+                DestroyRequest(target=self, pos=position)
+            ]

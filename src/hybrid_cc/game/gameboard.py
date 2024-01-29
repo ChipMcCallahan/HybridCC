@@ -3,7 +3,6 @@ from enum import Enum
 
 from hybrid_cc.game.camera import Camera
 from hybrid_cc.game.elements.instances.chip import Chip
-from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.map import Map

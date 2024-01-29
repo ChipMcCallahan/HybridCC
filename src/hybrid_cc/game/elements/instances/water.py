@@ -4,6 +4,7 @@ from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.monster_rule import MonsterRule
+from hybrid_cc.shared.tag import SWIMMING
 
 
 class Water(Elem):
@@ -26,14 +27,18 @@ class Water(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
+    @staticmethod
+    def finish_exit(mob, position, direction):
+        mob.tags.pop(SWIMMING)
+
     def finish_enter(self, mob, position, direction):
-        if mob.id == Id.PLAYER:
-            return [
-                DestroyRequest(target=mob, pos=position),
-                LoseRequest(cause=self.id)
-            ]
         if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:
             return
-        return [
-            DestroyRequest(target=mob, pos=position)
-        ]
+        if mob.tools[Id.FLIPPERS]:
+            mob.tags[SWIMMING] = True
+            return
+
+        requests = [DestroyRequest(target=mob, pos=position)]
+        if mob.id == Id.PLAYER:
+            requests.append(LoseRequest(cause=self.id))
+        return requests

@@ -34,8 +34,12 @@ class Fire(Elem):
         return MoveResult.PASS, None
 
     def finish_enter(self, mob, position, direction):
+        if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:
+            return
+        if mob.tools[Id.FIRE_BOOTS]:
+            return
+
+        requests = [DestroyRequest(target=mob, pos=position)]
         if mob.id == Id.PLAYER:
-            return [
-                DestroyRequest(target=mob, pos=position),
-                LoseRequest(cause=self.id)
-            ]
+            requests.append(LoseRequest(cause=self.id))
+        return requests
