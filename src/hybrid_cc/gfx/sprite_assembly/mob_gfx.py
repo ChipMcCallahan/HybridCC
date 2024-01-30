@@ -1,3 +1,4 @@
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.tag import PUSHING, SWIMMING
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.shared.color import Color
@@ -34,7 +35,21 @@ class MobGfx:
         return series
 
     def blob(self, elem, **kwargs):
-        return self.assembler.cc2("BLOB")  # TODO: handle animation
+        base = self.assembler.cc2("BLOB")
+        frames = [base]
+        if elem.direction == Direction.N:
+            for i in range(7, 0, -1):
+                frames.append(self.assembler.cc2(f"BLOB_VERTICAL_{i}"))
+        elif elem.direction == Direction.E:
+            for i in range(1, 8):
+                frames.append(self.assembler.cc2(f"BLOB_HORIZONTAL_{i}"))
+        elif elem.direction == Direction.S:
+            for i in range(1, 8):
+                frames.append(self.assembler.cc2(f"BLOB_VERTICAL_{i}"))
+        elif elem.direction == Direction.W:
+            for i in range(7, 0, -1):
+                frames.append(self.assembler.cc2(f"BLOB_HORIZONTAL_{i}"))
+        return frames
 
     def fireball(self, elem, **kwargs):
         frames = self.assembler.cc2_series("FIREBALL", 4)
@@ -58,7 +73,21 @@ class MobGfx:
         return frames + [frames[i] for i in (3, 2, 1)]
 
     def walker(self, elem, **kwargs):
-        return self.assembler.cc2("WALKER")  # TODO: handle animation
+        base = self.assembler.cc2("WALKER")
+        frames = [base]
+        if elem.direction == Direction.N:
+            for i in range(7, 0, -1):
+                frames.append(self.assembler.cc2(f"WALKER_VERTICAL_{i}"))
+        elif elem.direction == Direction.E:
+            for i in range(1, 8):
+                frames.append(self.assembler.cc2(f"WALKER_HORIZONTAL_{i}"))
+        elif elem.direction == Direction.S:
+            for i in range(1, 8):
+                frames.append(self.assembler.cc2(f"WALKER_VERTICAL_{i}"))
+        elif elem.direction == Direction.W:
+            for i in range(7, 0, -1):
+                frames.append(self.assembler.cc2(f"WALKER_HORIZONTAL_{i}"))
+        return frames
 
     def tank(self, elem, **kwargs):
         d = elem.direction.name

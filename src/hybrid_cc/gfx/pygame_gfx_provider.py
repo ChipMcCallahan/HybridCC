@@ -83,11 +83,15 @@ class PygameGfxProvider:
     @staticmethod
     def moving_double(frame, index, elem):
         if elem.direction in (Direction.N, Direction.S):
+            if frame.get_size() == (32, 64):  # Blobs, Walkers
+                return frame
             main_surface = pygame.Surface((32, 64), pygame.SRCALPHA)
             y = index * 4 if elem.direction == Direction.S else 32 - index * 4
             main_surface.blit(frame, (0, y))
             return main_surface
         elif elem.direction in (Direction.E, Direction.W):
+            if frame.get_size() == (64, 32):  # Blobs, Walkers
+                return frame
             main_surface = pygame.Surface((64, 32), pygame.SRCALPHA)
             x = index * 4 if elem.direction == Direction.E else 32 - index * 4
             main_surface.blit(frame, (x, 0))
@@ -112,7 +116,8 @@ class PygameGfxProvider:
                         if not elem:
                             continue
                         if isinstance(elem, Player):
-                            kwargs.update(elem.tags)
+                            for tag in elem.tags:
+                                kwargs[tag] = True
                         if isinstance(elem, TrickWall):
                             if position in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True

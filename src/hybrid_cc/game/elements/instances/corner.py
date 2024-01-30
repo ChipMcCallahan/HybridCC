@@ -47,4 +47,4 @@ class Corner(Elem):
         sides.remove(direction)
         orthogonal = sides.pop().reverse()
         return MoveResult.FAIL, [MoveRequest(mob_id=mob.mob_id,
-                                            directions=[orthogonal])]
+                                             direction=orthogonal)]

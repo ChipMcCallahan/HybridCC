@@ -75,17 +75,17 @@ class ElemHandler:
         for elem_class in self.id_to_class.values():
             method = getattr(elem_class, "do_class_planning", None)
             if method:
-                move_plan = method(inputs=inputs, tick=tick)
-                if move_plan:
-                    all_move_plans.append(move_plan)
+                move_plans = method(inputs=inputs, tick=tick)
+                if move_plans:
+                    all_move_plans.extend(move_plans)
 
         # Instance level plans (mobs)
         for mob_id, mob in Mob.instances.items():
             method = getattr(mob, "do_planning", None)
             if method:
-                move_plan = method(inputs=inputs, tick=tick)
-                if move_plan:
-                    all_move_plans.append(move_plan)
+                move_plans = method(inputs=inputs, tick=tick)
+                if move_plans:
+                    all_move_plans.extend(move_plans)
 
         return all_move_plans
 

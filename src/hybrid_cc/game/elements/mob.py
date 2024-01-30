@@ -14,7 +14,7 @@ class Mob(Elem):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.tags = {}
+        self.tags = set()
         self.mob_id = Mob._next_mob_id
         Mob.instances[self.mob_id] = self
         Mob._next_mob_id += 1
@@ -27,6 +27,15 @@ class Mob(Elem):
         self.position = new_p
         self.direction = Direction.from_move(old_p, new_p)
         self.last_move_tick = tick
+
+    def tag(self, tag):
+        self.tags.add(tag)
+
+    def untag(self, tag):
+        self.tags.discard(tag)
+
+    def tagged(self, tag):
+        return tag in self.tags
 
     @property
     def position(self):

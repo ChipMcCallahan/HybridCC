@@ -29,13 +29,13 @@ class Water(Elem):
 
     @staticmethod
     def finish_exit(mob, position, direction):
-        mob.tags.pop(SWIMMING)
+        mob.untag(SWIMMING)
 
     def finish_enter(self, mob, position, direction):
         if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:
             return
         if mob.tools[Id.FLIPPERS]:
-            mob.tags[SWIMMING] = True
+            mob.tag(SWIMMING)
             return
 
         requests = [DestroyRequest(target=mob, pos=position)]

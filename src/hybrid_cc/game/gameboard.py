@@ -10,6 +10,7 @@ from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
     LoseRequest, MoveRequest, ShowHintRequest, HideHintRequest
+from hybrid_cc.game.rng import RNG
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -21,7 +22,7 @@ class Gameboard:
         WIN = 2
         LOSE = 3
 
-    def __init__(self, level):
+    def __init__(self, level, seed=None):
         """Initialize a new Gameboard instance."""
         self._size = level.size
         self.map = Map(level)
@@ -36,6 +37,7 @@ class Gameboard:
         self.state = Gameboard.State.PLAY
         self.camera = Camera(Mob.instances[0], self)
         self.show_hint = False
+        RNG.reset(seed)
 
     @property
     def size(self):
@@ -65,16 +67,14 @@ class Gameboard:
         moved = set()
         while len(raw_moves) > 0:
             move = raw_moves.popleft()
-            mob_id, dirs = move.mob_id, move.directions
+            mob_id, d = move.mob_id, move.direction
             mob = self.elems.get_mob(mob_id)
-            if not mob or mob_id in moved:
+            if (not mob) or (mob_id in moved):
                 continue
-            for d in dirs:
-                result, requests = self.move_handler.move(mob, d, self.tick)
-                raw_moves.extendleft(reversed(self.do_requests(requests)))
-                if result == MoveResult.PASS:
-                    moved.add(mob.mob_id)
-                    break
+            result, requests = self.move_handler.move(mob, d, self.tick)
+            raw_moves.extendleft(reversed(self.do_requests(requests)))
+            if result == MoveResult.PASS:
+                moved.add(mob_id)
 
         self.tick += 1
         if self.time > 0 and self.time_remaining() == 0:
