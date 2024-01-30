@@ -1,6 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.mob import Mob
+from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared.tag import PUSHING
 from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
@@ -34,7 +35,8 @@ class Player(Mob):
         if None not in (tick, self.last_move_tick):
             if tick - self.last_move_tick <= 1:
                 return
-        return self.mob_id, [Direction[d] for d in inputs]
+        return MoveRequest(mob_id=self.mob_id,
+                           directions=[Direction[d] for d in inputs])
 
     # --------------------------------------------------------------------------
     # ACCESS RULES

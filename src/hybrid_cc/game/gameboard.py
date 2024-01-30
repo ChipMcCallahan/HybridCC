@@ -1,4 +1,5 @@
 """Gameboard module."""
+from collections import deque
 from enum import Enum
 
 from hybrid_cc.game.camera import Camera
@@ -8,7 +9,7 @@ from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
-    LoseRequest
+    LoseRequest, MoveRequest, ShowHintRequest, HideHintRequest
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -30,10 +31,11 @@ class Gameboard:
         self.title = level.title
         self.time = level.time
         self.hints = {}  # map from position to string
-        self.hint = ""  # default hint if not in dict
+        self.hint = level.hint  # default hint if not in dict
         self.tick = 0
         self.state = Gameboard.State.PLAY
         self.camera = Camera(Mob.instances[0], self)
+        self.show_hint = False
 
     @property
     def size(self):
@@ -58,26 +60,29 @@ class Gameboard:
         return self.map.get(p)
 
     def do_logic(self, inputs):
-        raw_moves = self.elems.collect_move_plans(inputs, self.tick)
+        raw_moves = deque(self.elems.collect_move_plans(inputs, self.tick))
 
         moved = set()
-        for move in raw_moves:
-            mob_id, dirs = move
+        while len(raw_moves) > 0:
+            move = raw_moves.popleft()
+            mob_id, dirs = move.mob_id, move.directions
             mob = self.elems.get_mob(mob_id)
             if not mob or mob_id in moved:
                 continue
             for d in dirs:
                 result, requests = self.move_handler.move(mob, d, self.tick)
-                self.do_requests(requests)
+                raw_moves.extendleft(reversed(self.do_requests(requests)))
                 if result == MoveResult.PASS:
                     moved.add(mob.mob_id)
                     break
+
         self.tick += 1
         if self.time > 0 and self.time_remaining() == 0:
             self.transition(Gameboard.State.LOSE)
         self.camera.update()
 
     def do_requests(self, requests):
+        move_requests = []
         for request in requests:
             if isinstance(request, DestroyRequest):
                 target, pos = request.target, request.pos
@@ -89,6 +94,13 @@ class Gameboard:
                 self.transition(Gameboard.State.WIN)
             elif isinstance(request, LoseRequest):
                 self.transition(Gameboard.State.LOSE)
+            elif isinstance(request, MoveRequest):
+                move_requests.append(request)
+            elif isinstance(request, ShowHintRequest):
+                self.show_hint = True
+            elif isinstance(request, HideHintRequest):
+                self.show_hint = False
+        return move_requests
 
     def transition(self, state):
         if self.state == Gameboard.State.PLAY:

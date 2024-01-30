@@ -2,6 +2,7 @@ import logging
 
 from hybrid_cc.game.constants import DESTROY
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 
@@ -25,5 +26,10 @@ class Bomb(Elem):
     # --------------------------------------------------------------------------
 
     def finish_enter(self, mob, position, direction):
-        return ((DESTROY, self, position),
-                (DESTROY, other, position))
+        requests = [
+            DestroyRequest(target=self, pos=position),
+            DestroyRequest(target=mob, pos=position)
+        ]
+        if mob.id == Id.PLAYER:
+            requests.append(LoseRequest(cause=self))
+        return requests

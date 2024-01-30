@@ -24,7 +24,6 @@ class PygameGfxProvider:
 
     def provide(self, id_and_kwargs, **extra_kwargs):
         cache_key = (id_and_kwargs, frozenset(extra_kwargs.items()))
-
         # Check if the item is in the cache
         if cache_key in self.cache:
             return self.cache[cache_key]
@@ -105,22 +104,25 @@ class PygameGfxProvider:
             for i in range(nw_pos[0], se_pos[0] + 1):
                 for j in range(nw_pos[1], se_pos[1] + 1):
                     position = (i, j, 0)
-                    elem = layer.get(position, None)
-                    kwargs = {}
-                    if not elem:
-                        continue
-                    if isinstance(elem, Player):
-                        kwargs.update(elem.tags)
-                    if isinstance(elem, TrickWall):
-                        if position in TrickWall.show_secrets_positions:
-                            kwargs["show_secrets"] = True
-                    img, offset = self.provide_one(elem, logic_tick, **kwargs)
-                    offset = offset or (0, 0)
-                    x = i + offset[0] - nw_pos[0]
-                    y = j + offset[1] - nw_pos[1]
-                    raw_surface.blit(img,
-                                     (x * 32,
-                                      y * 32))
+                    here = layer.get(position, None)
+                    if not is_iter(here):
+                        here = [here]
+                    for elem in here:
+                        kwargs = {}
+                        if not elem:
+                            continue
+                        if isinstance(elem, Player):
+                            kwargs.update(elem.tags)
+                        if isinstance(elem, TrickWall):
+                            if position in TrickWall.show_secrets_positions:
+                                kwargs["show_secrets"] = True
+                        img, offset = self.provide_one(elem, logic_tick, **kwargs)
+                        offset = offset or (0, 0)
+                        x = i + offset[0] - nw_pos[0]
+                        y = j + offset[1] - nw_pos[1]
+                        raw_surface.blit(img,
+                                         (x * 32,
+                                          y * 32))
 
         if (w, h) == (9, 9):
             return raw_surface

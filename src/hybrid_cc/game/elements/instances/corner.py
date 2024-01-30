@@ -1,8 +1,11 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.shared import Id
+from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.kwargs import COLOR, SIDES
+from hybrid_cc.shared.monster_rule import MonsterRule
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Corner(Elem):
@@ -21,23 +24,27 @@ class Corner(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         pass
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if direction.reverse().name in self.sides:
+            return MoveResult.FAIL, []
+        return MoveResult.PASS, []
 
     def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if direction.name not in self.sides:
+            return MoveResult.PASS, []
 
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        # This prevents unintuitive behavior with ants, paramecia, and teeth,
+        # while still allowing ice moves to work as intended.
+        if (mob.id not in (Id.DIRT_BLOCK, Id.ICE_BLOCK)
+                and direction != mob.direction):
+            return MoveResult.FAIL, []
 
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        sides = set(Direction[d] for d in self.sides)
+        sides.remove(direction)
+        orthogonal = sides.pop().reverse()
+        return MoveResult.FAIL, [MoveRequest(mob_id=mob.mob_id,
+                                            directions=[orthogonal])]

@@ -23,10 +23,12 @@ class Thief(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         pass
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    @staticmethod
+    def test_enter(mob, position, direction):
         if mob.enters_dirt:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []

@@ -115,6 +115,9 @@ class CellConverter:
                     sides = ''.join(set(sides))
                 kwargs[SIDES] = sides
                 cell.add_sides(LevelElem(Id.PANEL, **kwargs))
+                if bottom in CC1.valid().difference(CC1.mobs()).difference(
+                        CC1.panels()):
+                    populate(bottom)
 
             elif top in CC1.blocks():
                 kwargs = CellConverter.colorize(bottom)

@@ -3,6 +3,7 @@ import logging
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, SIDES
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class Panel(Elem):
@@ -21,23 +22,16 @@ class Panel(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         pass
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if direction.reverse().name in self.sides:
+            return MoveResult.FAIL, []
+        return MoveResult.PASS, []
 
     def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if direction.name in self.sides:
+            return MoveResult.FAIL, []
+        return MoveResult.PASS, []

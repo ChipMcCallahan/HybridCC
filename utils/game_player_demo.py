@@ -173,6 +173,38 @@ class GamePlayerDemo:
             self.render_centered_subsurface(self.screen, keys,
                                             444 + 2 * margin + 32 + margin)
 
+        if self.state_mgr.gameboard.show_hint:
+            surface = pygame.Surface((228, 288))
+            text = self.state_mgr.gameboard.hint
+            self.render_centered_wrapped_text(surface, text, self.font,
+                                              (255, 255, 255))
+            self.screen.blit(surface, (544 + 16, 156))
+
+    @staticmethod
+    def render_centered_wrapped_text(surface, text, font, color):
+        def wrap_text(_text, _font, max_width):
+            words = _text.split()
+            _lines = []
+            while words:
+                line_words = []
+                while words and _font.size(' '.join(line_words + [words[0]]))[
+                    0] <= max_width:
+                    line_words.append(words.pop(0))
+                line = ' '.join(line_words)
+                _lines.append(line)
+            return _lines
+
+        lines = wrap_text(text, font, surface.get_width())
+        total_height = sum(font.size(line)[1] for line in lines)
+        y = (surface.get_height() - total_height) // 2
+
+        for line in lines:
+            line_surface = font.render(line, True, color)
+            line_width, line_height = line_surface.get_size()
+            x = (surface.get_width() - line_width) // 2
+            surface.blit(line_surface, (x, y))
+            y += line_height
+
     def render_viewport(self, centered_text=None):
         # viewport_size = 11  # will clip this to 9x9
         # cx, cy, cz = self.state_mgr.gameboard.camera.position
@@ -199,7 +231,11 @@ class GamePlayerDemo:
                 if cell.mob:
                     mob[position] = cell.mob
                 if cell.get_sides():
-                    sides[position] = cell.get_sides()
+                    sides_list = cell.get_sides()
+                    if not position in sides:
+                        sides[position] = []
+                    for elem in sides_list:
+                        sides[position].append(elem)
 
         viewport = self.gfx.provide_viewport((terrain, terrain_mod,
                                               pickup, mob, sides),

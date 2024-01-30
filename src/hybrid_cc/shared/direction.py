@@ -31,6 +31,9 @@ class Direction(Enum):
                 return direction
         return None
 
+    def is_cardinal(self):
+        return self.name in "NESW"
+
     def right(self):
         if self in [Direction.UP, Direction.DOWN]:
             return self
