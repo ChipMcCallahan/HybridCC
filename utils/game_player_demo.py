@@ -183,6 +183,8 @@ class GamePlayerDemo:
     @staticmethod
     def render_centered_wrapped_text(surface, text, font, color):
         def wrap_text(_text, _font, max_width):
+            if not _text:
+                return ""
             words = _text.split()
             _lines = []
             while words:

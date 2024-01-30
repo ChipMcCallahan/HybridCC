@@ -1,7 +1,9 @@
 import logging
 
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared import Id
+from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import FAILED_MOVE, PUSHES, ENTERS_DIRT
 
 
 class IceBlock(Mob):
@@ -9,6 +11,7 @@ class IceBlock(Mob):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.tag(ENTERS_DIRT)
 
     @classmethod
     def init_at_level_load(cls):
@@ -17,26 +20,28 @@ class IceBlock(Mob):
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
-    @classmethod
-    def do_class_planning(cls, **kwargs):
-        pass
+
+    def do_planning(self, inputs="", tick=None, **kwargs):
+        self.untag(FAILED_MOVE)
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        if self.tagged(FAILED_MOVE) == direction:
+            return MoveResult.FAIL, []
+        if mob.tagged(PUSHES) or mob.id == self.id:
+            return MoveResult.PASS, []
+        return MoveResult.FAIL, []
 
     def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        return MoveResult.FAIL, [
+            MoveRequest(mob_id=self.mob_id, direction=direction),
+            MoveRequest(mob_id=mob.mob_id, direction=direction),
+        ]
 
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+    def on_failed_move(self, move_result, d):
+        self.tag(FAILED_MOVE, d)

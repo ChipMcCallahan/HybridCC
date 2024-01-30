@@ -4,6 +4,7 @@ from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import HideHintRequest, ShowHintRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import ENTERS_DIRT
 
 
 class Hint(Elem):
@@ -28,7 +29,7 @@ class Hint(Elem):
     # --------------------------------------------------------------------------
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.enters_dirt:
+        if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 

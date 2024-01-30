@@ -1,7 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.request import DestroyRequest, LoseRequest
+from hybrid_cc.game.request import DestroyRequest, LoseRequest, CreateRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.tag import SWIMMING
@@ -23,6 +23,7 @@ class Water(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         pass
+
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
@@ -41,4 +42,9 @@ class Water(Elem):
         requests = [DestroyRequest(target=mob, pos=position)]
         if mob.id == Id.PLAYER:
             requests.append(LoseRequest(cause=self.id))
+        elif mob.id == Id.DIRT_BLOCK:
+            requests.append(
+                CreateRequest(pos=position, eid=Id.DIRT, color=mob.color))
+        elif mob.id == Id.ICE_BLOCK:
+            requests.append(CreateRequest(pos=position, eid=Id.ICE))
         return requests

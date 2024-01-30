@@ -5,6 +5,7 @@ from hybrid_cc.game.request import DestroyRequest
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.kwargs import COLOR, RULE, COUNT
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import COLLECTS_ITEMS
 
 
 class Key(Elem):
@@ -28,12 +29,12 @@ class Key(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        if self.rule == KeyRule.ACTING_DIRT and not mob.enters_dirt:
+        if self.rule == KeyRule.ACTING_DIRT and not mob.tagged(ENTERS_DIRT):
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
     def finish_enter(self, mob, position, direction):
-        if mob.collects_items:
+        if mob.tagged(COLLECTS_ITEMS):
             if self.count == "+" or mob.keys[self.color] == "+":
                 mob.keys[self.color] = "+"
             else:

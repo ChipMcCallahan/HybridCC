@@ -2,6 +2,7 @@ from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import DestroyRequest, CreateRequest
 from hybrid_cc.shared.kwargs import COUNT, RULE
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import COLLECTS_ITEMS, ENTERS_DIRT
 from hybrid_cc.shared.tool_rule import ToolRule
 
 
@@ -10,7 +11,7 @@ class Tool(Elem):
 
     def test_enter(self, mob, position, direction):
         if self.rule == ToolRule.DEFAULT:
-            if mob.enters_dirt:
+            if mob.tagged(ENTERS_DIRT):
                 return MoveResult.PASS, []
             return MoveResult.FAIL, []
         elif self.rule == ToolRule.ITEM_BARRIER:
@@ -21,7 +22,7 @@ class Tool(Elem):
             raise ValueError(f"invalid rule {self.rule}")
 
     def finish_enter(self, mob, position, direction):
-        if self.rule == ToolRule.DEFAULT and mob.collects_items:
+        if self.rule == ToolRule.DEFAULT and mob.tagged(COLLECTS_ITEMS):
             mob.tools[self.id] += 1
             requests = [DestroyRequest(target=self, pos=position)]
             if self.count > 1:

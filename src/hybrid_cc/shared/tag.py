@@ -1,8 +1,10 @@
 # Temporary tags
 PUSHING = "pushing"
 SWIMMING = "swimming"
+FAILED_MOVE = "failed_move"
 
 # Permanent tags or traits
-ENTERS_DIRT = "enters_dirt"
 COLLECTS_CHIPS = "collects_chips"
 COLLECTS_ITEMS = "collects_items"
+ENTERS_DIRT = "enters_dirt"
+PUSHES = "pushes"

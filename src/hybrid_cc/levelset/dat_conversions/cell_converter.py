@@ -123,8 +123,11 @@ class CellConverter:
                 kwargs = CellConverter.colorize(bottom)
                 if top in CC1.clone_blocks():
                     kwargs[DIRECTION] = Direction[CC1.dirs(top)]
+                if bottom == CC1.BLUE_WALL_REAL:
+                    populate(CC1.POP_UP_WALL)
                 cell.mob = LevelElem(Id.DIRT_BLOCK, **kwargs)
-                if bottom in CC1.valid().difference(CC1.mobs()):
+                if bottom in CC1.valid().difference(
+                        CC1.mobs()) and bottom != CC1.BLUE_WALL_REAL:
                     populate(bottom)
 
             elif top == CC1.DIRT:

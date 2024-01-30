@@ -39,6 +39,8 @@ class PygameGfxProvider:
             pyg_result = [self.to_pygame_surface(i) for i in pil_result]
         else:
             pyg_result = self.to_pygame_surface(pil_result)
+        if id_and_kwargs.id in (Id.DIRT_BLOCK, Id.ICE_BLOCK):
+            pyg_result = [pyg_result] * 8
         self.cache[cache_key] = pyg_result
         return pyg_result
 

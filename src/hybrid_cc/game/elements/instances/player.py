@@ -2,7 +2,8 @@ import logging
 
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
-from hybrid_cc.shared.tag import PUSHING
+from hybrid_cc.shared.tag import PUSHING, PUSHES, COLLECTS_CHIPS, \
+    COLLECTS_ITEMS, ENTERS_DIRT
 from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
 
@@ -10,15 +11,16 @@ from hybrid_cc.shared.kwargs import DIRECTION
 class Player(Mob):
     kwarg_filter = (DIRECTION,)  # Retain these kwargs only.
     instance = None
-    collects_chips = True
-    collects_items = True
-    enters_dirt = True
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if self.__class__.instance:
             raise ValueError("Cannot have more than one Player instance!")
         self.__class__.instance = self
+        self.tag(COLLECTS_CHIPS)
+        self.tag(COLLECTS_ITEMS)
+        self.tag(ENTERS_DIRT)
+        self.tag(PUSHES)
 
     @classmethod
     def init_at_level_load(cls):

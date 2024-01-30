@@ -5,6 +5,7 @@ from hybrid_cc.game.request import DestroyRequest, CreateRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import ENTERS_DIRT
 
 
 class Dirt(Elem):
@@ -29,7 +30,7 @@ class Dirt(Elem):
 
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.enters_dirt:
+        if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 

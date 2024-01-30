@@ -6,6 +6,7 @@ from hybrid_cc.game.request import DestroyRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, COUNT
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import ENTERS_DIRT
 
 
 class Socket(Elem):
@@ -28,7 +29,7 @@ class Socket(Elem):
     # --------------------------------------------------------------------------
 
     def test_enter(self, mob, position, direction):
-        if mob.enters_dirt:
+        if mob.tagged(ENTERS_DIRT):
             chips = Chip.chips_collected.get(self.color, 0)
             if chips >= self.chips_required[self.color]:
                 return MoveResult.PASS, None

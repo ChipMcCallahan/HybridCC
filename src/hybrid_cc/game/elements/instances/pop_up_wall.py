@@ -5,6 +5,7 @@ from hybrid_cc.game.request import CreateRequest, DestroyRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, COUNT
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import ENTERS_DIRT
 
 
 class PopUpWall(Elem):
@@ -29,7 +30,7 @@ class PopUpWall(Elem):
 
     @staticmethod
     def test_enter(mob, position, direction):
-        if mob.id == Id.PLAYER:
+        if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
