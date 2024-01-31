@@ -1,6 +1,7 @@
 from math import floor, ceil
 
 from hybrid_cc.shared import Direction
+from hybrid_cc.shared.tag import SLIDING
 
 VIEWPORT_SIZE = 9
 TILE_SIZE = 32
@@ -34,12 +35,17 @@ class Camera:
         target_offset = (0, 0)
         if self.last_move_tick is not None:
             stale_time = move_tick - self.last_move_tick
-            if stale_time < 2:
-                fraction = 1 - ((stale_time * 4 + tick_modulo) / 8)
-                offset_x, offset_y, _ = self.direction.reverse().value
-                offset_x *= fraction
-                offset_y *= fraction
-                target_offset = offset_x, offset_y
+            index = stale_time * 4 + logic_tick % 4
+            fraction = 0
+            if self.target.tagged(SLIDING) and (0 < index < 5):
+                fraction = 1 - (index - 1) / 4
+            elif stale_time < 2:
+                fraction = 1 - (index / 8)
+
+            offset_x, offset_y, _ = self.direction.reverse().value
+            offset_x *= fraction
+            offset_y *= fraction
+            target_offset = offset_x, offset_y
         return target_offset
 
     def get_target_render_position(self, logic_tick):

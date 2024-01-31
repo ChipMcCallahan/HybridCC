@@ -97,7 +97,3 @@ class ElemHandler:
     @staticmethod
     def get_mob(mob_id):
         return Mob.get_mob(mob_id)
-
-    @staticmethod
-    def exists(mob_id):
-        return Mob.exists(mob_id)

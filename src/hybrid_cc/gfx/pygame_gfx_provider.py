@@ -12,6 +12,7 @@ from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.shared_utils import is_iter
+from hybrid_cc.shared.tag import SLIDING
 from hybrid_cc.shared.tool_rule import ToolRule
 
 
@@ -68,9 +69,17 @@ class PygameGfxProvider:
             return frames, None
         move_tick = logic_tick // 4
         if isinstance(elem, Mob) and elem.last_move_tick is not None:
-            offset = move_tick - elem.last_move_tick
-            if offset < 2:
-                index = offset * 4 + logic_tick % 4
+            stale_tick = move_tick - elem.last_move_tick
+            index = stale_tick * 4 + logic_tick % 4
+            if elem.tagged(SLIDING) and (0 < index < 5):
+                frame = self.moving_double(frames[0], index * 2 - 1, elem)
+                offset = (0, 0)
+                if elem.direction == Direction.S:
+                    offset = (0, -1)  # render one tile higher than normal
+                elif elem.direction == Direction.E:
+                    offset = (-1, 0)  # render one tile left of normal
+                return frame, offset
+            elif stale_tick < 2:
                 frames = self.expand_to_8_frames(frames)
                 frame = self.moving_double(frames[index], index, elem)
                 offset = (0, 0)
@@ -126,7 +135,8 @@ class PygameGfxProvider:
                         if isinstance(elem, TrickWall):
                             if position in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
-                        img, offset = self.provide_one(elem, logic_tick, **kwargs)
+                        img, offset = self.provide_one(elem, logic_tick,
+                                                       **kwargs)
                         if not img:
                             continue
                         offset = offset or (0, 0)
@@ -168,7 +178,7 @@ class PygameGfxProvider:
             return
         keys = []
         for color in Color:
-            if color in key_counts:
+            if key_counts[color]:
                 keys.append((color, key_counts[color]))
         raw_surface = pygame.Surface((len(keys) * 32, 32))
         for index, pair in enumerate(keys):
@@ -190,7 +200,7 @@ class PygameGfxProvider:
             return
         tools = []
         for id in (Id.FLIPPERS, Id.FIRE_BOOTS, Id.SKATES, Id.SUCTION_BOOTS):
-            if id in tool_counts:
+            if tool_counts[id]:
                 tools.append((id, tool_counts[id]))
         raw_surface = pygame.Surface((len(tools) * 32, 32))
         for index, pair in enumerate(tools):

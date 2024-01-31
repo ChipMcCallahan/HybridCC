@@ -3,6 +3,7 @@ PUSHING = "pushing"
 SWIMMING = "swimming"
 FAILED_MOVE = "failed_move"
 MOVED = "moved"
+SLIDING = "sliding"
 
 # Permanent tags or traits
 COLLECTS_CHIPS = "collects_chips"

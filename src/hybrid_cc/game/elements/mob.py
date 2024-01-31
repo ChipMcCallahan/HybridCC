@@ -28,6 +28,9 @@ class Mob(Elem):
         self.direction = Direction.from_move(old_p, new_p)
         self.last_move_tick = tick
 
+    def exists(self):
+        return self.mob_id in Mob.instances
+
     def tag(self, tag, value=True):
         self.tags[tag] = value
 
@@ -65,7 +68,3 @@ class Mob(Elem):
     @classmethod
     def get_mob(cls, mob_id):
         return cls.instances.get(mob_id, None)
-
-    @classmethod
-    def exists(cls, mob_id):
-        return mob_id in cls.instances
