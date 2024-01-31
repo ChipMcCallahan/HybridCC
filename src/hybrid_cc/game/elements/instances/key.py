@@ -5,7 +5,7 @@ from hybrid_cc.game.request import DestroyRequest
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.kwargs import COLOR, RULE, COUNT
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import COLLECTS_ITEMS
+from hybrid_cc.shared.tag import COLLECTS_ITEMS, ENTERS_DIRT
 
 
 class Key(Elem):

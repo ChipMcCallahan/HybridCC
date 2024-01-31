@@ -81,7 +81,9 @@ class GamePlayerDemo:
             self.render_screen()
 
             pygame.display.flip()
-            self.clock.tick(HZ)
+            hz = 2 * HZ if pygame.key.get_pressed()[pygame.K_LSHIFT] else HZ
+
+            self.clock.tick(hz)
 
     def run(self):
         self.show_levelset_menu()
