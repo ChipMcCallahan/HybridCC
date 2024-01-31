@@ -2,9 +2,9 @@ import logging
 
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
+from hybrid_cc.shared import Id
 from hybrid_cc.shared.tag import PUSHING, PUSHES, COLLECTS_CHIPS, \
-    COLLECTS_ITEMS, ENTERS_DIRT, FORCED
-from hybrid_cc.shared import Direction
+    COLLECTS_ITEMS, ENTERS_DIRT, FORCED, OVERRIDDEN, SLIDING
 from hybrid_cc.shared.kwargs import DIRECTION
 
 
@@ -30,6 +30,17 @@ class Player(Mob):
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
+    @classmethod
+    def do_class_planning(cls, **kwargs):
+        # This method is a hack to allow Player to be overridden for the
+        # first tick of the game if starting on a FF.
+        tick = kwargs['tick']
+        overridden = cls.instance.tagged(OVERRIDDEN)
+        on_ff = cls.instance.tagged(SLIDING) == Id.FORCE
+
+        if overridden and on_ff and tick > 0:
+            cls.instance.untag(OVERRIDDEN)
+        return None, None
 
     def do_planning(self, tick, **kwargs):
         inputs = kwargs.get("inputs", [])

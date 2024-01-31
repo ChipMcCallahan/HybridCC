@@ -48,6 +48,6 @@ class Ice(Elem):
 
     def finish_enter(self, mob, position, direction):
         if not mob.tools[Id.SKATES]:
-            mob.tag(SLIDING)
+            mob.tag(SLIDING, self.id)
             mob.tag(OVERRIDDEN)
             self.sliding[mob.mob_id] = mob

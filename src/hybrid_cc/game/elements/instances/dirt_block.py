@@ -5,7 +5,7 @@ from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.kwargs import COLOR
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE
+from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING
 
 
 class DirtBlock(Mob):
@@ -38,8 +38,16 @@ class DirtBlock(Mob):
         return MoveResult.FAIL, []
 
     def start_enter(self, mob, position, direction):
-        if self.tagged(MOVED) or self.tagged((FAILED_MOVE, direction)):
+        # if we already failed in this direction, don't retry
+        if self.tagged((FAILED_MOVE, direction)):
             return MoveResult.FAIL, []
+
+        # if we already moved, don't move again. exception if we are sliding
+        # and the push is orthogonal
+        if self.tagged(MOVED):
+            if not (self.tagged(SLIDING) and self.direction in (
+                    direction.right(), direction.left())):
+                return MoveResult.FAIL, []
         return MoveResult.RETRY, [
             MoveRequest(mob_id=self.mob_id, direction=direction),
         ]

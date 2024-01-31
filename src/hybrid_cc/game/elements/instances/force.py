@@ -56,5 +56,14 @@ class Force(Elem):
             return
         if mob.id != Id.PLAYER:
             mob.tag(OVERRIDDEN)
-        mob.tag(SLIDING)
+        mob.direction = self.direction
+        mob.tag(SLIDING, self.id)
         self.hovering[mob.mob_id] = (mob, self.direction)
+
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+    def construct_mob_here(self, mob, position):
+        if mob.id == Id.PLAYER:
+            mob.tag(OVERRIDDEN)  # Prevent move on first tick.
+        self.finish_enter(mob, position, mob.direction)

@@ -309,8 +309,11 @@ class CellConverter:
                 pass
 
             elif top == CC1.NOT_USED_3:
+                if bottom == CC1.BLUE_WALL_REAL:
+                    populate(CC1.POP_UP_WALL)
                 cell.mob = LevelElem(Id.ICE_BLOCK)
-                if bottom in CC1.valid().difference(CC1.mobs()):
+                if bottom in CC1.valid().difference(
+                        CC1.mobs()) and bottom != CC1.BLUE_WALL_REAL:
                     populate(bottom)
 
             elif top == CC1.CHIP_EXIT:

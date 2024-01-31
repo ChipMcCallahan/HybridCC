@@ -69,7 +69,13 @@ class Map:
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
         elem = self.elems.construct_at(p, _id, **kwargs)
+        if isinstance(elem, Mob):
+            for other_elem in self.map[p].all():
+                method = getattr(other_elem, "construct_mob_here", None)
+                if method:
+                    method(elem, p)
         self.map[p].add(elem)
+
         return elem
 
     def destruct_at(self, p, elem):
