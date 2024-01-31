@@ -4,6 +4,8 @@ SWIMMING = "swimming"
 FAILED_MOVE = "failed_move"
 MOVED = "moved"
 SLIDING = "sliding"
+FORCED = "forced"
+OVERRIDDEN = "overridden"
 
 # Permanent tags or traits
 COLLECTS_CHIPS = "collects_chips"

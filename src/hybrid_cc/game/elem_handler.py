@@ -7,6 +7,7 @@ from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
     CHANNEL
+from hybrid_cc.shared.tag import OVERRIDDEN
 
 DEFAULT_KWARGS = {
     COLOR: Color.GREY,
@@ -84,11 +85,15 @@ class ElemHandler:
 
         # Instance level plans (mobs)
         for mob_id, mob in Mob.instances.items():
+            if mob.tagged(OVERRIDDEN):
+                continue
             method = getattr(mob, "do_planning", None)
             if method:
-                new_moves, new_requests = method(inputs=inputs, tick=tick)
+                new_moves, new_requests = method(tick, inputs=inputs)
                 if new_moves:
-                    moves.extend(new_moves)
+                    moves.insert(0, new_moves[0])  # put player at start
+                    if len(new_moves) > 1:
+                        moves.extend(new_moves[1:])
                 if new_requests:
                     requests.extend(new_requests)
 

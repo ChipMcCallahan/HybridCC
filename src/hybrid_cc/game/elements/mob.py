@@ -28,6 +28,9 @@ class Mob(Elem):
         self.direction = Direction.from_move(old_p, new_p)
         self.last_move_tick = tick
 
+    def on_failed_move(self, move_result, d):
+        self.last_move_tick = None
+
     def exists(self):
         return self.mob_id in Mob.instances
 

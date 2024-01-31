@@ -25,7 +25,7 @@ class Monster(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, inputs="", tick=None, **kwargs):
+    def do_planning(self, tick, **kwargs):
         if self.rule == MonsterRule.PLACEHOLDER:
             return [], [DestroyRequest(target=self, pos=self.position)]
         if None not in (tick, self.last_move_tick):

@@ -22,7 +22,7 @@ class DirtBlock(Mob):
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
-    def do_planning(self, inputs="", tick=None, **kwargs):
+    def do_planning(self, tick, **kwargs):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
@@ -33,13 +33,13 @@ class DirtBlock(Mob):
     # --------------------------------------------------------------------------
 
     def test_enter(self, mob, position, direction):
-        if self.tagged(MOVED) or self.tagged((FAILED_MOVE, direction)):
-            return MoveResult.FAIL, []
         if mob.tagged(PUSHES):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
     def start_enter(self, mob, position, direction):
+        if self.tagged(MOVED) or self.tagged((FAILED_MOVE, direction)):
+            return MoveResult.FAIL, []
         return MoveResult.RETRY, [
             MoveRequest(mob_id=self.mob_id, direction=direction),
         ]
@@ -52,4 +52,5 @@ class DirtBlock(Mob):
         self.tag(MOVED)
 
     def on_failed_move(self, move_result, d):
+        super().on_failed_move(move_result, d)
         self.tag((FAILED_MOVE, d))

@@ -24,7 +24,7 @@ class IceBlock(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, inputs="", tick=None, **kwargs):
+    def do_planning(self, tick, **kwargs):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
@@ -53,4 +53,5 @@ class IceBlock(Mob):
         self.tag(MOVED)
 
     def on_failed_move(self, move_result, d):
+        super().on_failed_move(move_result, d)
         self.tag((FAILED_MOVE, d))

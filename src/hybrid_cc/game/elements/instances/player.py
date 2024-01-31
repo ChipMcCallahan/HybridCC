@@ -3,7 +3,7 @@ import logging
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
 from hybrid_cc.shared.tag import PUSHING, PUSHES, COLLECTS_CHIPS, \
-    COLLECTS_ITEMS, ENTERS_DIRT
+    COLLECTS_ITEMS, ENTERS_DIRT, FORCED
 from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
 
@@ -31,12 +31,17 @@ class Player(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, inputs=None, tick=None, **kwargs):
-        inputs = inputs or []
+    def do_planning(self, tick, **kwargs):
+        inputs = kwargs.get("inputs", [])
         self.untag(PUSHING)
-        if None not in (tick, self.last_move_tick):
-            if tick - self.last_move_tick <= 1:
-                return [], []
+        moved_last_tick = (self.last_move_tick is not None
+                           and tick - self.last_move_tick <= 1)
+        if moved_last_tick and not self.tagged(FORCED):
+            return [], []
+
+        # If we're getting to submit our move inputs, we're not forced anymore.
+        self.untag(FORCED)
+
         primary, secondary = (inputs + [None, None])[0:2]
         if self.direction in inputs and self.direction != primary:
             primary, secondary = secondary, primary
@@ -71,5 +76,6 @@ class Player(Mob):
         self.untag(PUSHING)
 
     def on_failed_move(self, move_result, d):
-        self.tag(PUSHING)
+        super().on_failed_move(move_result, d)
         self.direction = d
+        self.tag(PUSHING)
