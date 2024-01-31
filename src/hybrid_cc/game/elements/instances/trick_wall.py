@@ -5,6 +5,7 @@ from hybrid_cc.game.request import DestroyRequest, CreateRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, RULE
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import PUSHABLE
 from hybrid_cc.shared.trick_wall_rule import TrickWallRule
 
 
@@ -41,7 +42,7 @@ class TrickWall(Elem):
 
     def start_enter(self, mob, position, direction):
         if self.rule == TrickWallRule.PASS_THRU:
-            if mob.id not in (Id.DIRT_BLOCK, Id.ICE_BLOCK):
+            if not mob.tagged(PUSHABLE):
                 return MoveResult.PASS, None
         elif (self.rule == TrickWallRule.BECOMES_WALL or
               self.rule == TrickWallRule.INVISIBLE_BECOMES_WALL):

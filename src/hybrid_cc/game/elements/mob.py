@@ -23,7 +23,7 @@ class Mob(Elem):
         self.keys = defaultdict(int)
         self.tools = defaultdict(int)
 
-    def finalize_move(self, old_p, new_p, tick):
+    def on_completed_move(self, old_p, new_p, tick):
         self.position = new_p
         self.direction = Direction.from_move(old_p, new_p)
         self.last_move_tick = tick

@@ -1,5 +1,5 @@
 """Gameboard module."""
-from collections import deque
+from collections import deque, defaultdict
 from enum import Enum
 
 from hybrid_cc.game.camera import Camera
@@ -65,6 +65,7 @@ class Gameboard:
         raw_moves = deque(self.elems.collect_move_plans(inputs, self.tick))
 
         moved = set()
+        debug_counts = defaultdict(int)
         while len(raw_moves) > 0:
             move = raw_moves.popleft()
             mob_id, d = move.mob_id, move.direction
@@ -72,6 +73,11 @@ class Gameboard:
             if (not mob) or (mob_id in moved):
                 continue
             result, requests = self.move_handler.move(mob, d, self.tick)
+
+            debug_counts[mob.mob_id] += 1
+            if debug_counts[mob.mob_id] > 1000:
+                raise ValueError(f"Break the infinite loop! {result} {requests}")
+
             raw_moves.extendleft(reversed(self.do_requests(requests)))
             if result == MoveResult.PASS:
                 moved.add(mob_id)

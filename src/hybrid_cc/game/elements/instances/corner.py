@@ -6,6 +6,7 @@ from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.kwargs import COLOR, SIDES
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import PUSHABLE
 
 
 class Corner(Elem):
@@ -39,8 +40,7 @@ class Corner(Elem):
 
         # This prevents unintuitive behavior with ants, paramecia, and teeth,
         # while still allowing ice moves to work as intended.
-        if (mob.id not in (Id.DIRT_BLOCK, Id.ICE_BLOCK)
-                and direction != mob.direction):
+        if not mob.tagged(PUSHABLE) and direction != mob.direction:
             return MoveResult.FAIL, []
 
         sides = set(Direction[d] for d in self.sides)

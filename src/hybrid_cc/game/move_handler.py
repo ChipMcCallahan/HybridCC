@@ -1,3 +1,4 @@
+from hybrid_cc.shared import Id
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -44,10 +45,8 @@ class MoveHandler:
         here_p, offset = mob.position, d.value
         there_p = tuple(a + b for a, b in zip(here_p, offset))
 
-        if self.map.is_oob(there_p):
-            return MoveResult.FAIL, []
-
-        here, there = self.map.get(here_p), self.map.get(there_p)
+        here = self.map.get(here_p)
+        there = None if self.map.is_oob(there_p) else self.map.get(there_p)
 
         result, requests = MoveResult.PASS, []
 
@@ -61,6 +60,9 @@ class MoveHandler:
                 requests += new_requests or []
                 if result != MoveResult.PASS:
                     return result, requests
+
+        if not there:
+            return MoveResult.FAIL, requests
 
         # Process enter
         for elem in there.all():
@@ -100,5 +102,5 @@ class MoveHandler:
 
         here.remove(mob)
         there.add(mob)
-        mob.finalize_move(here_p, there_p, tick)
+        mob.on_completed_move(here_p, there_p, tick)
         return requests

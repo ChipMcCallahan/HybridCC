@@ -53,9 +53,9 @@ class Player(Mob):
     # OTHER
     # --------------------------------------------------------------------------
 
-    def finalize_move(self, old_p, new_p, tick):
+    def on_completed_move(self, old_p, new_p, tick):
+        super().on_completed_move(old_p, new_p, tick)
         self.untag(PUSHING)
-        super().finalize_move(old_p, new_p, tick)
 
     def on_failed_move(self, move_result, d):
         self.tag(PUSHING)

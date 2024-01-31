@@ -2,8 +2,10 @@ import logging
 
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import FAILED_MOVE, PUSHES, ENTERS_DIRT
+from hybrid_cc.shared.tag import FAILED_MOVE, PUSHES, ENTERS_DIRT, MOVED, \
+    PUSHABLE
 
 
 class IceBlock(Mob):
@@ -12,6 +14,7 @@ class IceBlock(Mob):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tag(ENTERS_DIRT)
+        self.tag(PUSHABLE)
 
     @classmethod
     def init_at_level_load(cls):
@@ -22,13 +25,15 @@ class IceBlock(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, inputs="", tick=None, **kwargs):
-        self.untag(FAILED_MOVE)
+        self.untag(MOVED)
+        for d in "NESW":
+            self.untag((FAILED_MOVE, Direction[d]))
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        if self.tagged(FAILED_MOVE) == direction:
+        if self.tagged(MOVED) or self.tagged((FAILED_MOVE, direction)):
             return MoveResult.FAIL, []
         if mob.tagged(PUSHES) or mob.id == self.id:
             return MoveResult.PASS, []
@@ -43,5 +48,9 @@ class IceBlock(Mob):
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
+    def on_completed_move(self, old_p, new_p, tick):
+        super().on_completed_move(old_p, new_p, tick)
+        self.tag(MOVED)
+
     def on_failed_move(self, move_result, d):
-        self.tag(FAILED_MOVE, d)
+        self.tag((FAILED_MOVE, d))
