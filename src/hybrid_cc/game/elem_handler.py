@@ -69,25 +69,30 @@ class ElemHandler:
         return new_kwargs
 
     def collect_move_plans(self, inputs, tick):
-        all_move_plans = []
+        moves, requests = [], []
 
         # Class level plans (e.g. ice, force floor, dpad buttons)
         for elem_class in self.id_to_class.values():
             method = getattr(elem_class, "do_class_planning", None)
             if method:
-                move_plans = method(inputs=inputs, tick=tick)
-                if move_plans:
-                    all_move_plans.extend(move_plans)
+                new_moves, new_requests = method(inputs=inputs, tick=tick)
+                if new_moves:
+                    moves.extend(new_moves)
+                if new_requests:
+                    requests.extend(new_requests)
+
 
         # Instance level plans (mobs)
         for mob_id, mob in Mob.instances.items():
             method = getattr(mob, "do_planning", None)
             if method:
-                move_plans = method(inputs=inputs, tick=tick)
-                if move_plans:
-                    all_move_plans.extend(move_plans)
+                new_moves, new_requests = method(inputs=inputs, tick=tick)
+                if new_moves:
+                    moves.extend(new_moves)
+                if new_requests:
+                    requests.extend(new_requests)
 
-        return all_move_plans
+        return moves, requests
 
     @staticmethod
     def get_mob(mob_id):

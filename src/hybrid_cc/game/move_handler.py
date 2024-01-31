@@ -102,5 +102,7 @@ class MoveHandler:
 
         here.remove(mob)
         there.add(mob)
-        mob.on_completed_move(here_p, there_p, tick)
+        new_requests = mob.on_completed_move(here_p, there_p, tick)
+        if new_requests:
+            requests.extend(new_requests)
         return requests

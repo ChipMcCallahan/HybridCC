@@ -2,7 +2,8 @@ import logging
 
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
+from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest, \
+    CreateRequest
 from hybrid_cc.game.rng import RNG
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.kwargs import RULE, DIRECTION
@@ -25,11 +26,13 @@ class Monster(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, inputs="", tick=None, **kwargs):
+        if self.rule == MonsterRule.PLACEHOLDER:
+            return [], [DestroyRequest(target=self, pos=self.position)]
         if None not in (tick, self.last_move_tick):
             tick_limit = 3 if self.rule in (
                 MonsterRule.TEETH, MonsterRule.BLOB) else 1
             if tick - self.last_move_tick <= tick_limit:
-                return
+                return [], []
         d = self.direction
         if self.rule == MonsterRule.FIREBALL:
             directions = [d, d.right(), d.left(), d.reverse()]
@@ -46,7 +49,7 @@ class Monster(Mob):
                 directions.append(pool.pop(RNG.next() % len(pool)))
         elif self.rule == MonsterRule.TEETH:
             if not Player.instance:
-                return []
+                return [], []
             tx, ty, _ = self.position
             px, py, _ = Player.instance.position
             dx, dy = px - tx, py - ty
@@ -72,14 +75,16 @@ class Monster(Mob):
             directions = [d, d.reverse()]
         else:
             raise ValueError(f"Unexpected monster rule: {self.rule}")
-        return MoveRequest.from_directions(self.mob_id, directions)
+        return MoveRequest.from_directions(self.mob_id, directions), []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    @staticmethod
-    def test_enter(mob, position, direction):
+
+    def test_enter(self, mob, position, direction):
         if mob.id == Id.PLAYER:
+            return MoveResult.PASS, []
+        if self.rule == MonsterRule.PLACEHOLDER and mob.id != self.id:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
@@ -90,3 +95,12 @@ class Monster(Mob):
                 DestroyRequest(target=self, pos=position),
                 LoseRequest(cause=self)
             ]
+
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+
+    def on_completed_move(self, old_p, new_p, tick):
+        super().on_completed_move(old_p, new_p, tick)
+        return [
+            CreateRequest(pos=old_p, eid=self.id, rule=MonsterRule.PLACEHOLDER)]

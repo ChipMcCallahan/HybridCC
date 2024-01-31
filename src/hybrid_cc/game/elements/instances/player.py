@@ -35,9 +35,9 @@ class Player(Mob):
         self.untag(PUSHING)
         if None not in (tick, self.last_move_tick):
             if tick - self.last_move_tick <= 1:
-                return
+                return [], []
         return MoveRequest.from_directions(self.mob_id,
-                                           [Direction[d] for d in inputs])
+                                           [Direction[d] for d in inputs]), []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES

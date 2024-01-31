@@ -35,6 +35,7 @@ class TrickWall(Elem):
                 keys_to_remove.append(key)
         for key in keys_to_remove:
             cls.show_secrets_positions.pop(key)
+        return [], []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES

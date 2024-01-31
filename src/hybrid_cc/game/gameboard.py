@@ -62,8 +62,10 @@ class Gameboard:
         return self.map.get(p)
 
     def do_logic(self, inputs):
-        raw_moves = deque(self.elems.collect_move_plans(inputs, self.tick))
+        moves, requests = self.elems.collect_move_plans(inputs, self.tick)
+        self.do_requests(requests)
 
+        raw_moves = deque(moves)
         moved = set()
         debug_counts = defaultdict(int)
         while len(raw_moves) > 0:

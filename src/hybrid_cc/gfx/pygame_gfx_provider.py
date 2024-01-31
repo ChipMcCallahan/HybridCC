@@ -10,6 +10,7 @@ from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
+from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.tool_rule import ToolRule
 
@@ -23,6 +24,8 @@ class PygameGfxProvider:
         self.viewport = pygame.Surface((320, 320))
 
     def provide(self, id_and_kwargs, **extra_kwargs):
+        if getattr(id_and_kwargs, "rule", None) == MonsterRule.PLACEHOLDER:
+            return None
         cache_key = (id_and_kwargs, frozenset(extra_kwargs.items()))
         # Check if the item is in the cache
         if cache_key in self.cache:
@@ -124,6 +127,8 @@ class PygameGfxProvider:
                             if position in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
                         img, offset = self.provide_one(elem, logic_tick, **kwargs)
+                        if not img:
+                            continue
                         offset = offset or (0, 0)
                         x = i + offset[0] - nw_pos[0]
                         y = j + offset[1] - nw_pos[1]
