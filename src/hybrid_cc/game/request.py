@@ -29,6 +29,7 @@ class MoveRequest(Request):
     def from_directions(mob_id, directions):
         return [MoveRequest(mob_id=mob_id, direction=d) for d in directions]
 
+
 class WinRequest(Request):
     def __init__(self, *, color):
         self.color = color

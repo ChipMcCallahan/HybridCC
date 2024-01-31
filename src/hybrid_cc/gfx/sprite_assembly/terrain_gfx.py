@@ -1,6 +1,7 @@
 from PIL import Image
 
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
+from hybrid_cc.shared.force_rule import ForceRule
 from hybrid_cc.shared.space_rule import SpaceRule
 from hybrid_cc.shared.stepping_stone_rule import SteppingStoneRule
 from hybrid_cc.shared.thief_rule import ThiefRule
@@ -70,7 +71,7 @@ class TerrainGfx:
         return self.assembler.cc2("ICE")
 
     def force(self, elem, **kwargs):
-        if elem.direction:
+        if elem.rule != ForceRule.RANDOM:
             base = self.assembler.cc2(f"FORCE_N")
             frames = [self.assembler.cc2(f"FORCE_{elem.direction.name}")]
             for i in range(1, 8):

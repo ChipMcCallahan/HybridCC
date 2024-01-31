@@ -92,6 +92,8 @@ class PygameGfxProvider:
                 return frames[0], None
         if len(frames) == 4:
             return frames[(move_tick // 2) % 4], None
+        elif len(frames) == 8:
+            return frames[(move_tick // 2) % 8], None
         return frames[0], None
 
     @staticmethod

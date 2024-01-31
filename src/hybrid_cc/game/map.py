@@ -4,6 +4,7 @@ from hybrid_cc.game.cell import Cell
 from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.monster_rule import MonsterRule
 
 
 class Map:
@@ -69,7 +70,7 @@ class Map:
         if self.is_oob(p):
             raise ValueError("Coordinates out of bounds")
         elem = self.elems.construct_at(p, _id, **kwargs)
-        if isinstance(elem, Mob):
+        if isinstance(elem, Mob) and elem.rule != MonsterRule.PLACEHOLDER:
             for other_elem in self.map[p].all():
                 method = getattr(other_elem, "construct_mob_here", None)
                 if method:

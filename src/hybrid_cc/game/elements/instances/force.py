@@ -2,7 +2,9 @@ import logging
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import MoveRequest
-from hybrid_cc.shared import Id
+from hybrid_cc.game.rng import RNG
+from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared.force_rule import ForceRule
 from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR
 from hybrid_cc.shared.tag import FORCED, OVERRIDDEN, SLIDING
 
@@ -30,10 +32,16 @@ class Force(Elem):
             mob, direction = entry
             if not mob.exists():
                 to_remove.append(mob_id)
+                continue
+            if direction:
+                directions = [direction]
             else:
-                moves = MoveRequest.from_directions(mob_id,
-                                                    (direction,))
-                requests.extend(moves)
+                pool = [Direction[d] for d in "NESW"]
+                directions = []
+                while len(pool) > 0:
+                    directions.append(pool.pop(RNG.next() % len(pool)))
+            moves = MoveRequest.from_directions(mob_id, directions)
+            requests.extend(moves)
         for mob_id in to_remove:
             cls.instances.pop(mob_id, None)
         return requests, []
@@ -43,10 +51,10 @@ class Force(Elem):
     # --------------------------------------------------------------------------
 
     def finish_exit(self, mob, position, direction):
-        if (mob.id == Id.PLAYER and
-                direction == self.direction and not
+        if (mob.id == Id.PLAYER and not
                 mob.tools[Id.SUCTION_BOOTS]):
-            mob.tag(FORCED)
+            if self.rule == ForceRule.RANDOM or self.direction == direction:
+                mob.tag(FORCED)
         mob.untag(OVERRIDDEN)
         mob.untag(SLIDING)
         self.hovering.pop(mob.mob_id, None)
@@ -56,9 +64,12 @@ class Force(Elem):
             return
         if mob.id != Id.PLAYER:
             mob.tag(OVERRIDDEN)
-        mob.direction = self.direction
         mob.tag(SLIDING, self.id)
-        self.hovering[mob.mob_id] = (mob, self.direction)
+        if self.rule == ForceRule.RANDOM:
+            self.hovering[mob.mob_id] = (mob, None)
+        else:
+            mob.direction = self.direction
+            self.hovering[mob.mob_id] = (mob, self.direction)
 
     # --------------------------------------------------------------------------
     # OTHER
