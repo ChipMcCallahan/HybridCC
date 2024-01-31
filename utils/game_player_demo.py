@@ -13,7 +13,7 @@ from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
 BLACK_THEME.background_color = (0, 0, 0)
-HZ = 8  # 40 IS NORMAL, 80 IS 2x
+HZ = 40  # 40 IS NORMAL, 80 IS 2x
 
 
 class GamePlayerDemo:
