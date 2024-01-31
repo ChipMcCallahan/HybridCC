@@ -6,7 +6,7 @@ class MoveHandler:
     def __init__(self, map):
         self.map = map
 
-    def move(self, mob, d, tick):
+    def move(self, mob, d, tick, slap=None):
         requests = []
 
         result, new_requests = self.test_move(mob, d)
@@ -22,6 +22,13 @@ class MoveHandler:
             result, new_requests = self.fail_move(mob, result, d)
             requests += new_requests or []
             return result, requests
+
+        if slap:
+            slap_result, new_requests = self.test_move(mob, slap)
+            requests += new_requests or []
+            if slap_result == MoveResult.PASS:
+                _, new_requests = self.start_move(mob, slap)
+                requests += new_requests or []
 
         requests += self.finish_move(mob, d, tick) or []
 

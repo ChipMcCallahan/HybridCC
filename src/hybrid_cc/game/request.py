@@ -20,9 +20,10 @@ class CreateRequest(Request):
 
 
 class MoveRequest(Request):
-    def __init__(self, *, mob_id, direction):
+    def __init__(self, *, mob_id, direction, slap=None):
         self.mob_id = mob_id
         self.direction = direction
+        self.slap = slap
 
     @staticmethod
     def from_directions(mob_id, directions):

@@ -31,13 +31,26 @@ class Player(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, inputs="", tick=None, **kwargs):
+    def do_planning(self, inputs=None, tick=None, **kwargs):
+        inputs = inputs or []
         self.untag(PUSHING)
         if None not in (tick, self.last_move_tick):
             if tick - self.last_move_tick <= 1:
                 return [], []
-        return MoveRequest.from_directions(self.mob_id,
-                                           [Direction[d] for d in inputs]), []
+        primary, secondary = (inputs + [None, None])[0:2]
+        if self.direction in inputs and self.direction != primary:
+            primary, secondary = secondary, primary
+        moves = []
+        if primary:
+            moves.append(
+                MoveRequest(mob_id=self.mob_id, direction=primary,
+                            slap=secondary)
+            )
+        if secondary:
+            moves.append(
+                MoveRequest(mob_id=self.mob_id, direction=secondary)
+            )
+        return moves, []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES

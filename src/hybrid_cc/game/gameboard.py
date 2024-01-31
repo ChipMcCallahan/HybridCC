@@ -11,6 +11,7 @@ from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
     LoseRequest, MoveRequest, ShowHintRequest, HideHintRequest
 from hybrid_cc.game.rng import RNG
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -62,6 +63,10 @@ class Gameboard:
         return self.map.get(p)
 
     def do_logic(self, inputs):
+        if len(inputs) > 2:
+            inputs = inputs[0:2]
+        inputs = [Direction[d] for d in inputs]
+
         moves, requests = self.elems.collect_move_plans(inputs, self.tick)
         self.do_requests(requests)
 
@@ -70,15 +75,17 @@ class Gameboard:
         debug_counts = defaultdict(int)
         while len(raw_moves) > 0:
             move = raw_moves.popleft()
-            mob_id, d = move.mob_id, move.direction
+            mob_id, d, slap = move.mob_id, move.direction, move.slap
             mob = self.elems.get_mob(mob_id)
             if (not mob) or (mob_id in moved):
                 continue
-            result, requests = self.move_handler.move(mob, d, self.tick)
-
+            result, requests = self.move_handler.move(mob, d, self.tick, slap)
+            if result == MoveResult.RETRY:
+                raw_moves.appendleft(move)
             debug_counts[mob.mob_id] += 1
             if debug_counts[mob.mob_id] > 1000:
-                raise ValueError(f"Break the infinite loop! {result} {requests}")
+                raise ValueError(
+                    f"Break the infinite loop! {result} {requests}")
 
             raw_moves.extendleft(reversed(self.do_requests(requests)))
             if result == MoveResult.PASS:

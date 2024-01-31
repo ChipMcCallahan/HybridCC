@@ -28,6 +28,7 @@ class IceBlock(Mob):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
+        return [], []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
@@ -40,9 +41,8 @@ class IceBlock(Mob):
         return MoveResult.FAIL, []
 
     def start_enter(self, mob, position, direction):
-        return MoveResult.FAIL, [
+        return MoveResult.RETRY, [
             MoveRequest(mob_id=self.mob_id, direction=direction),
-            MoveRequest(mob_id=mob.mob_id, direction=direction),
         ]
 
     # --------------------------------------------------------------------------
