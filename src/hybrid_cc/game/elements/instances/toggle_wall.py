@@ -1,8 +1,10 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
+from hybrid_cc.shared.move_result import MoveResult
 
 
 class ToggleWall(Elem):
@@ -23,19 +25,8 @@ class ToggleWall(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def test_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def start_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_exit(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
-
-    def finish_enter(self, mob, position, direction):
-        raise NotImplementedError("Implement or remove.")
+        key = (self.color, self.channel)
+        toggle_state = Button.state[key] % 2
+        if (self.rule.value + toggle_state) % 2 == 0:
+            return MoveResult.PASS, []
+        return MoveResult.FAIL, []

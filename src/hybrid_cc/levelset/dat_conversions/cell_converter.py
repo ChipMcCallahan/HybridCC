@@ -211,13 +211,16 @@ class CellConverter:
                     populate(bottom)
 
             elif top in CC1.toggles():
-                kwargs = CellConverter.colorize(bottom)
+                kwargs = CellConverter.colorize(
+                    bottom) or CellConverter.channelize(bottom)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.GREEN
                 kwargs[RULE] = (ToggleWallRule.STARTS_OPEN
                                 if top == CC1.TOGGLE_FLOOR
                                 else ToggleWallRule.STARTS_SHUT)
                 cell.terrain_mod = LevelElem(Id.TOGGLE_WALL, **kwargs)
+                if bottom in CC1.valid().difference(CC1.mobs()):
+                    populate(bottom)
 
             elif top == CC1.TELEPORT:
                 kwargs = CellConverter.colorize(
