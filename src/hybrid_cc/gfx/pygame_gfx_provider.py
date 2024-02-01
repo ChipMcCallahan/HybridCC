@@ -28,7 +28,7 @@ class PygameGfxProvider:
         self.viewport = pygame.Surface((320, 320))
 
     def provide(self, id_and_kwargs, **extra_kwargs):
-        if getattr(id_and_kwargs, "rule", None) == MonsterRule.PLACEHOLDER:
+        if id_and_kwargs.id == Id.PLACEHOLDER:
             return None
         cache_key = (id_and_kwargs, frozenset(extra_kwargs.items()))
         # Check if the item is in the cache

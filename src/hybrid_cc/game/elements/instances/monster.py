@@ -26,9 +26,6 @@ class Monster(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, tick, **kwargs):
-        if self.rule == MonsterRule.PLACEHOLDER:
-            return [], [DestroyRequest(target=self, pos=self.position)]
-
         n = 3 if self.rule in (MonsterRule.TEETH, MonsterRule.BLOB) else 1
         if self.moved_last_n_ticks(tick, n=n):
             return [], []
@@ -81,10 +78,9 @@ class Monster(Mob):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def test_enter(self, mob, position, direction):
+    @staticmethod
+    def test_enter(mob, position, direction):
         if mob.id == Id.PLAYER:
-            return MoveResult.PASS, []
-        if self.rule == MonsterRule.PLACEHOLDER and mob.id != self.id:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
@@ -102,5 +98,4 @@ class Monster(Mob):
 
     def on_completed_move(self, old_p, new_p, tick, **kwargs):
         super().on_completed_move(old_p, new_p, tick, **kwargs)
-        return [
-            CreateRequest(pos=old_p, eid=self.id, rule=MonsterRule.PLACEHOLDER)]
+        return [CreateRequest(pos=old_p, eid=Id.PLACEHOLDER)]

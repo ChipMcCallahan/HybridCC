@@ -2,7 +2,8 @@ import logging
 
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.game.request import DestroyRequest, LoseRequest, MoveRequest
+from hybrid_cc.game.request import DestroyRequest, LoseRequest, MoveRequest, \
+    CreateRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
@@ -54,3 +55,11 @@ class Tank(Mob):
                 DestroyRequest(target=self, pos=position),
                 LoseRequest(cause=self)
             ]
+
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+
+    def on_completed_move(self, old_p, new_p, tick, **kwargs):
+        super().on_completed_move(old_p, new_p, tick, **kwargs)
+        return [CreateRequest(pos=old_p, eid=Id.PLACEHOLDER)]

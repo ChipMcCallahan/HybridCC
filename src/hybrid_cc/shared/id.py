@@ -48,6 +48,7 @@ class Id(Enum):
     TANK = (Layer.MOB, 4)
     ROBOT = (Layer.MOB, 5)
     PLAYER = (Layer.MOB, 6)
+    PLACEHOLDER = (Layer.MOB, 7)
 
     def layer(self):
         return self.value[0]

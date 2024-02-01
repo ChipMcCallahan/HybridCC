@@ -2,7 +2,6 @@ from enum import Enum
 
 
 class MonsterRule(Enum):
-    PLACEHOLDER = 0,
     TEETH = 1,
     BLOB = 2,
     FIREBALL = 3,
