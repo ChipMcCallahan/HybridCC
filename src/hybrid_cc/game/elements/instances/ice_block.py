@@ -56,8 +56,8 @@ class IceBlock(Mob):
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def on_completed_move(self, old_p, new_p, tick):
-        super().on_completed_move(old_p, new_p, tick)
+    def on_completed_move(self, old_p, new_p, tick, **kwargs):
+        super().on_completed_move(old_p, new_p, tick, **kwargs)
         self.tag(MOVED)
 
     def on_failed_move(self, move_result, d):

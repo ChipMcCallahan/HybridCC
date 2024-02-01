@@ -23,6 +23,8 @@ class Stacker:
         if not images:
             raise ValueError("At least one image is required to stack.")
 
+        images = [image for image in images if image]
+
         # Verify all images are the same size
         image_size = images[0].size
         if not all(img.size == image_size for img in images):

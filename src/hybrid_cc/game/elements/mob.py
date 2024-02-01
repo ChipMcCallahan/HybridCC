@@ -23,9 +23,9 @@ class Mob(Elem):
         self.keys = defaultdict(int)
         self.tools = defaultdict(int)
 
-    def on_completed_move(self, old_p, new_p, tick):
+    def on_completed_move(self, old_p, new_p, tick, *, simulated_position=None):
         self.position = new_p
-        self.direction = Direction.from_move(old_p, new_p)
+        self.direction = Direction.from_move(simulated_position or old_p, new_p)
         self.last_move_tick = tick
 
     def on_failed_move(self, move_result, d):

@@ -100,7 +100,7 @@ class Monster(Mob):
     # OTHER
     # --------------------------------------------------------------------------
 
-    def on_completed_move(self, old_p, new_p, tick):
-        super().on_completed_move(old_p, new_p, tick)
+    def on_completed_move(self, old_p, new_p, tick, **kwargs):
+        super().on_completed_move(old_p, new_p, tick, **kwargs)
         return [
             CreateRequest(pos=old_p, eid=self.id, rule=MonsterRule.PLACEHOLDER)]

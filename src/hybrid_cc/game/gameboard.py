@@ -79,7 +79,8 @@ class Gameboard:
             mob = self.elems.get_mob(mob_id)
             if (not mob) or (mob_id in moved):
                 continue
-            result, requests = self.move_handler.move(mob, d, self.tick, slap)
+            result, requests = self.move_handler.move(mob, d, self.tick, slap,
+                                                      move.simulated_position)
             if result == MoveResult.RETRY:
                 raw_moves.appendleft(move)
             debug_counts[mob.mob_id] += 1

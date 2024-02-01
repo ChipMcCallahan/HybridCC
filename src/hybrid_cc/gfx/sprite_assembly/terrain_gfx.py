@@ -100,7 +100,8 @@ class TerrainGfx:
         frames = [self.assembler.custom(i) for i in range(6, 10)]
         colored = [self.assembler.colorize(frame, elem.color) for frame in
                    frames]
-        return [self.assembler.stack(floor, frame) for frame in colored]
+        label = self.label(elem.channel, elem.color) if elem.channel else None
+        return [self.assembler.stack(floor, frame, label) for frame in colored]
 
     def trap(self, elem, **kwargs):
         current_state = kwargs.get(CURRENT_STATE, 0)
