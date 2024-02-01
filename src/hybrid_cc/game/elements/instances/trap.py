@@ -35,8 +35,10 @@ class Trap(Elem):
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
+    # noinspection PyUnresolvedReferences
     @classmethod
     def do_class_planning(cls, **kwargs):
+        to_remove = []
         requests = []
         for key, positions in cls.positions.items():
             color, channel, rule = key
@@ -53,12 +55,20 @@ class Trap(Elem):
             direction = None
             if dpad_signal and dpad_signal > last_signal:
                 direction = dpad_direction
-            mobs = [cls.mobs[p] for p in positions if cls.mobs[p]]
-            for mob in mobs:
-                # noinspection PyUnresolvedReferences
+            for p in positions:
+                mob = cls.mobs.get(p, None)
+                if not mob:
+                    continue
+                if not mob.exists():
+                    to_remove.append(p)
+                    continue
+                if direction and direction.is_cardinal():
+                    mob.direction = direction
                 requests.append(
                     MoveRequest(mob_id=mob.mob_id,
-                                direction=(direction or mob.direction)))
+                                direction=mob.direction))
+        for p in to_remove:
+            cls.mobs.pop(p, None)
         return requests, []
 
     # --------------------------------------------------------------------------
