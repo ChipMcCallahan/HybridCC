@@ -3,6 +3,7 @@ from collections import deque, defaultdict
 from enum import Enum
 
 from hybrid_cc.game.camera import Camera
+from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.elements.mob import Mob
@@ -66,7 +67,6 @@ class Gameboard:
         if len(inputs) > 2:
             inputs = inputs[0:2]
         inputs = [Direction[d] for d in inputs]
-
         moves, requests = self.elems.collect_move_plans(inputs, self.tick)
         self.do_requests(requests)
 
@@ -96,6 +96,7 @@ class Gameboard:
         if self.time > 0 and self.time_remaining() == 0:
             self.transition(Gameboard.State.LOSE)
         self.camera.update()
+        Button.update()  # Update all the button signals at end of turn.
 
     def do_requests(self, requests):
         move_requests = []

@@ -6,6 +6,7 @@ from PIL import Image
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.toggle_wall import ToggleWall
+from hybrid_cc.game.elements.instances.trap import Trap
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared.color import Color
@@ -139,9 +140,10 @@ class PygameGfxProvider:
                         if isinstance(elem, TrickWall):
                             if position in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
-                        if isinstance(elem, ToggleWall):
+                        if isinstance(elem, ToggleWall) or isinstance(elem,
+                                                                      Trap):
                             key = (elem.color, elem.channel)
-                            kwargs["current_state"] = Button.state[key] % 2
+                            kwargs["current_state"] = Button.signal[key] % 2
 
                         img, offset = self.provide_one(elem, logic_tick,
                                                        **kwargs)

@@ -105,8 +105,8 @@ class TerrainGfx:
 
     def trap(self, elem, **kwargs):
         current_state = kwargs.get(CURRENT_STATE, 0)
-        index = [TrapRule.DEFAULT, TrapRule.STARTS_SHUT].index(
-            elem.rule or TrapRule.DEFAULT)
+        index = [TrapRule.STARTS_OPEN, TrapRule.STARTS_SHUT].index(
+            elem.rule or TrapRule.STARTS_OPEN)
         name = ["TRAP", "TRAP_SHUT"][(index + current_state) % 2]
         base = self.assembler.cc2(name)
         colored = self.assembler.colorize(base, elem.color)

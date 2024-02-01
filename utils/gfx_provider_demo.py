@@ -49,14 +49,14 @@ ELIB.update(
                          c in
                          Color],
         "TELEPORT": [LevelElem(Id.TELEPORT, color=c) for c in Color],
-        "TRAP_OPEN": [LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT) for c
+        "TRAP_OPEN": [LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN) for c
                       in
                       Color],
         "TRAP_SHUT": [LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT) for
                       c in
                       Color],
         "TRAP_OPEN_1": [
-            LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1)
+            LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN, channel=1)
             for c in
             Color],
         "TRAP_SHUT_128": [
@@ -65,7 +65,7 @@ ELIB.update(
             in
             Color],
         "TRAP_TOGGLED_SHUT": [
-            (LevelElem(Id.TRAP, color=c, rule=TrapRule.DEFAULT, channel=1),
+            (LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_OPEN, channel=1),
              {CURRENT_STATE: 1}) for c in Color],
         "TRAP_TOGGLED_OPEN": [
             (LevelElem(Id.TRAP, color=c, rule=TrapRule.STARTS_SHUT, channel=1),

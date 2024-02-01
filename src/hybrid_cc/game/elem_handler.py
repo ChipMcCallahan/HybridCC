@@ -82,7 +82,6 @@ class ElemHandler:
                 if new_requests:
                     requests.extend(new_requests)
 
-
         # Instance level plans (mobs)
         for mob_id, mob in Mob.instances.items():
             if mob.tagged(OVERRIDDEN):
@@ -91,9 +90,10 @@ class ElemHandler:
             if method:
                 new_moves, new_requests = method(tick, inputs=inputs)
                 if new_moves:
-                    moves.insert(0, new_moves[0])  # put player at start
-                    if len(new_moves) > 1:
-                        moves.extend(new_moves[1:])
+                    if mob.id == Id.PLAYER:  # Player always moves first
+                        moves = new_moves + moves
+                    else:
+                        moves += new_moves
                 if new_requests:
                     requests.extend(new_requests)
 

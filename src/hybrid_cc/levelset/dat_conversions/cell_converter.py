@@ -258,6 +258,7 @@ class CellConverter:
                     kwargs = (CellConverter.colorize(bottom) or
                               CellConverter.channelize(bottom))
                     kwargs[COLOR] = kwargs.get(COLOR, Color.TAN)
+                    kwargs[RULE] = TrapRule.STARTS_OPEN
                     if channel:
                         kwargs[CHANNEL] = channel
                 cell.terrain = LevelElem(Id.TRAP, **kwargs)

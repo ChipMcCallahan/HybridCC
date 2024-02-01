@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Direction
+from hybrid_cc.shared.tag import SLIDING
 
 
 class Mob(Elem):

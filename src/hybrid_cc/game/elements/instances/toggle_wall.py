@@ -26,7 +26,7 @@ class ToggleWall(Elem):
     # --------------------------------------------------------------------------
     def test_enter(self, mob, position, direction):
         key = (self.color, self.channel)
-        toggle_state = Button.state[key] % 2
+        toggle_state = Button.signal[key] % 2
         if (self.rule.value + toggle_state) % 2 == 0:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []

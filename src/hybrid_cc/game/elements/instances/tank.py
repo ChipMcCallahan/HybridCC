@@ -28,8 +28,8 @@ class Tank(Mob):
             return [], []
 
         key = (self.color, self.channel)
-        signal = Button.state[key]
-        dpad_direction, dpad_signal = Button.dpad_directions[key]
+        signal = Button.signal[key]
+        dpad_direction, dpad_signal = Button.dpad_signal[key]
         if dpad_signal and dpad_signal > self.last_signal:
             self.direction = dpad_direction or self.direction
             self.last_signal = dpad_signal
