@@ -28,11 +28,11 @@ class Monster(Mob):
     def do_planning(self, tick, **kwargs):
         if self.rule == MonsterRule.PLACEHOLDER:
             return [], [DestroyRequest(target=self, pos=self.position)]
-        if None not in (tick, self.last_move_tick):
-            tick_limit = 3 if self.rule in (
-                MonsterRule.TEETH, MonsterRule.BLOB) else 1
-            if tick - self.last_move_tick <= tick_limit:
-                return [], []
+
+        n = 3 if self.rule in (MonsterRule.TEETH, MonsterRule.BLOB) else 1
+        if self.moved_last_n_ticks(tick, n=n):
+            return [], []
+
         d = self.direction
         if self.rule == MonsterRule.FIREBALL:
             directions = [d, d.right(), d.left(), d.reverse()]

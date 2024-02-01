@@ -424,11 +424,12 @@ class CellConverter:
     def do_buttons(cell, top, bottom, channel):
         kwargs = {}
         if top == CC1.GREEN_BUTTON:
+            kwargs = {COLOR: Color.GREEN}
             if bottom in COLOR_CODE:
-                kwargs = CellConverter.colorize(bottom)
+                kwargs.update(CellConverter.colorize(bottom))
                 kwargs[RULE] = ButtonRule.TOGGLE
             elif bottom in NUMBER_CODE:
-                kwargs = CellConverter.channelize(bottom)
+                kwargs.update(CellConverter.channelize(bottom))
                 kwargs[RULE] = ButtonRule.TOGGLE
             elif bottom == CC1.GREEN_BUTTON:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
@@ -443,6 +444,7 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.TOGGLE
                 kwargs[COLOR] = Color.GREEN
         elif top == CC1.TANK_BUTTON:
+            kwargs = {COLOR: Color.BLUE}
             if bottom == top:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.BLUE
@@ -450,10 +452,10 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.CYAN
             elif bottom in COLOR_CODE:
-                kwargs = CellConverter.colorize(bottom)
+                kwargs.update(CellConverter.colorize(bottom))
                 kwargs[RULE] = ButtonRule.HOLD_ALL
             elif bottom in NUMBER_CODE:
-                kwargs = CellConverter.channelize(bottom)
+                kwargs.update(CellConverter.channelize(bottom))
                 kwargs[COLOR] = Color.BLUE
                 kwargs[RULE] = ButtonRule.HOLD_ALL
             elif bottom == CC1.CLONER:
@@ -463,15 +465,16 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.TOGGLE
                 kwargs[COLOR] = Color.BLUE
         elif top == CC1.CLONE_BUTTON:
+            kwargs[COLOR] = Color.RED
             if channel and bottom in COLOR_CODE:
-                kwargs = CellConverter.colorize(bottom)
+                kwargs.update(CellConverter.colorize(bottom))
                 kwargs[CHANNEL] = channel
                 kwargs[RULE] = ButtonRule.TOGGLE
             elif bottom == top:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.RED
             elif bottom in NUMBER_CODE:
-                kwargs = CellConverter.channelize(bottom)
+                kwargs.update(CellConverter.channelize(bottom))
                 kwargs[COLOR] = Color.RED
                 kwargs[RULE] = ButtonRule.HOLD_ONE
             elif bottom == CC1.CLONER:
@@ -487,6 +490,7 @@ class CellConverter:
                 kwargs[CHANNEL] = channel or "NONE"
                 kwargs[COLOR] = Color.RED
         elif top == CC1.TRAP_BUTTON:
+            kwargs = {COLOR: Color.TAN}
             if bottom == CC1.GREEN_BUTTON:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.ORANGE
@@ -494,14 +498,14 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.TAN
             elif channel and bottom in COLOR_CODE:
-                kwargs = CellConverter.colorize(bottom)
+                kwargs.update(CellConverter.colorize(bottom))
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[CHANNEL] = channel
             elif bottom == CC1.CLONER:
                 kwargs[RULE] = ButtonRule.DPAD
                 kwargs[COLOR] = Color.TAN
             elif bottom in NUMBER_CODE:
-                kwargs = CellConverter.channelize(bottom)
+                kwargs.update(CellConverter.channelize(bottom))
                 kwargs[RULE] = ButtonRule.DPAD
             else:
                 kwargs[RULE] = ButtonRule.HOLD_ONE

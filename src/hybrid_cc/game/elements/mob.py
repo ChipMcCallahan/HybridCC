@@ -34,6 +34,10 @@ class Mob(Elem):
     def exists(self):
         return self.mob_id in Mob.instances
 
+    def moved_last_n_ticks(self, tick, *, n=1):
+        return (self.last_move_tick is not None
+                and tick - self.last_move_tick <= n)
+
     def tag(self, tag, value=True):
         self.tags[tag] = value
 

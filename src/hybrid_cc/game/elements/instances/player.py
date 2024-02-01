@@ -45,9 +45,8 @@ class Player(Mob):
     def do_planning(self, tick, **kwargs):
         inputs = kwargs.get("inputs", [])
         self.untag(PUSHING)
-        moved_last_tick = (self.last_move_tick is not None
-                           and tick - self.last_move_tick <= 1)
-        if moved_last_tick and not self.tagged(FORCED):
+
+        if self.moved_last_n_ticks(tick, n=1) and not self.tagged(FORCED):
             return [], []
 
         # If we're getting to submit our move inputs, we're not forced anymore.

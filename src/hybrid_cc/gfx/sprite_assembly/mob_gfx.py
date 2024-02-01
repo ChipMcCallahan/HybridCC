@@ -92,8 +92,10 @@ class MobGfx:
     def tank(self, elem, **kwargs):
         d = elem.direction.name
         base = self.assembler.cc2_series(f"TANK_{d}", 2)
-        return [self.assembler.colorize(frame, elem.color, brightness=3) for
-                frame in base]
+        label = self.label(elem.channel, elem.color) if elem.channel else None
+        colored = [self.assembler.colorize(frame, elem.color, brightness=3) for
+                   frame in base]
+        return [self.assembler.stack(frame, label) for frame in colored]
 
     def player(self, elem, **kwargs):
         d = elem.direction.name

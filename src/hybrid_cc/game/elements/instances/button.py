@@ -11,7 +11,7 @@ class Button(Elem):
     state = defaultdict(int)
     hold_one_counts = defaultdict(int)
     hold_all_counts = defaultdict(int)
-    dpad_directions = defaultdict(lambda: (None, None))
+    dpad_directions = defaultdict(lambda: (None, 0))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
