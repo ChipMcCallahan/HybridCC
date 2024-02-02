@@ -30,20 +30,20 @@ class Monster(Mob):
         if self.moved_last_n_ticks(tick, n=n):
             return [], []
 
-        d = self.direction
+        d = self.d
         if self.rule == MonsterRule.FIREBALL:
-            directions = [d, d.right(), d.left(), d.reverse()]
+            dirs = [d, d.right(), d.left(), d.reverse()]
         elif self.rule == MonsterRule.GLIDER:
-            directions = [d, d.left(), d.right(), d.reverse()]
+            dirs = [d, d.left(), d.right(), d.reverse()]
         elif self.rule == MonsterRule.ANT:
-            directions = [d.left(), d, d.right(), d.reverse()]
+            dirs = [d.left(), d, d.right(), d.reverse()]
         elif self.rule == MonsterRule.PARAMECIUM:
-            directions = [d.right(), d, d.left(), d.reverse()]
+            dirs = [d.right(), d, d.left(), d.reverse()]
         elif self.rule == MonsterRule.BLOB:
             pool = [Direction[d] for d in "NESW"]
-            directions = []
+            dirs = []
             while len(pool) > 0:
-                directions.append(pool.pop(RNG.next() % len(pool)))
+                dirs.append(pool.pop(RNG.next() % len(pool)))
         elif self.rule == MonsterRule.TEETH:
             if not Player.instance:
                 return [], []
@@ -59,32 +59,32 @@ class Monster(Mob):
                 y_dir = Direction.N
             if dy > 0:
                 y_dir = Direction.S
-            directions = [d for d in [y_dir, x_dir] if d]
+            dirs = [d for d in [y_dir, x_dir] if d]
             if abs(dx) > abs(dy):
-                directions = reversed(directions)
+                dirs = reversed(dirs)
         elif self.rule == MonsterRule.WALKER:
-            d = self.direction
+            d = self.d
             pool = [d.right(), d.left(), d.reverse()]
-            directions = [d]
+            dirs = [d]
             while len(pool) > 0:
-                directions.append(pool.pop(RNG.next() % len(pool)))
+                dirs.append(pool.pop(RNG.next() % len(pool)))
         elif self.rule == MonsterRule.BALL:
-            directions = [d, d.reverse()]
+            dirs = [d, d.reverse()]
         else:
             raise ValueError(f"Unexpected monster rule: {self.rule}")
-        return MoveRequest.from_directions(self.mob_id, directions), []
+        return MoveRequest.from_dirs(self.mob_id, dirs), []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.id == Id.PLAYER:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             return [
                 DestroyRequest(target=mob, p=p),

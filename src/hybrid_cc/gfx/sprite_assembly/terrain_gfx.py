@@ -73,7 +73,7 @@ class TerrainGfx:
     def force(self, elem, **kwargs):
         if elem.rule != ForceRule.RANDOM:
             base = self.assembler.cc2(f"FORCE_N")
-            frames = [self.assembler.cc2(f"FORCE_{elem.direction.name}")]
+            frames = [self.assembler.cc2(f"FORCE_{elem.d.name}")]
             for i in range(1, 8):
                 top_height = 32 * i // 8  # Height of the top part
                 bottom_height = 32 - top_height  # Height of the bottom part
@@ -87,8 +87,8 @@ class TerrainGfx:
                 new_frame = Image.new('RGBA', (32, 32))
                 new_frame.paste(bottom_part, (0, 0))
                 new_frame.paste(top_part, (0, bottom_height))
-                if elem.direction.name in "WSE":
-                    amt = "NWSE".index(elem.direction.name) * 90
+                if elem.d.name in "WSE":
+                    amt = "NWSE".index(elem.d.name) * 90
                     new_frame = new_frame.rotate(amt)
                 frames.append(new_frame)
         else:
@@ -148,7 +148,7 @@ class TerrainGfx:
 
     def cloner(self, elem, **kwargs):
         cloner = self.assembler.cc2("CLONER")
-        d = elem.direction
+        d = elem.d
         colored = self.assembler.colorize(cloner, elem.color)
         if d:
             arrow = self.assembler.cc2(f"CLONER_ARROW_{d.name}")

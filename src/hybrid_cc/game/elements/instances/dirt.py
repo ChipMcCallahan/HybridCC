@@ -27,12 +27,12 @@ class Dirt(Elem):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         return [
             DestroyRequest(target=self, p=p),
             CreateRequest(p=p, id=Id.FLOOR, color=self.color)

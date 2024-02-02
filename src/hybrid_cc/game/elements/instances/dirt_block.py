@@ -32,24 +32,24 @@ class DirtBlock(Mob):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         if mob.tagged(PUSHES):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def start_enter(self, mob, p, direction):
+    def start_enter(self, mob, p, d):
         # if we already failed in this direction, don't retry
-        if self.tagged((FAILED_MOVE, direction)):
+        if self.tagged((FAILED_MOVE, d)):
             return MoveResult.FAIL, []
 
         # if we already moved, don't move again. exception if we are sliding
         # and the push is orthogonal
         if self.tagged(MOVED):
-            if not (self.tagged(SLIDING) and self.direction in (
-                    direction.right(), direction.left())):
+            if not (self.tagged(SLIDING) and self.d in (
+                    d.right(), d.left())):
                 return MoveResult.FAIL, []
         return MoveResult.RETRY, [
-            MoveRequest(mob_id=self.mob_id, direction=direction),
+            MoveRequest(mob_id=self.mob_id, d=d),
         ]
 
     # --------------------------------------------------------------------------

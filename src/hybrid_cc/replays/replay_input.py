@@ -19,7 +19,7 @@ class ReplayInput(Enum):
     WN = 12
 
     @property
-    def directions(self):
+    def dirs(self):
         dirs = [None, None]
         if self != ReplayInput.NONE:
             dirs = [Direction[d] for d in self.name] + dirs

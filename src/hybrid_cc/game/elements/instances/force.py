@@ -29,18 +29,18 @@ class Force(Elem):
         to_remove = []
         requests = []
         for mob_id, entry in cls.hovering.items():
-            mob, direction = entry
+            mob, d = entry
             if not mob.exists():
                 to_remove.append(mob_id)
                 continue
-            if direction:
-                directions = [direction]
+            if d:
+                dirs = [d]
             else:
                 pool = [Direction[d] for d in "NESW"]
-                directions = []
+                dirs = []
                 while len(pool) > 0:
-                    directions.append(pool.pop(RNG.next() % len(pool)))
-            moves = MoveRequest.from_directions(mob_id, directions)
+                    dirs.append(pool.pop(RNG.next() % len(pool)))
+            moves = MoveRequest.from_dirs(mob_id, dirs)
             requests.extend(moves)
         for mob_id in to_remove:
             cls.instances.pop(mob_id, None)
@@ -50,16 +50,16 @@ class Force(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         if (mob.id == Id.PLAYER and not
                 mob.tools[Id.SUCTION_BOOTS]):
-            if self.rule == ForceRule.RANDOM or self.direction == direction:
+            if self.rule == ForceRule.RANDOM or self.d == d:
                 mob.tag(FORCED)
         mob.untag(OVERRIDDEN)
         mob.untag(SLIDING)
         self.hovering.pop(mob.mob_id, None)
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.tools[Id.SUCTION_BOOTS]:
             return
         if mob.id != Id.PLAYER:
@@ -68,8 +68,8 @@ class Force(Elem):
         if self.rule == ForceRule.RANDOM:
             self.hovering[mob.mob_id] = (mob, None)
         else:
-            mob.direction = self.direction
-            self.hovering[mob.mob_id] = (mob, self.direction)
+            mob.d = self.d
+            self.hovering[mob.mob_id] = (mob, self.d)
 
     # --------------------------------------------------------------------------
     # OTHER
@@ -77,4 +77,4 @@ class Force(Elem):
     def construct_mob_here(self, mob, p):
         if mob.id == Id.PLAYER:
             mob.tag(OVERRIDDEN)  # Prevent move on first tick.
-        self.finish_enter(mob, p, mob.direction)
+        self.finish_enter(mob, p, mob.d)

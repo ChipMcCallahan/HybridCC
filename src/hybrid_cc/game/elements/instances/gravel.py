@@ -24,7 +24,7 @@ class Gravel(Elem):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.id in (Id.MONSTER, Id.TANK):
             return MoveResult.FAIL, None
         return MoveResult.PASS, None

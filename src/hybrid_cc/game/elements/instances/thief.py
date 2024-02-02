@@ -26,12 +26,12 @@ class Thief(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if self.rule == ThiefRule.KEYS:
             mob.keys.clear()
         elif self.rule == ThiefRule.TOOLS:

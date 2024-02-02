@@ -27,12 +27,12 @@ class PopUpWall(Elem):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         if self.count > 1:
             create_request = CreateRequest(id=self.id,
                                            p=p, color=self.color,

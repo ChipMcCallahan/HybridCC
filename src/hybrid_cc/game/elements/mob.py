@@ -25,7 +25,7 @@ class Mob(Elem):
 
     def on_completed_move(self, old_p, new_p, tick, *, simulated_p=None):
         self.p = new_p
-        self.direction = Direction.from_move(simulated_p or old_p, new_p)
+        self.d = Direction.from_move(simulated_p or old_p, new_p)
         self.last_move_tick = tick
 
     def on_failed_move(self, move_result, d):

@@ -341,10 +341,10 @@ class CellConverter:
                 pass
 
             elif top in CC1.monsters().difference(CC1.tanks()):
-                rule, direction = top.name.split("_")
+                rule, d = top.name.split("_")
                 kwargs = {
                     RULE: MonsterRule[rule],
-                    DIRECTION: Direction[direction]
+                    DIRECTION: Direction[d]
                 }
                 cell.mob = LevelElem(Id.MONSTER, **kwargs)
                 if bottom not in CC1.mobs():

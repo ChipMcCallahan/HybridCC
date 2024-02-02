@@ -1,4 +1,4 @@
-DIRECTION = "direction"
+DIRECTION = "d"
 RULE = "rule"
 COLOR = "color"
 COUNT = "count"

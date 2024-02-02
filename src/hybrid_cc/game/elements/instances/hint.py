@@ -26,17 +26,17 @@ class Hint(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
     @staticmethod
-    def finish_exit(mob, p, direction):
+    def finish_exit(mob, p, d):
         if mob.id == Id.PLAYER:
             return [HideHintRequest()]
 
     @staticmethod
-    def finish_enter(mob, p, direction):
+    def finish_enter(mob, p, d):
         if mob.id == Id.PLAYER:
             return [ShowHintRequest()]

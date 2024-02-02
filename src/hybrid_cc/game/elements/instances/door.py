@@ -23,14 +23,14 @@ class Door(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         if self.color in mob.keys:
             count = mob.keys[self.color]
             if count == "+" or count >= self.count:
                 return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if self.color in mob.keys:
             count = mob.keys[self.color]
             if count != "+" and count >= self.count:

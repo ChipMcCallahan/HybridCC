@@ -25,12 +25,12 @@ class Chip(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.tagged(COLLECTS_CHIPS):
             current = self.chips_collected.get(self.color, 0)
             self.chips_collected[self.color] = current + self.count

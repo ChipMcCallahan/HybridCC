@@ -4,7 +4,7 @@ from collections import defaultdict
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
-from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
+from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL, DIRECTION
 from hybrid_cc.shared.tag import SLIDING
 
 
@@ -20,10 +20,10 @@ class Button(Elem):
     dpad_signal = defaultdict(lambda: (None, 0))
 
     class DeferredSignal:
-        def __init__(self, color, channel, *, defer=0, direction=None):
+        def __init__(self, color, channel, *, defer=0, d=None):
             self.color = color
             self.channel = channel
-            self.direction = direction
+            self.d = d
             self.defer = defer
 
         @property
@@ -61,9 +61,9 @@ class Button(Elem):
         for pending in cls.deferred_signals:
             if pending.defer == 0:
                 cls.signal[pending.key] += 1
-                if pending.direction:
+                if pending.d:
                     cls.dpad_signal[pending.key] = (
-                        pending.direction, cls.signal[pending.key])
+                        pending.d, cls.signal[pending.key])
                 to_remove.append(pending)
             else:
                 pending.defer -= 1
@@ -74,7 +74,7 @@ class Button(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         key = (self.color, self.channel)
         if self.rule == ButtonRule.HOLD_ONE:
             self.hold_one_counts[key] -= 1
@@ -88,7 +88,7 @@ class Button(Elem):
                 self.activate(mob)
             self.hold_all_counts[key] += 1
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         key = (self.color, self.channel)
         if self.rule == ButtonRule.TOGGLE:
             self.activate(mob)
@@ -104,14 +104,14 @@ class Button(Elem):
             if self.hold_all_counts[key] == 0:
                 self.activate(mob)
         elif self.rule == ButtonRule.DPAD:
-            self.activate(mob, direction)
+            self.activate(mob, d)
 
-    def activate(self, mob, direction=None):
+    def activate(self, mob, d=None):
         kwargs = {
             "defer": 0 if mob.tagged(SLIDING) else 1
         }
-        if direction and direction.is_cardinal():
-            kwargs["direction"] = direction
+        if d and d.is_cardinal():
+            kwargs[DIRECTION] = d
         signal = self.DeferredSignal(self.color, self.channel, **kwargs)
         self.deferred_signals.add(signal)
 
@@ -120,4 +120,4 @@ class Button(Elem):
     # --------------------------------------------------------------------------
     def construct_mob_here(self, mob, p):
         if self.rule in (ButtonRule.HOLD_ONE, ButtonRule.HOLD_ALL):
-            self.finish_enter(mob, p, mob.direction)
+            self.finish_enter(mob, p, mob.d)

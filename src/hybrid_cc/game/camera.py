@@ -1,6 +1,7 @@
 from math import floor, ceil
 
 from hybrid_cc.shared import Direction
+from hybrid_cc.shared.kwargs import DIRECTION
 from hybrid_cc.shared.tag import SLIDING
 
 VIEWPORT_SIZE = 9
@@ -12,7 +13,7 @@ class Camera:
         self.target = target
         self.target_p = None
         self.p = None
-        self.direction = None
+        self.d = None
         self.last_move_tick = None
         self.gameboard = gameboard
         self.margin = VIEWPORT_SIZE // 2  # 4
@@ -20,7 +21,7 @@ class Camera:
 
     def update(self):
         self.target_p = getattr(self.target, "p", (0, 0, 0))
-        self.direction = getattr(self.target, "direction", Direction.S)
+        self.d = getattr(self.target, DIRECTION, Direction.S)
         self.last_move_tick = getattr(self.target, "last_move_tick", None)
 
         x, y, z = self.target_p
@@ -42,7 +43,7 @@ class Camera:
             elif stale_time < 2:
                 fraction = 1 - (index / 8)
 
-            offset_x, offset_y, _ = self.direction.reverse().value
+            offset_x, offset_y, _ = self.d.reverse().value
             offset_x *= fraction
             offset_y *= fraction
             target_offset = offset_x, offset_y

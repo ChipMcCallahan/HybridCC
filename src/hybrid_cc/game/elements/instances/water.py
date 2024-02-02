@@ -26,10 +26,10 @@ class Water(Elem):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def finish_exit(mob, p, direction):
+    def finish_exit(mob, p, d):
         mob.untag(SWIMMING)
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:
             return
         if mob.tools[Id.FLIPPERS]:

@@ -49,11 +49,11 @@ class Trap(Elem):
             if not can_exit or signal <= last_signal:
                 continue
 
-            dpad_direction, dpad_signal = Button.dpad_signal[
+            dpad_d, dpad_signal = Button.dpad_signal[
                 (color, channel)]
-            direction = None
+            d = None
             if dpad_signal and dpad_signal > last_signal:
-                direction = dpad_direction
+                d = dpad_d
             for p in positions:
                 mob = cls.mobs.get(p, None)
                 if not mob:
@@ -61,11 +61,11 @@ class Trap(Elem):
                 if not mob.exists():
                     to_remove.append(p)
                     continue
-                if direction and direction.is_cardinal():
-                    mob.direction = direction
+                if d and d.is_cardinal():
+                    mob.d = d
                 requests.append(
                     MoveRequest(mob_id=mob.mob_id,
-                                direction=mob.direction))
+                                d=mob.d))
         for p in to_remove:
             cls.mobs.pop(p, None)
         return requests, []
@@ -73,21 +73,21 @@ class Trap(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_exit(self, mob, p, direction):
+    def test_exit(self, mob, p, d):
         key = (self.color, self.channel)
         signal = Button.signal[key]
         if (self.rule.value + signal % 2) % 2 == 1:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         self.mobs[p] = mob
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         self.mobs[p] = None
 
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
     def construct_mob_here(self, mob, p):
-        self.finish_enter(mob, p, mob.direction)
+        self.finish_enter(mob, p, mob.d)

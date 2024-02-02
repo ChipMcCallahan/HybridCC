@@ -48,7 +48,7 @@ class Teleport(Elem):
             index = positions.index(p)
             start = (index + 1) % len(positions)
             choices = positions[start:] + positions[0:start]
-            moves.extend([MoveRequest(mob_id=mob_id, direction=mob.direction,
+            moves.extend([MoveRequest(mob_id=mob_id, d=mob.d,
                                       simulated_p=choice)
                           for choice in choices])
         for mob_id in to_remove:
@@ -58,8 +58,8 @@ class Teleport(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         self.mobs.pop(mob.mob_id, None)
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         self.mobs[mob.mob_id] = (mob, self.color, self.channel, p)

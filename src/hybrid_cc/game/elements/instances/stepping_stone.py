@@ -24,7 +24,7 @@ class SteppingStone(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         if self.count > 1:
             create_request = CreateRequest(id=self.id,
                                            p=p,

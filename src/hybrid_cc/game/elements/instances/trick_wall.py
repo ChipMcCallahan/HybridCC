@@ -41,7 +41,7 @@ class TrickWall(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def start_enter(self, mob, p, direction):
+    def start_enter(self, mob, p, d):
         if self.rule == TrickWallRule.PASS_THRU:
             if not mob.tagged(PUSHABLE):
                 return MoveResult.PASS, None
@@ -62,10 +62,10 @@ class TrickWall(Elem):
             self.show_secrets_positions[p] = 4
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if self.rule == TrickWallRule.PASS_THRU:
             self.show_secrets_positions[p] = None
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         if self.rule == TrickWallRule.PASS_THRU:
             self.show_secrets_positions.pop(p)

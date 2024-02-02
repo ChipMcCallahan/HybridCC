@@ -31,12 +31,12 @@ class Placeholder(Elem):
         return [], requests
 
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.id == Id.PLAYER:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             return [
                 DestroyRequest(target=mob, p=p),

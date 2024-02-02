@@ -78,18 +78,18 @@ class PygameGfxProvider:
             if elem.tagged(SLIDING) and (0 < index < 5):
                 frame = self.moving_double(frames[0], index * 2 - 1, elem)
                 offset = (0, 0)
-                if elem.direction == Direction.S:
+                if elem.d == Direction.S:
                     offset = (0, -1)  # render one tile higher than normal
-                elif elem.direction == Direction.E:
+                elif elem.d == Direction.E:
                     offset = (-1, 0)  # render one tile left of normal
                 return frame, offset
             elif stale_tick < 2:
                 frames = self.expand_to_8_frames(frames)
                 frame = self.moving_double(frames[index], index, elem)
                 offset = (0, 0)
-                if elem.direction == Direction.S:
+                if elem.d == Direction.S:
                     offset = (0, -1)  # render one tile higher than normal
-                elif elem.direction == Direction.E:
+                elif elem.d == Direction.E:
                     offset = (-1, 0)  # render one tile left of normal
                 return frame, offset
             else:
@@ -102,18 +102,18 @@ class PygameGfxProvider:
 
     @staticmethod
     def moving_double(frame, index, elem):
-        if elem.direction in (Direction.N, Direction.S):
+        if elem.d in (Direction.N, Direction.S):
             if frame.get_size() == (32, 64):  # Blobs, Walkers
                 return frame
             main_surface = pygame.Surface((32, 64), pygame.SRCALPHA)
-            y = index * 4 if elem.direction == Direction.S else 32 - index * 4
+            y = index * 4 if elem.d == Direction.S else 32 - index * 4
             main_surface.blit(frame, (0, y))
             return main_surface
-        elif elem.direction in (Direction.E, Direction.W):
+        elif elem.d in (Direction.E, Direction.W):
             if frame.get_size() == (64, 32):  # Blobs, Walkers
                 return frame
             main_surface = pygame.Surface((64, 32), pygame.SRCALPHA)
-            x = index * 4 if elem.direction == Direction.E else 32 - index * 4
+            x = index * 4 if elem.d == Direction.E else 32 - index * 4
             main_surface.blit(frame, (x, 0))
             return main_surface
         return frame

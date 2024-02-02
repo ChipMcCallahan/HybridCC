@@ -26,22 +26,22 @@ class Corner(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
-        if direction.reverse().name in self.sides:
+    def test_enter(self, mob, p, d):
+        if d.reverse().name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def test_exit(self, mob, p, direction):
-        if direction.name not in self.sides:
+    def test_exit(self, mob, p, d):
+        if d.name not in self.sides:
             return MoveResult.PASS, []
 
         # This prevents unintuitive behavior with ants, paramecia, and teeth,
         # while still allowing ice moves to work as intended.
-        if not mob.tagged(PUSHABLE) and direction != mob.direction:
+        if not mob.tagged(PUSHABLE) and d != mob.d:
             return MoveResult.FAIL, []
 
         sides = set(Direction[d] for d in self.sides)
-        sides.remove(direction)
+        sides.remove(d)
         orthogonal = sides.pop().reverse()
         return MoveResult.FAIL, [MoveRequest(mob_id=mob.mob_id,
-                                             direction=orthogonal)]
+                                             d=orthogonal)]

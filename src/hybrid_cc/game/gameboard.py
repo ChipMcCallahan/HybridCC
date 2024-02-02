@@ -87,7 +87,7 @@ class Gameboard:
         debug_counts = defaultdict(int)
         while len(raw_moves) > 0:
             move = raw_moves.popleft()
-            mob_id, d, slap = move.mob_id, move.direction, move.slap
+            mob_id, d, slap = move.mob_id, move.d, move.slap
             mob = self.elems.get_mob(mob_id)
             if (not mob) or (mob_id in moved):
                 continue

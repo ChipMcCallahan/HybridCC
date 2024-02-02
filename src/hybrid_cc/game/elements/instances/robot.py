@@ -21,20 +21,20 @@ class Robot(Mob):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, p, direction):
+    def test_exit(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")
 
-    def start_enter(self, mob, p, direction):
+    def start_enter(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")
 
-    def start_exit(self, mob, p, direction):
+    def start_exit(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         raise NotImplementedError("Implement or remove.")

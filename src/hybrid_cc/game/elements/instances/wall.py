@@ -23,5 +23,5 @@ class Wall(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         return MoveResult.FAIL, None

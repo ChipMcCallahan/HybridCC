@@ -23,7 +23,7 @@ class ToggleWall(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         key = (self.color, self.channel)
         toggle_state = Button.signal[key] % 2
         if (self.rule.value + toggle_state) % 2 == 0:

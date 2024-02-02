@@ -24,7 +24,7 @@ class Bomb(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         requests = [
             DestroyRequest(target=self, p=p),
             DestroyRequest(target=mob, p=p)

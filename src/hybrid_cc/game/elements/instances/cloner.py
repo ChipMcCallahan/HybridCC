@@ -48,10 +48,10 @@ class Cloner(Elem):
             if signal <= last_signal:
                 continue
 
-            dpad_direction, dpad_signal = Button.dpad_signal[(color, channel)]
-            direction = None
+            dpad_d, dpad_signal = Button.dpad_signal[(color, channel)]
+            d = None
             if dpad_signal and dpad_signal > last_signal:
-                direction = dpad_direction
+                d = dpad_d
 
             for p in positions:
                 mob = cls.mobs.get(p, None)
@@ -61,12 +61,12 @@ class Cloner(Elem):
                 if not mob.exists():
                     to_remove.append(p)
                     continue
-                if direction and direction.is_cardinal():
-                    mob.direction = direction
+                if d and d.is_cardinal():
+                    mob.d = d
                 # noinspection PyUnresolvedReferences
                 requests.append(
                     MoveRequest(mob_id=mob.mob_id,
-                                direction=mob.direction))
+                                d=mob.d))
         for p in to_remove:
             cls.mobs.pop(p, None)
         return requests, []
@@ -75,16 +75,16 @@ class Cloner(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         # TODO: are there cases this would make sense?
         return MoveResult.FAIL, []
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         self.mobs.pop(p, None)
         mob.untag(OVERRIDDEN)
         return [CreateRequest(p=p, id=mob.id, **mob.kwargs)]
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         mob.tag(OVERRIDDEN)
         self.mobs[p] = mob
 
@@ -92,4 +92,4 @@ class Cloner(Elem):
     # OTHER
     # --------------------------------------------------------------------------
     def construct_mob_here(self, mob, p):
-        self.finish_enter(mob, p, mob.direction)
+        self.finish_enter(mob, p, mob.d)

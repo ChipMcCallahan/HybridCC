@@ -25,14 +25,14 @@ class Socket(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             chips = Chip.chips_collected.get(self.color, 0)
             if chips >= self.chips_required[self.color]:
                 return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         return [
             DestroyRequest(target=self, p=p),
         ]

@@ -23,12 +23,12 @@ class Panel(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
-        if direction.reverse().name in self.sides:
+    def test_enter(self, mob, p, d):
+        if d.reverse().name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def test_exit(self, mob, p, direction):
-        if direction.name in self.sides:
+    def test_exit(self, mob, p, d):
+        if d.name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []

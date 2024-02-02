@@ -25,12 +25,12 @@ class Key(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, p, direction):
+    def test_enter(self, mob, p, d):
         if self.rule == KeyRule.ACTING_DIRT and not mob.tagged(ENTERS_DIRT):
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.tagged(COLLECTS_ITEMS):
             if self.count == "+" or mob.keys[self.color] == "+":
                 mob.keys[self.color] = "+"

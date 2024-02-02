@@ -53,17 +53,17 @@ class Player(Mob):
         self.untag(FORCED)
 
         primary, secondary = inputs
-        if self.direction in inputs and self.direction != primary:
+        if self.d in inputs and self.d != primary:
             primary, secondary = secondary, primary
         moves = []
         if primary:
             moves.append(
-                MoveRequest(mob_id=self.mob_id, direction=primary,
+                MoveRequest(mob_id=self.mob_id, d=primary,
                             slap=secondary)
             )
         if secondary:
             moves.append(
-                MoveRequest(mob_id=self.mob_id, direction=secondary)
+                MoveRequest(mob_id=self.mob_id, d=secondary)
             )
         return moves, []
 
@@ -71,7 +71,7 @@ class Player(Mob):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         return [
             DestroyRequest(target=self, p=p),
             LoseRequest(cause=mob, p=p)
@@ -87,5 +87,5 @@ class Player(Mob):
 
     def on_failed_move(self, move_result, d):
         super().on_failed_move(move_result, d)
-        self.direction = d
+        self.d = d
         self.tag(PUSHING)

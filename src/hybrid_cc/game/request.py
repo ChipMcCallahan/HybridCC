@@ -28,13 +28,13 @@ class CreateRequest:
 @dataclass
 class MoveRequest:
     mob_id: int
-    direction: Direction
+    d: Direction
     slap: Optional[Direction] = None
     simulated_p: Optional[Tuple[int, int, int]] = None
 
     @staticmethod
-    def from_directions(mob_id, directions) -> List['MoveRequest']:
-        return [MoveRequest(mob_id=mob_id, direction=d) for d in directions]
+    def from_dirs(mob_id, dirs) -> List['MoveRequest']:
+        return [MoveRequest(mob_id=mob_id, d=d) for d in dirs]
 
 
 @dataclass

@@ -30,25 +30,25 @@ class Tank(Mob):
 
         key = (self.color, self.channel)
         signal = Button.signal[key]
-        dpad_direction, dpad_signal = Button.dpad_signal[key]
+        dpad_d, dpad_signal = Button.dpad_signal[key]
         if dpad_signal and dpad_signal > self.last_signal:
-            self.direction = dpad_direction or self.direction
+            self.d = dpad_d or self.d
             self.last_signal = dpad_signal
         if signal > self.last_signal:
-            self.direction = self.direction.reverse()
+            self.d = self.d.reverse()
             self.last_signal = signal
-        return [MoveRequest(mob_id=self.mob_id, direction=self.direction)], []
+        return [MoveRequest(mob_id=self.mob_id, d=self.d)], []
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, p, direction):
+    def test_enter(mob, p, d):
         if mob.id == Id.PLAYER:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             return [
                 DestroyRequest(target=mob, p=p),

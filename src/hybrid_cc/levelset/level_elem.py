@@ -11,17 +11,17 @@ class LevelElem:
     An immutable element in a game or application.
 
     Attributes: id (Id): An enum representing the type of the element.
-    direction, rule, count, color, channel, sides: Various attributes of the
+    d, rule, count, color, channel, sides: Various attributes of the
     element.
     """
 
-    def __init__(self, _id, direction=None, rule=None, count=None, color=None,
+    def __init__(self, _id, d=None, rule=None, count=None, color=None,
                  channel=None, sides=None):
         """
         Initializes a new instance of the Elem class.
         """
         self._id = _id
-        self._direction = direction
+        self._d = d
         self._rule = rule
         self._count = count
         self._color = color
@@ -30,7 +30,7 @@ class LevelElem:
 
     def get_kwargs(self):
         return {
-            DIRECTION: self.direction,
+            DIRECTION: self.d,
             RULE: self.rule,
             COUNT: self.count,
             COLOR: self.color,
@@ -44,9 +44,9 @@ class LevelElem:
         return self._id
 
     @property
-    def direction(self):
+    def d(self):
         """Gets the direction of the element."""
-        return self._direction
+        return self._d
 
     @property
     def rule(self):
@@ -80,16 +80,16 @@ class LevelElem:
         Returns:
             int: A hash value representing the element.
         """
-        return hash((self._id, self._direction, self._rule, self._count,
+        return hash((self._id, self._d, self._rule, self._count,
                      self._color, self._channel, self._sides))
 
     def __eq__(self, other):
         """Check equality with another Elem instance."""
         if not isinstance(other, LevelElem):
             return False
-        return (self._id, self._direction, self._rule, self._count, self._color,
+        return (self._id, self._d, self._rule, self._count, self._color,
                 self._channel, self._sides) == \
-            (other._id, other._direction, other._rule, other._count,
+            (other._id, other._d, other._rule, other._count,
              other._color, other._channel, other._sides)
 
     def __repr__(self):
@@ -97,14 +97,14 @@ class LevelElem:
         Generates an unambiguous string representation of the element.
         """
         return (
-            f"Elem(id={self._id!r}, direction={self._direction!r}, rule={self._rule!r}, "
+            f"Elem(id={self._id!r}, d={self._d!r}, rule={self._rule!r}, "
             f"count={self._count!r}, color={self._color!r}, channel={self._channel!r}, sides={self._sides!r})")
 
     def __str__(self):
         """
         Generates a readable string representation of the element.
         """
-        attributes = [f"direction={self._direction}", f"rule={self._rule}",
+        attributes = [f"d={self._d}", f"rule={self._rule}",
                       f"count={self._count}",
                       f"color={self._color}", f"channel={self._channel}",
                       f"sides={self._sides}"]

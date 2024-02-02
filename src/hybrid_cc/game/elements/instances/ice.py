@@ -29,9 +29,9 @@ class Ice(Elem):
             if not mob.exists():
                 to_remove.append(mob_id)
             else:
-                moves = MoveRequest.from_directions(mob_id,
-                                                    (mob.direction,
-                                                     mob.direction.reverse()))
+                moves = MoveRequest.from_dirs(mob_id,
+                                                    (mob.d,
+                                                     mob.d.reverse()))
                 requests.extend(moves)
         for mob_id in to_remove:
             cls.instances.pop(mob_id, None)
@@ -41,12 +41,12 @@ class Ice(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, p, direction):
+    def finish_exit(self, mob, p, d):
         mob.untag(SLIDING)
         mob.untag(OVERRIDDEN)
         self.sliding.pop(mob.mob_id, None)
 
-    def finish_enter(self, mob, p, direction):
+    def finish_enter(self, mob, p, d):
         if not mob.tools[Id.SKATES]:
             mob.tag(SLIDING, self.id)
             mob.tag(OVERRIDDEN)

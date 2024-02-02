@@ -35,11 +35,11 @@ class Elem(ABC):
         return self._id.layer()
 
     @property
-    def direction(self):
+    def d(self):
         return self.kwargs.get(DIRECTION)
 
-    @direction.setter
-    def direction(self, value):
+    @d.setter
+    def d(self, value):
         self.kwargs[DIRECTION] = value
 
     @property

@@ -39,7 +39,7 @@ for r in TrickWallRule:
         c in Color]
 
 for d in "NESW":
-    ELIB[f"FORCE_{d}"] = [LevelElem(Id.FORCE, direction=Direction[d], color=c)
+    ELIB[f"FORCE_{d}"] = [LevelElem(Id.FORCE, d=Direction[d], color=c)
                           for c
                           in Color]
 
@@ -84,16 +84,16 @@ ELIB.update(
             LevelElem(Id.STEPPING_STONE, rule=SteppingStoneRule.WATER,
                       count=2)],
         "HINT": [LevelElem(Id.HINT)],
-        "CLONER_N": [LevelElem(Id.CLONER, color=c, direction=Direction.N) for c
+        "CLONER_N": [LevelElem(Id.CLONER, color=c, d=Direction.N) for c
                      in
                      Color],
-        "CLONER_E": [LevelElem(Id.CLONER, color=c, direction=Direction.E) for c
+        "CLONER_E": [LevelElem(Id.CLONER, color=c, d=Direction.E) for c
                      in
                      Color],
-        "CLONER_S": [LevelElem(Id.CLONER, color=c, direction=Direction.S) for c
+        "CLONER_S": [LevelElem(Id.CLONER, color=c, d=Direction.S) for c
                      in
                      Color],
-        "CLONER_W": [LevelElem(Id.CLONER, color=c, direction=Direction.W) for c
+        "CLONER_W": [LevelElem(Id.CLONER, color=c, d=Direction.W) for c
                      in
                      Color],
         "DOOR": [LevelElem(Id.DOOR, color=c) for c in Color],
@@ -227,48 +227,48 @@ ELIB.update(
                       (LevelElem(Id.ICE_BLOCK), {"show_secrets": True})],
         "TEETH": [
             LevelElem(Id.MONSTER, rule=MonsterRule.TEETH,
-                      direction=Direction[d]) for
+                      d=Direction[d]) for
             d in "NESW"],
         "BLOB": [
-            LevelElem(Id.MONSTER, rule=MonsterRule.BLOB, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.BLOB, d=Direction[d])
             for d in "NESW"],
         "FIREBALL": [
             LevelElem(Id.MONSTER, rule=MonsterRule.FIREBALL,
-                      direction=Direction[d])
+                      d=Direction[d])
             for d in "NESW"],
         "GLIDER": [
             LevelElem(Id.MONSTER, rule=MonsterRule.GLIDER,
-                      direction=Direction[d])
+                      d=Direction[d])
             for d in "NESW"],
         "ANT": [
-            LevelElem(Id.MONSTER, rule=MonsterRule.ANT, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.ANT, d=Direction[d])
             for d in "NESW"],
         "PARAMECIUM": [LevelElem(Id.MONSTER, rule=MonsterRule.PARAMECIUM,
-                                 direction=Direction[d]) for d in "NESW"],
+                                 d=Direction[d]) for d in "NESW"],
         "BALL": [
-            LevelElem(Id.MONSTER, rule=MonsterRule.BALL, direction=Direction[d])
+            LevelElem(Id.MONSTER, rule=MonsterRule.BALL, d=Direction[d])
             for d in "NESW"],
         "WALKER": [
             LevelElem(Id.MONSTER, rule=MonsterRule.WALKER,
-                      direction=Direction[d])
+                      d=Direction[d])
             for d in "NESW"],
         "TANK_N": [
-            LevelElem(Id.TANK, direction=Direction.N, color=c) for c in Color],
+            LevelElem(Id.TANK, d=Direction.N, color=c) for c in Color],
         "TANK_E": [
-            LevelElem(Id.TANK, direction=Direction.E, color=c) for c in Color],
+            LevelElem(Id.TANK, d=Direction.E, color=c) for c in Color],
         "TANK_S": [
-            LevelElem(Id.TANK, direction=Direction.S, color=c) for c in Color],
+            LevelElem(Id.TANK, d=Direction.S, color=c) for c in Color],
         "TANK_W": [
-            LevelElem(Id.TANK, direction=Direction.W, color=c) for c in Color],
+            LevelElem(Id.TANK, d=Direction.W, color=c) for c in Color],
         "PLAYER": [
-            LevelElem(Id.PLAYER, direction=Direction[d]) for d in "NESW"],
+            LevelElem(Id.PLAYER, d=Direction[d]) for d in "NESW"],
         "PLAYER_SWIM": [
-            (LevelElem(Id.PLAYER, direction=Direction[d]), {SWIMMING: True})
+            (LevelElem(Id.PLAYER, d=Direction[d]), {SWIMMING: True})
             for d
             in "NESW"
         ],
         "PLAYER_PUSH": [
-            (LevelElem(Id.PLAYER, direction=Direction[d]), {PUSHING: True})
+            (LevelElem(Id.PLAYER, d=Direction[d]), {PUSHING: True})
             for d
             in "NESW"
         ]
