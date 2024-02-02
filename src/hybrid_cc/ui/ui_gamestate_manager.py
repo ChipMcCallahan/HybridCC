@@ -32,17 +32,13 @@ class UIGamestateManager:
                         self.reset()
                     elif self.is_start:
                         return False
-                if event.key == pygame.K_w:  # Simulate Win condition
-                    self.state.win()
-                if event.key == pygame.K_l:  # Simulate Loss condition
-                    self.state.lose()
                 if event.key in [pygame.K_LEFT, pygame.K_RIGHT,
                                  pygame.K_UP, pygame.K_DOWN]:
                     self.state.play()
                 if event.key == pygame.K_RETURN:
                     if (self.state.is_play or self.state.is_pause or
                             self.state.is_start):
-                        continue
+                        self.state.play()
                     elif self.state.start():
                         self.reset()
 

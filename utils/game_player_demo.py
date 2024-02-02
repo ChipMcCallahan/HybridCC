@@ -62,7 +62,8 @@ class GamePlayerDemo:
             self.run_events()
 
         menu = pygame_menu.Menu('Select Level', 800, 600,
-                                theme=BLACK_THEME)
+                                theme=BLACK_THEME,
+                                onclose=pygame_menu.events.BACK)
 
         for lvl in self.state_mgr.level_set.levels:
             menu.add.button(lvl.title, on_select, lvl)
