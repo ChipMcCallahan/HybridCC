@@ -15,7 +15,7 @@ class Elem(ABC):
     def __init__(self, **kwargs):
         super().__init__()
         self._id = Id.from_class_name(self.__class__.__name__)
-        self._kwargs = Kwargs.filter(self.__class__.kwarg_filter, **kwargs)
+        self.kwargs = Kwargs.filter(self.__class__.kwarg_filter, **kwargs)
 
     @classmethod
     def class_lookup_key(cls, **kwargs):
@@ -24,7 +24,7 @@ class Elem(ABC):
 
     @property
     def lookup_key(self):
-        return self.__class__.class_lookup_key(**self._kwargs)
+        return self.__class__.class_lookup_key(**self.kwargs)
 
     @property
     def id(self):
@@ -36,51 +36,51 @@ class Elem(ABC):
 
     @property
     def direction(self):
-        return self._kwargs.get(DIRECTION)
+        return self.kwargs.get(DIRECTION)
 
     @direction.setter
     def direction(self, value):
-        self._kwargs[DIRECTION] = value
+        self.kwargs[DIRECTION] = value
 
     @property
     def rule(self):
-        return self._kwargs.get(RULE)
+        return self.kwargs.get(RULE)
 
     @rule.setter
     def rule(self, value):
-        self._kwargs[RULE] = value
+        self.kwargs[RULE] = value
 
     @property
     def color(self):
-        return self._kwargs.get(COLOR)
+        return self.kwargs.get(COLOR)
 
     @color.setter
     def color(self, value):
-        self._kwargs[COLOR] = value
+        self.kwargs[COLOR] = value
 
     @property
     def count(self):
-        return self._kwargs.get(COUNT)
+        return self.kwargs.get(COUNT)
 
     @count.setter
     def count(self, value):
-        self._kwargs[COUNT] = value
+        self.kwargs[COUNT] = value
 
     @property
     def channel(self):
-        return self._kwargs.get(CHANNEL)
+        return self.kwargs.get(CHANNEL)
 
     @channel.setter
     def channel(self, value):
-        self._kwargs[CHANNEL] = value
+        self.kwargs[CHANNEL] = value
 
     @property
     def sides(self):
-        return self._kwargs.get(SIDES)
+        return self.kwargs.get(SIDES)
 
     @sides.setter
     def sides(self, value):
-        self._kwargs[SIDES] = value
+        self.kwargs[SIDES] = value
 
     @classmethod
     def construct_at(cls, pos, **kwargs):

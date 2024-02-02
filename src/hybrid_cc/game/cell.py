@@ -1,3 +1,5 @@
+import logging
+
 from hybrid_cc.shared import Id
 
 
@@ -14,8 +16,18 @@ class Cell:
     # BOOKKEEPING
     # -----------
     def add(self, elem):
-        layer = elem.id.layer()
-        set_layer = getattr(self, f"set_{layer.name.lower()}")
+        layer_name = elem.id.layer().name.lower()
+        already_here = getattr(self, layer_name, None)
+        if already_here:
+            # Don't log if a Placeholder is trying to overwrite. This is normal
+            # for a cloner cloning.
+            if elem.id != Id.PLACEHOLDER:
+                logging.error(
+                    f"{already_here.id.name} already exists at layer "
+                    f"{layer_name}. Ignoring create request for "
+                    f"{elem.id.name}.")
+            return
+        set_layer = getattr(self, f"set_{layer_name}")
         set_layer(elem)
 
     def remove(self, elem_or_id):

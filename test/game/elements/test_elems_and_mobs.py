@@ -65,7 +65,7 @@ class TestElemsAndMobs(unittest.TestCase):
 
             # Assert only the filtered kwargs remain
             in_filter = set(result.__class__.kwarg_filter)
-            in_kwargs = set(result._kwargs)
+            in_kwargs = set(result.kwargs)
             self.assertEqual(in_kwargs, in_filter)
 
 

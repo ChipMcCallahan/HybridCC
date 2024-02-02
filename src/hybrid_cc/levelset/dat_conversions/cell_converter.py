@@ -424,6 +424,8 @@ class CellConverter:
     @staticmethod
     def do_buttons(cell, top, bottom, channel):
         kwargs = {}
+        if channel is not None:
+            kwargs[CHANNEL] = channel
         if top == CC1.GREEN_BUTTON:
             kwargs = {COLOR: Color.GREEN}
             if bottom in COLOR_CODE:

@@ -71,7 +71,9 @@ class PygameGfxProvider:
         if not is_iter(frames):
             return frames, None
         move_tick = logic_tick // 4
-        if isinstance(elem, Mob) and elem.last_move_tick is not None:
+        if isinstance(elem, Mob):
+            if elem.last_move_tick is None:
+                return frames[0], None
             stale_tick = move_tick - elem.last_move_tick
             index = stale_tick * 4 + logic_tick % 4
             if elem.tagged(SLIDING) and (0 < index < 5):

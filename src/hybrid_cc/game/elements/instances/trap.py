@@ -4,7 +4,6 @@ from collections import defaultdict
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.request import MoveRequest
-from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
 from hybrid_cc.shared.move_result import MoveResult
 
