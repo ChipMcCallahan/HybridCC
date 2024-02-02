@@ -82,7 +82,7 @@ class Cloner(Elem):
     def finish_exit(self, mob, position, direction):
         self.mobs.pop(position, None)
         mob.untag(OVERRIDDEN)
-        return [CreateRequest(pos=position, eid=mob.id, **mob.kwargs)]
+        return [CreateRequest(pos=position, id=mob.id, **mob.kwargs)]
 
     def finish_enter(self, mob, position, direction):
         mob.tag(OVERRIDDEN)

@@ -28,5 +28,5 @@ class Tool(Elem):
             if self.count > 1:
                 kwargs = {COUNT: self.count - 1, RULE: ToolRule.DEFAULT}
                 requests.append(
-                    CreateRequest(pos=position, eid=self.id, **kwargs))
+                    CreateRequest(pos=position, id=self.id, **kwargs))
             return requests

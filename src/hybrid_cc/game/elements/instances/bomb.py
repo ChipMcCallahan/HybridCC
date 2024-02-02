@@ -31,5 +31,5 @@ class Bomb(Elem):
             DestroyRequest(target=mob, pos=position)
         ]
         if mob.id == Id.PLAYER:
-            requests.append(LoseRequest(cause=self))
+            requests.append(LoseRequest(cause=self, pos=position))
         return requests

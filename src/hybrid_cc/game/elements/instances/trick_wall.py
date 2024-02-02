@@ -45,16 +45,18 @@ class TrickWall(Elem):
         if self.rule == TrickWallRule.PASS_THRU:
             if not mob.tagged(PUSHABLE):
                 return MoveResult.PASS, None
-        elif (self.rule == TrickWallRule.BECOMES_WALL or
+        if mob.id != Id.PLAYER:
+            return MoveResult.FAIL, None
+        if (self.rule == TrickWallRule.BECOMES_WALL or
               self.rule == TrickWallRule.INVISIBLE_BECOMES_WALL):
             return MoveResult.FAIL, [
                 DestroyRequest(target=self, pos=position),
-                CreateRequest(eid=Id.WALL, pos=position, color=self.color)
+                CreateRequest(id=Id.WALL, pos=position, color=self.color)
             ]
         elif self.rule == TrickWallRule.BECOMES_FLOOR:
             return MoveResult.PASS, [
                 DestroyRequest(target=self, pos=position),
-                CreateRequest(eid=Id.FLOOR, pos=position, color=self.color)
+                CreateRequest(id=Id.FLOOR, pos=position, color=self.color)
             ]
         elif self.rule == TrickWallRule.PERMANENTLY_INVISIBLE:
             self.show_secrets_positions[position] = 4

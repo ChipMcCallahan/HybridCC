@@ -52,7 +52,7 @@ class Player(Mob):
         # If we're getting to submit our move inputs, we're not forced anymore.
         self.untag(FORCED)
 
-        primary, secondary = (inputs + [None, None])[0:2]
+        primary, secondary = inputs
         if self.direction in inputs and self.direction != primary:
             primary, secondary = secondary, primary
         moves = []
@@ -74,7 +74,7 @@ class Player(Mob):
     def finish_enter(self, mob, position, direction):
         return [
             DestroyRequest(target=self, pos=position),
-            LoseRequest(cause=mob)
+            LoseRequest(cause=mob, pos=position)
         ]
 
     # --------------------------------------------------------------------------

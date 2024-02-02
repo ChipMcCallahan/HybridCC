@@ -33,5 +33,5 @@ class Exit(Elem):
 
     def finish_enter(self, mob, position, direction):
         return [
-            WinRequest(color=self.color)
+            WinRequest(color=self.color, pos=position)
         ]

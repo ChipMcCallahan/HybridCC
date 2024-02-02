@@ -34,11 +34,11 @@ class PopUpWall(Elem):
 
     def finish_exit(self, mob, position, direction):
         if self.count > 1:
-            create_request = CreateRequest(eid=self.id,
+            create_request = CreateRequest(id=self.id,
                                            pos=position, color=self.color,
                                            count=self.count - 1)
         else:
-            create_request = CreateRequest(eid=Id.WALL,
+            create_request = CreateRequest(id=Id.WALL,
                                            pos=position, color=self.color)
         return [
             DestroyRequest(target=self, pos=position),

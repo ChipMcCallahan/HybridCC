@@ -71,7 +71,7 @@ class Mob(Elem):
 
     @classmethod
     def destruct_at(cls, elem, pos):
-        cls.instances.pop(elem.mob_id)
+        cls.instances.pop(elem.mob_id, None)
 
     @classmethod
     def get_mob(cls, mob_id):

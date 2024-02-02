@@ -26,14 +26,14 @@ class SteppingStone(Elem):
     # --------------------------------------------------------------------------
     def finish_exit(self, mob, position, direction):
         if self.count > 1:
-            create_request = CreateRequest(eid=self.id,
+            create_request = CreateRequest(id=self.id,
                                            pos=position,
                                            count=self.count - 1,
                                            rule=self.rule)
         elif self.rule == SteppingStoneRule.WATER:
-            create_request = CreateRequest(eid=Id.WATER, pos=position)
+            create_request = CreateRequest(id=Id.WATER, pos=position)
         else:
-            create_request = CreateRequest(eid=Id.FIRE, pos=position)
+            create_request = CreateRequest(id=Id.FIRE, pos=position)
         return [
             DestroyRequest(target=self, pos=position),
             create_request

@@ -43,5 +43,5 @@ class Placeholder(Elem):
                 DestroyRequest(target=self, pos=position),
                 # TODO: pass (id, rule) into placeholder creation. Not sure
                 # this is even possible since player moves first?
-                LoseRequest(cause=self)
+                LoseRequest(cause=self, pos=position)
             ]

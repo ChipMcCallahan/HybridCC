@@ -5,6 +5,7 @@ from enum import Enum
 from hybrid_cc.game.camera import Camera
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.chip import Chip
+from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.map import Map
@@ -12,7 +13,9 @@ from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
     LoseRequest, MoveRequest, ShowHintRequest, HideHintRequest
 from hybrid_cc.game.rng import RNG
-from hybrid_cc.shared import Direction
+from hybrid_cc.replays.replay import Replay
+from hybrid_cc.shared import Direction, Id
+from hybrid_cc.shared.game_result import WinResult, LoseResult
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -26,6 +29,7 @@ class Gameboard:
 
     def __init__(self, level, seed=None):
         """Initialize a new Gameboard instance."""
+        self.result = None
         self._size = level.size
         self.map = Map(level)
         self.elems = self.map.elems
@@ -40,6 +44,7 @@ class Gameboard:
         self.camera = Camera(Mob.instances[0], self)
         self.show_hint = False
         RNG.reset(seed)
+        self.replay = Replay(RNG.seed)
 
     @property
     def size(self):
@@ -64,9 +69,16 @@ class Gameboard:
         return self.map.get(p)
 
     def do_logic(self, inputs):
-        if len(inputs) > 2:
-            inputs = inputs[0:2]
         inputs = [Direction[d] for d in inputs]
+        pop = lambda: inputs.pop(0) if inputs else None
+        i1, i2 = pop(), None
+        while inputs and not i2:
+            d = pop()
+            if d in (i1.right(), i1.left()):
+                i2 = d
+        inputs = (i1, i2)
+        self.replay.update(self.tick, inputs)
+
         moves, requests = self.elems.collect_move_plans(inputs, self.tick)
         self.do_requests(requests)
 
@@ -94,7 +106,7 @@ class Gameboard:
 
         self.tick += 1
         if self.time > 0 and self.time_remaining() == 0:
-            self.transition(Gameboard.State.LOSE)
+            self.lose(cause="CLOCK", position=Player.instance.position)
         self.camera.update()
         Button.update()  # Update all the button signals at end of turn.
 
@@ -108,9 +120,12 @@ class Gameboard:
                 pos, eid, kwargs = request.pos, request.id, request.kwargs
                 self.map.construct_at(pos, eid, **kwargs)
             elif isinstance(request, WinRequest):
-                self.transition(Gameboard.State.WIN)
+                self.win(request.color, request.pos)
             elif isinstance(request, LoseRequest):
-                self.transition(Gameboard.State.LOSE)
+                id = request.cause.id
+                rule = request.cause.rule
+                cause = rule.name if id == Id.MONSTER else id.name
+                self.lose(cause=cause, position=request.pos)
             elif isinstance(request, MoveRequest):
                 move_requests.append(request)
             elif isinstance(request, ShowHintRequest):
@@ -120,8 +135,17 @@ class Gameboard:
         return move_requests
 
     def transition(self, state):
-        if self.state == Gameboard.State.PLAY:
+        if self.state == self.State.PLAY:
             self.state = state
+
+    def win(self, color, position):
+        self.result = WinResult(color=color, position=position, score=0,
+                                tick=self.tick)
+        self.transition(self.State.WIN)
+
+    def lose(self, cause, position):
+        self.result = LoseResult(cause=cause, position=position, tick=self.tick)
+        self.transition(self.State.LOSE)
 
     def time_remaining(self):
         return max(self.time - self.tick // 10, 0)

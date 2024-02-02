@@ -31,5 +31,5 @@ class ReplayInput(Enum):
             return ReplayInput.NONE
         s = ""
         for d in inputs:
-            s = d.name + s
+            s = d.name + s if d else s
         return ReplayInput[s]

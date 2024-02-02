@@ -53,7 +53,7 @@ class Tank(Mob):
             return [
                 DestroyRequest(target=mob, pos=position),
                 DestroyRequest(target=self, pos=position),
-                LoseRequest(cause=self)
+                LoseRequest(cause=self, pos=position)
             ]
 
     # --------------------------------------------------------------------------
@@ -62,4 +62,4 @@ class Tank(Mob):
 
     def on_completed_move(self, old_p, new_p, tick, **kwargs):
         super().on_completed_move(old_p, new_p, tick, **kwargs)
-        return [CreateRequest(pos=old_p, eid=Id.PLACEHOLDER)]
+        return [CreateRequest(pos=old_p, id=Id.PLACEHOLDER)]

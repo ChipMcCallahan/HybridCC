@@ -38,15 +38,15 @@ class Water(Elem):
 
         requests = [DestroyRequest(target=mob, pos=position)]
         if mob.id == Id.PLAYER:
-            requests.append(LoseRequest(cause=self.id))
+            requests.append(LoseRequest(cause=self, pos=position))
         elif mob.id == Id.DIRT_BLOCK:
             requests.extend([
                 DestroyRequest(target=self, pos=position),
-                CreateRequest(pos=position, eid=Id.DIRT, color=mob.color)
+                CreateRequest(pos=position, id=Id.DIRT, color=mob.color)
             ])
         elif mob.id == Id.ICE_BLOCK:
             requests.extend([
                 DestroyRequest(target=self, pos=position),
-                CreateRequest(pos=position, eid=Id.ICE)
+                CreateRequest(pos=position, id=Id.ICE)
             ])
         return requests
