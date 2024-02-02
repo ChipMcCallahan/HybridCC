@@ -6,7 +6,7 @@ from hybrid_cc.game.rng import RNG
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.force_rule import ForceRule
 from hybrid_cc.shared.kwargs import DIRECTION, RULE, COLOR
-from hybrid_cc.shared.tag import FORCED, OVERRIDDEN, SLIDING
+from hybrid_cc.shared.tag import FORCED, OVERRIDDEN, SLIDING, SPEED_BOOST
 
 
 class Force(Elem):
@@ -55,6 +55,7 @@ class Force(Elem):
                 mob.tools[Id.SUCTION_BOOTS]):
             if self.rule == ForceRule.RANDOM or self.d == d:
                 mob.tag(FORCED)
+                mob.tag(SPEED_BOOST)
         mob.untag(OVERRIDDEN)
         mob.untag(SLIDING)
         self.hovering.pop(mob.mob_id, None)

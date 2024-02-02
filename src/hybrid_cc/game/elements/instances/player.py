@@ -4,7 +4,7 @@ from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.tag import PUSHING, PUSHES, COLLECTS_CHIPS, \
-    COLLECTS_ITEMS, ENTERS_DIRT, FORCED, OVERRIDDEN, SLIDING
+    COLLECTS_ITEMS, ENTERS_DIRT, FORCED, OVERRIDDEN, SLIDING, SPEED_BOOST
 from hybrid_cc.shared.kwargs import DIRECTION
 
 
@@ -46,11 +46,14 @@ class Player(Mob):
         inputs = kwargs.get("inputs", [])
         self.untag(PUSHING)
 
-        if self.moved_last_n_ticks(tick, n=1) and not self.tagged(FORCED):
+        if self.moved_last_n_ticks(tick, n=1) and not self.tagged(
+                FORCED) and not self.tagged(SPEED_BOOST):
             return [], []
 
+        self.untag(SPEED_BOOST)
         # If we're getting to submit our move inputs, we're not forced anymore.
         self.untag(FORCED)
+        self.last_move_tick = None
 
         primary, secondary = inputs
         if self.d in inputs and self.d != primary:

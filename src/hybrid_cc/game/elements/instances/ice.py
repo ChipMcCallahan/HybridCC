@@ -3,7 +3,7 @@ import logging
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared import Id
-from hybrid_cc.shared.tag import SLIDING, OVERRIDDEN
+from hybrid_cc.shared.tag import SLIDING, OVERRIDDEN, SPEED_BOOST
 
 
 class Ice(Elem):
@@ -45,6 +45,8 @@ class Ice(Elem):
         mob.untag(SLIDING)
         mob.untag(OVERRIDDEN)
         self.sliding.pop(mob.mob_id, None)
+        if mob.id == Id.PLAYER and not mob.tools[Id.SKATES]:
+            mob.tag(SPEED_BOOST)
 
     def finish_enter(self, mob, p, d):
         if not mob.tools[Id.SKATES]:

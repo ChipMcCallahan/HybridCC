@@ -91,15 +91,15 @@ class LevelCell:
         """Sets the MOB layer."""
         self.set(Layer.MOB, elem)
 
-    def get_elem_by_id(self, eid):
-        here = self.get(eid.layer)
-        return here if here.id == eid else None
+    def get_elem_by_id(self, id):
+        here = self.get(id.layer)
+        return here if here.id == id else None
 
-    def contains(self, eid):
-        return self.get_elem_by_id(eid) is not None
+    def contains(self, id):
+        return self.get_elem_by_id(id) is not None
 
-    def contains_any(self, *eids):
-        for eid in eids:
-            if self.contains(eid):
+    def contains_any(self, *ids):
+        for id in ids:
+            if self.contains(id):
                 return True
         return False

@@ -2,7 +2,7 @@ from math import floor, ceil
 
 from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
-from hybrid_cc.shared.tag import SLIDING
+from hybrid_cc.shared.tag import SLIDING, SPEED_BOOST
 
 VIEWPORT_SIZE = 9
 TILE_SIZE = 32
@@ -38,8 +38,9 @@ class Camera:
             stale_time = move_tick - self.last_move_tick
             index = stale_time * 4 + logic_tick % 4
             fraction = 0
-            if self.target.tagged(SLIDING) and (0 < index < 5):
-                fraction = 1 - (index - 1) / 4
+            fast = self.target.tagged(SLIDING) or self.target.tagged(SPEED_BOOST)
+            if fast and (0 < index < 5):
+                fraction = 1 - (index - 1) / 4 - 1/8
             elif stale_time < 2:
                 fraction = 1 - (index / 8)
 

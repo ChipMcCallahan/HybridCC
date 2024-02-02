@@ -43,10 +43,10 @@ class GfxProvider:
         if self.cache_misses % 10000 == 0:
             logging.warning(f"{self.cache_misses} cache misses so far")
 
-        eid = id_and_kwargs.id if hasattr(id_and_kwargs, "id") else None
-        layer = eid.layer() if hasattr(eid, "layer") else None
+        id = id_and_kwargs.id if hasattr(id_and_kwargs, "id") else None
+        layer = id.layer() if hasattr(id, "layer") else None
 
-        if eid and layer:
+        if id and layer:
             gfx_obj = {
                 Layer.TERRAIN: self.terrain_gfx,
                 Layer.PICKUP: self.pickup_gfx,
@@ -54,7 +54,7 @@ class GfxProvider:
                 Layer.SIDES: self.sides_gfx,
                 Layer.MOB: self.mob_gfx
             }
-            method = getattr(gfx_obj[layer], eid.name.lower(), None)
+            method = getattr(gfx_obj[layer], id.name.lower(), None)
             result = method(id_and_kwargs, **extra_kwargs)
             self.cache[cache_key] = result
             return result

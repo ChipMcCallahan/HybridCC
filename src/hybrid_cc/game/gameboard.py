@@ -117,8 +117,8 @@ class Gameboard:
                 target, p = request.target, request.p
                 self.map.destruct_at(p, target)
             elif isinstance(request, CreateRequest):
-                p, eid, kwargs = request.p, request.id, request.kwargs
-                self.map.construct_at(p, eid, **kwargs)
+                p, id, kwargs = request.p, request.id, request.kwargs
+                self.map.construct_at(p, id, **kwargs)
             elif isinstance(request, WinRequest):
                 self.win(request.color, request.p)
             elif isinstance(request, LoseRequest):

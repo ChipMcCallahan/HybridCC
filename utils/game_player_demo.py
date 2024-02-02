@@ -56,17 +56,17 @@ class GamePlayerDemo:
         menu.mainloop(self.screen)
 
     def show_level_menu(self):
-        def on_select(_lvl):
+        def on_select(i):
             self.show_loading()
-            self.state_mgr.set_level(_lvl)
+            self.state_mgr.set_level(i)
             self.run_events()
 
         menu = pygame_menu.Menu('Select Level', 800, 600,
                                 theme=BLACK_THEME,
                                 onclose=pygame_menu.events.BACK)
 
-        for lvl in self.state_mgr.level_set.levels:
-            menu.add.button(lvl.title, on_select, lvl)
+        for i, lvl in enumerate(self.state_mgr.level_set.levels):
+            menu.add.button(lvl.title, on_select, i)
 
         menu.add.button('Back', self.show_levelset_menu)
         menu.mainloop(self.screen)

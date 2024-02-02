@@ -6,6 +6,7 @@ MOVED = "moved"
 SLIDING = "sliding"
 FORCED = "forced"
 OVERRIDDEN = "overridden"
+SPEED_BOOST = "speed_boost"
 
 # Permanent tags or traits
 COLLECTS_CHIPS = "collects_chips"

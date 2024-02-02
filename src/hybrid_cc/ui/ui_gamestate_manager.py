@@ -8,6 +8,7 @@ from hybrid_cc.ui.ui_gamestate import UIGamestate
 
 class UIGamestateManager:
     def __init__(self):
+        self.level_index = None
         self.logic_tick = 0
         self.movement_tick = 0
         self.inputs = []
@@ -35,10 +36,15 @@ class UIGamestateManager:
                 if event.key in [pygame.K_LEFT, pygame.K_RIGHT,
                                  pygame.K_UP, pygame.K_DOWN]:
                     self.state.play()
+                if event.key == pygame.K_n:
+                    self.next_level()
+                if event.key == pygame.K_p:
+                    self.previous_level()
                 if event.key == pygame.K_RETURN:
-                    if (self.state.is_play or self.state.is_pause or
-                            self.state.is_start):
+                    if self.state.is_pause or self.state.is_start:
                         self.state.play()
+                    elif self.state.is_win:
+                        self.next_level()
                     elif self.state.start():
                         self.reset()
 
@@ -81,9 +87,20 @@ class UIGamestateManager:
         if self.level:
             self.gameboard = Gameboard(self.level)
 
-    def set_level(self, level):
-        self.level = level
+    def set_level(self, i):
+        self.level_index = i
+        self.level = self.level_set.levels[i]
         self.reset()
+
+    def next_level(self):
+        i = self.level_index + 1 % len(self.level_set.levels)
+        self.set_level(i)
+        self.state.start()
+
+    def previous_level(self):
+        i = self.level_index - 1 % len(self.level_set.levels)
+        self.set_level(i)
+        self.state.start()
 
     @property
     def is_start(self):

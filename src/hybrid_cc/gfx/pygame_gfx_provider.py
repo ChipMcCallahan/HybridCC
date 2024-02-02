@@ -14,7 +14,7 @@ from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.shared_utils import is_iter
-from hybrid_cc.shared.tag import SLIDING
+from hybrid_cc.shared.tag import SLIDING, SPEED_BOOST, FORCED
 from hybrid_cc.shared.tool_rule import ToolRule
 
 
@@ -75,7 +75,11 @@ class PygameGfxProvider:
                 return frames[0], None
             stale_tick = move_tick - elem.last_move_tick
             index = stale_tick * 4 + logic_tick % 4
-            if elem.tagged(SLIDING) and (0 < index < 5):
+
+            fast = elem.tagged(SLIDING) or (elem.id == Id.PLAYER and (
+                        elem.tagged(FORCED) or elem.tagged(SPEED_BOOST)))
+
+            if fast and (0 < index < 5):
                 frame = self.moving_double(frames[0], index * 2 - 1, elem)
                 offset = (0, 0)
                 if elem.d == Direction.S:

@@ -324,12 +324,12 @@ class GfxViewerApp:
         self.animate_toggle = not self.animate_toggle
         self.update_canvas(self.listbox.get(self.listbox.curselection()[0]))
 
-    def update_canvas(self, selected_eid):
+    def update_canvas(self, selected_id):
         self.stop_animations()
         self.canvas.delete("all")
         self.image_refs.clear()
 
-        elements = self.get_images(selected_eid)
+        elements = self.get_images(selected_id)
         x_offset, y_offset = 0, 10
         initial_y_offset = y_offset
 

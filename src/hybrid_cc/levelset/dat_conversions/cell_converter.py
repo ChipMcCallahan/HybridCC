@@ -407,8 +407,8 @@ class CellConverter:
                 kwargs = {RULE: (ToolRule.ITEM_BARRIER if top == bottom
                                  else ToolRule.DEFAULT)}
                 kwargs.update(CellConverter.count(bottom))
-                eid = Id[top.name]
-                cell.pickup = LevelElem(eid, **kwargs)
+                id = Id[top.name]
+                cell.pickup = LevelElem(id, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
                         CC1.mobs()):
                     populate(bottom)
