@@ -50,6 +50,8 @@ NUMBER_CODE = {
 
 
 class CellConverter:
+    memos = {}
+
     @staticmethod
     def colorize(bottom: CC1) -> Dict[str, any]:
         if bottom in COLOR_CODE:
@@ -68,8 +70,12 @@ class CellConverter:
             return {COUNT: NUMBER_CODE[bottom]}
         return dict()
 
-    @staticmethod
-    def convert(cc1_cell, channel=None, conversion_rules=()):
+    @classmethod
+    def convert(cls, cc1_cell, channel=None, conversion_rules=()):
+        memo = (cc1_cell.top, cc1_cell.bottom, channel, tuple(conversion_rules))
+        if memo in cls.memos:
+            return cls.memos[memo]
+
         cell = LevelCell()
 
         def populate(top, bottom=CC1.FLOOR):
@@ -418,6 +424,7 @@ class CellConverter:
         populate(cc1_cell.top, cc1_cell.bottom)
         if not cell.terrain:
             cell.terrain = LevelElem(Id.FLOOR)
+        cls.memos[memo] = cell
         return cell
 
     @staticmethod
