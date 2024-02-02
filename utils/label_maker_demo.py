@@ -15,7 +15,7 @@ class LabelMakerDemo:
 
         # Defaults
         default_text_color = "yellow"
-        default_position = 5
+        default_p = 5
         default_label_text = "128"
 
         # Left side - Inputs
@@ -34,10 +34,10 @@ class LabelMakerDemo:
 
         # Position input box
         tk.Label(left_frame, text="Position (1-9):").pack()
-        self.position_var = tk.StringVar(value=str(default_position))
-        position_entry = tk.Entry(left_frame, textvariable=self.position_var)
-        position_entry.pack()
-        position_entry.bind("<KeyRelease>", self.update_label)
+        self.p_var = tk.StringVar(value=str(default_p))
+        p_entry = tk.Entry(left_frame, textvariable=self.p_var)
+        p_entry.pack()
+        p_entry.bind("<KeyRelease>", self.update_label)
 
         # Label text input box
         tk.Label(left_frame, text="Label Text:").pack()
@@ -55,10 +55,10 @@ class LabelMakerDemo:
         self.update_label()
 
     def update_label(self, event=None):
-        if self.position_var.get().isdigit():
+        if self.p_var.get().isdigit():
             # Generate and display the label
             label_image = self.labeler.label(self.label_text_var.get(),
-                                             int(self.position_var.get()),
+                                             int(self.p_var.get()),
                                              self.text_color_var.get())
         else:
             label_image = Image.new("RGBA", (32, 32), "cyan")

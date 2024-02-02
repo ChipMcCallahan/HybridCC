@@ -24,17 +24,17 @@ class SteppingStone(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         if self.count > 1:
             create_request = CreateRequest(id=self.id,
-                                           pos=position,
+                                           p=p,
                                            count=self.count - 1,
                                            rule=self.rule)
         elif self.rule == SteppingStoneRule.WATER:
-            create_request = CreateRequest(id=Id.WATER, pos=position)
+            create_request = CreateRequest(id=Id.WATER, p=p)
         else:
-            create_request = CreateRequest(id=Id.FIRE, pos=position)
+            create_request = CreateRequest(id=Id.FIRE, p=p)
         return [
-            DestroyRequest(target=self, pos=position),
+            DestroyRequest(target=self, p=p),
             create_request
         ]

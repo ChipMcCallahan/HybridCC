@@ -4,7 +4,6 @@ from hybrid_cc.game.cell import Cell
 from hybrid_cc.game.elem_handler import ElemHandler
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.shared import Id
-from hybrid_cc.shared.monster_rule import MonsterRule
 
 
 class Map:

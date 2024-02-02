@@ -47,8 +47,8 @@ class Monster(Mob):
         elif self.rule == MonsterRule.TEETH:
             if not Player.instance:
                 return [], []
-            tx, ty, _ = self.position
-            px, py, _ = Player.instance.position
+            tx, ty, _ = self.p
+            px, py, _ = Player.instance.p
             dx, dy = px - tx, py - ty
             x_dir, y_dir = None, None
             if dx < 0:
@@ -79,17 +79,17 @@ class Monster(Mob):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         if mob.id == Id.PLAYER:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.id == Id.PLAYER:
             return [
-                DestroyRequest(target=mob, pos=position),
-                DestroyRequest(target=self, pos=position),
-                LoseRequest(cause=self, pos=position)
+                DestroyRequest(target=mob, p=p),
+                DestroyRequest(target=self, p=p),
+                LoseRequest(cause=self, p=p)
             ]
 
     # --------------------------------------------------------------------------
@@ -98,4 +98,4 @@ class Monster(Mob):
 
     def on_completed_move(self, old_p, new_p, tick, **kwargs):
         super().on_completed_move(old_p, new_p, tick, **kwargs)
-        return [CreateRequest(pos=old_p, id=Id.PLACEHOLDER)]
+        return [CreateRequest(p=old_p, id=Id.PLACEHOLDER)]

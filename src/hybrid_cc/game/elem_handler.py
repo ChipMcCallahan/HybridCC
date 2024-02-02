@@ -1,4 +1,3 @@
-import logging
 from hybrid_cc.game.elements import instances
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.elements.instances.socket import Socket
@@ -43,17 +42,17 @@ class ElemHandler:
         # Element specific initializations.
         Socket.set_chips_required(level.chips.copy())
 
-    def construct_at(self, pos, _id, **kwargs):
+    def construct_at(self, p, _id, **kwargs):
         kwargs = self.assign_kwarg_defaults(**kwargs)
         instance_class = self.get_class(_id)
         constructor = getattr(instance_class, "construct_at")
-        return constructor(pos, **kwargs)
+        return constructor(p, **kwargs)
 
     @staticmethod
-    def destruct_at(pos, elem):
+    def destruct_at(p, elem):
         instance_class = elem.__class__
         destructor = getattr(instance_class, "destruct_at")
-        destructor(elem, pos)
+        destructor(elem, p)
 
     def get_class(self, _id):
         if not self.id_to_class:

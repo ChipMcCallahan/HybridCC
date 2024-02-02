@@ -2,7 +2,6 @@ import logging
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import WinRequest
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import ENTERS_DIRT
@@ -26,12 +25,12 @@ class Exit(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         if mob.tagged(ENTERS_DIRT):
             return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         return [
-            WinRequest(color=self.color, pos=position)
+            WinRequest(color=self.color, p=p)
         ]

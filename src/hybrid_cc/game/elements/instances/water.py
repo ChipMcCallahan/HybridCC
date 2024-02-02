@@ -26,27 +26,27 @@ class Water(Elem):
     # --------------------------------------------------------------------------
 
     @staticmethod
-    def finish_exit(mob, position, direction):
+    def finish_exit(mob, p, direction):
         mob.untag(SWIMMING)
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.id == Id.MONSTER and mob.rule == MonsterRule.GLIDER:
             return
         if mob.tools[Id.FLIPPERS]:
             mob.tag(SWIMMING)
             return
 
-        requests = [DestroyRequest(target=mob, pos=position)]
+        requests = [DestroyRequest(target=mob, p=p)]
         if mob.id == Id.PLAYER:
-            requests.append(LoseRequest(cause=self, pos=position))
+            requests.append(LoseRequest(cause=self, p=p))
         elif mob.id == Id.DIRT_BLOCK:
             requests.extend([
-                DestroyRequest(target=self, pos=position),
-                CreateRequest(pos=position, id=Id.DIRT, color=mob.color)
+                DestroyRequest(target=self, p=p),
+                CreateRequest(p=p, id=Id.DIRT, color=mob.color)
             ])
         elif mob.id == Id.ICE_BLOCK:
             requests.extend([
-                DestroyRequest(target=self, pos=position),
-                CreateRequest(pos=position, id=Id.ICE)
+                DestroyRequest(target=self, p=p),
+                CreateRequest(p=p, id=Id.ICE)
             ])
         return requests

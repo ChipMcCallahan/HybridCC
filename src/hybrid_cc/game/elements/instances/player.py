@@ -71,10 +71,10 @@ class Player(Mob):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         return [
-            DestroyRequest(target=self, pos=position),
-            LoseRequest(cause=mob, pos=position)
+            DestroyRequest(target=self, p=p),
+            LoseRequest(cause=mob, p=p)
         ]
 
     # --------------------------------------------------------------------------

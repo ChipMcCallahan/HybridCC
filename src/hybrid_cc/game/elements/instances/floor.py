@@ -1,7 +1,6 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 
 

@@ -41,7 +41,7 @@ class TrickWall(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def start_enter(self, mob, position, direction):
+    def start_enter(self, mob, p, direction):
         if self.rule == TrickWallRule.PASS_THRU:
             if not mob.tagged(PUSHABLE):
                 return MoveResult.PASS, None
@@ -50,22 +50,22 @@ class TrickWall(Elem):
         if (self.rule == TrickWallRule.BECOMES_WALL or
               self.rule == TrickWallRule.INVISIBLE_BECOMES_WALL):
             return MoveResult.FAIL, [
-                DestroyRequest(target=self, pos=position),
-                CreateRequest(id=Id.WALL, pos=position, color=self.color)
+                DestroyRequest(target=self, p=p),
+                CreateRequest(id=Id.WALL, p=p, color=self.color)
             ]
         elif self.rule == TrickWallRule.BECOMES_FLOOR:
             return MoveResult.PASS, [
-                DestroyRequest(target=self, pos=position),
-                CreateRequest(id=Id.FLOOR, pos=position, color=self.color)
+                DestroyRequest(target=self, p=p),
+                CreateRequest(id=Id.FLOOR, p=p, color=self.color)
             ]
         elif self.rule == TrickWallRule.PERMANENTLY_INVISIBLE:
-            self.show_secrets_positions[position] = 4
+            self.show_secrets_positions[p] = 4
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if self.rule == TrickWallRule.PASS_THRU:
-            self.show_secrets_positions[position] = None
+            self.show_secrets_positions[p] = None
 
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         if self.rule == TrickWallRule.PASS_THRU:
-            self.show_secrets_positions.pop(position)
+            self.show_secrets_positions.pop(p)

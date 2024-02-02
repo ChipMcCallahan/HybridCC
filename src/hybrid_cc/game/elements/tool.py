@@ -9,7 +9,7 @@ from hybrid_cc.shared.tool_rule import ToolRule
 class Tool(Elem):
     kwarg_filter = (RULE, COUNT)  # Retain these kwargs only.
 
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if self.rule == ToolRule.DEFAULT:
             if mob.tagged(ENTERS_DIRT):
                 return MoveResult.PASS, []
@@ -21,12 +21,12 @@ class Tool(Elem):
         else:
             raise ValueError(f"invalid rule {self.rule}")
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if self.rule == ToolRule.DEFAULT and mob.tagged(COLLECTS_ITEMS):
             mob.tools[self.id] += 1
-            requests = [DestroyRequest(target=self, pos=position)]
+            requests = [DestroyRequest(target=self, p=p)]
             if self.count > 1:
                 kwargs = {COUNT: self.count - 1, RULE: ToolRule.DEFAULT}
                 requests.append(
-                    CreateRequest(pos=position, id=self.id, **kwargs))
+                    CreateRequest(p=p, id=self.id, **kwargs))
             return requests

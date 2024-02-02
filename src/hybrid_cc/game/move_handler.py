@@ -1,4 +1,3 @@
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.move_result import MoveResult
 
 
@@ -6,16 +5,16 @@ class MoveHandler:
     def __init__(self, map):
         self.map = map
 
-    def move(self, mob, d, tick, slap=None, sim_pos=None):
+    def move(self, mob, d, tick, slap=None, sim_p=None):
         requests = []
-        result, new_requests = self.test_move(mob, d, sim_pos)
+        result, new_requests = self.test_move(mob, d, sim_p)
         requests += new_requests or []
         if result != MoveResult.PASS:
             result, new_requests = self.fail_move(mob, result, d)
             requests += new_requests or []
             return result, requests
 
-        result, new_requests = self.start_move(mob, d, sim_pos)
+        result, new_requests = self.start_move(mob, d, sim_p)
         requests += new_requests or []
         if result != MoveResult.PASS:
             result, new_requests = self.fail_move(mob, result, d)
@@ -23,13 +22,13 @@ class MoveHandler:
             return result, requests
 
         if slap:
-            slap_result, new_requests = self.test_move(mob, slap, sim_pos)
+            slap_result, new_requests = self.test_move(mob, slap, sim_p)
             requests += new_requests or []
             if slap_result == MoveResult.PASS:
-                _, new_requests = self.start_move(mob, slap, sim_pos)
+                _, new_requests = self.start_move(mob, slap, sim_p)
                 requests += new_requests or []
 
-        requests += self.finish_move(mob, d, tick, sim_pos) or []
+        requests += self.finish_move(mob, d, tick, sim_p) or []
 
         return result, requests
 
@@ -41,15 +40,15 @@ class MoveHandler:
             requests = method(move_result, d)
         return move_result, requests
 
-    def test_move(self, mob, d, sim_pos=None):
-        return self._do_trial_move(mob, d, 'test', sim_pos)
+    def test_move(self, mob, d, sim_p=None):
+        return self._do_trial_move(mob, d, 'test', sim_p)
 
-    def start_move(self, mob, d, sim_pos=None):
-        return self._do_trial_move(mob, d, 'start', sim_pos)
+    def start_move(self, mob, d, sim_p=None):
+        return self._do_trial_move(mob, d, 'start', sim_p)
 
-    def _do_trial_move(self, mob, d, phase, sim_pos=None):
-        here_p, offset = sim_pos or mob.position, d.value
-        there_p = tuple(a + b for a, b in zip(sim_pos or here_p, offset))
+    def _do_trial_move(self, mob, d, phase, sim_p=None):
+        here_p, offset = sim_p or mob.p, d.value
+        there_p = tuple(a + b for a, b in zip(sim_p or here_p, offset))
 
         here = self.map.get(here_p)
         there = None if self.map.is_oob(there_p) else self.map.get(there_p)
@@ -80,9 +79,9 @@ class MoveHandler:
                     return result, requests
         return result, requests
 
-    def finish_move(self, mob, d, tick, sim_pos=None):
-        here_p, offset = mob.position, d.value
-        there_p = tuple(a + b for a, b in zip(sim_pos or here_p, offset))
+    def finish_move(self, mob, d, tick, sim_p=None):
+        here_p, offset = mob.p, d.value
+        there_p = tuple(a + b for a, b in zip(sim_p or here_p, offset))
 
         if self.map.is_oob(there_p):
             raise AttributeError(f"Position {there_p} is oob, can't finalize a "
@@ -109,7 +108,7 @@ class MoveHandler:
         here.remove(mob)
         there.add(mob)
         new_requests = mob.on_completed_move(here_p, there_p, tick,
-                                             simulated_position=sim_pos)
+                                             simulated_p=sim_p)
         if new_requests:
             requests.extend(new_requests)
         return requests

@@ -1,7 +1,6 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR
 from hybrid_cc.shared.move_result import MoveResult
 
@@ -24,5 +23,5 @@ class Wall(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         return MoveResult.FAIL, None

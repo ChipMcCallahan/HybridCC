@@ -25,17 +25,17 @@ class Key(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if self.rule == KeyRule.ACTING_DIRT and not mob.tagged(ENTERS_DIRT):
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.tagged(COLLECTS_ITEMS):
             if self.count == "+" or mob.keys[self.color] == "+":
                 mob.keys[self.color] = "+"
             else:
                 mob.keys[self.color] += self.count
-            return [DestroyRequest(target=self, pos=position)]
+            return [DestroyRequest(target=self, p=p)]
         elif self.rule == KeyRule.FRAGILE:
-            return [DestroyRequest(target=self, pos=position)]
+            return [DestroyRequest(target=self, p=p)]

@@ -1,9 +1,6 @@
-import logging
-
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.request import DestroyRequest
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, COUNT
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import ENTERS_DIRT
@@ -28,14 +25,14 @@ class Socket(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if mob.tagged(ENTERS_DIRT):
             chips = Chip.chips_collected.get(self.color, 0)
             if chips >= self.chips_required[self.color]:
                 return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         return [
-            DestroyRequest(target=self, pos=position),
+            DestroyRequest(target=self, p=p),
         ]

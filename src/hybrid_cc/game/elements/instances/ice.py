@@ -41,12 +41,12 @@ class Ice(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         mob.untag(SLIDING)
         mob.untag(OVERRIDDEN)
         self.sliding.pop(mob.mob_id, None)
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if not mob.tools[Id.SKATES]:
             mob.tag(SLIDING, self.id)
             mob.tag(OVERRIDDEN)

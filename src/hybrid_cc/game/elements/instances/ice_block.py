@@ -34,12 +34,12 @@ class IceBlock(Mob):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if mob.tagged(PUSHES) or mob.id == self.id:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def start_enter(self, mob, position, direction):
+    def start_enter(self, mob, p, direction):
         # if we already failed in this direction, don't retry
         if self.tagged((FAILED_MOVE, direction)):
             return MoveResult.FAIL, []

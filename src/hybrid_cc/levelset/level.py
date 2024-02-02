@@ -22,7 +22,6 @@ class Level:
         """
         Initialize a new Level instance.
 
-        :param title: The title of the level.
         :param x_size: The size along the x-axis.
         :param y_size: The size along the y-axis.
         :param z_size: The size along the z-axis.

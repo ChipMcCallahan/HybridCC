@@ -1,5 +1,4 @@
 from hybrid_cc.replays.replay_input import ReplayInput
-from hybrid_cc.shared.game_result import WinResult, LoseResult
 
 
 class Replay:

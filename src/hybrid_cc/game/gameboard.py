@@ -92,7 +92,7 @@ class Gameboard:
             if (not mob) or (mob_id in moved):
                 continue
             result, requests = self.move_handler.move(mob, d, self.tick, slap,
-                                                      move.simulated_position)
+                                                      move.simulated_p)
             if result == MoveResult.RETRY:
                 raw_moves.appendleft(move)
             debug_counts[mob.mob_id] += 1
@@ -106,7 +106,7 @@ class Gameboard:
 
         self.tick += 1
         if self.time > 0 and self.time_remaining() == 0:
-            self.lose(cause="CLOCK", position=Player.instance.position)
+            self.lose(cause="CLOCK", p=Player.instance.p)
         self.camera.update()
         Button.update()  # Update all the button signals at end of turn.
 
@@ -114,18 +114,18 @@ class Gameboard:
         move_requests = []
         for request in requests:
             if isinstance(request, DestroyRequest):
-                target, pos = request.target, request.pos
-                self.map.destruct_at(pos, target)
+                target, p = request.target, request.p
+                self.map.destruct_at(p, target)
             elif isinstance(request, CreateRequest):
-                pos, eid, kwargs = request.pos, request.id, request.kwargs
-                self.map.construct_at(pos, eid, **kwargs)
+                p, eid, kwargs = request.p, request.id, request.kwargs
+                self.map.construct_at(p, eid, **kwargs)
             elif isinstance(request, WinRequest):
-                self.win(request.color, request.pos)
+                self.win(request.color, request.p)
             elif isinstance(request, LoseRequest):
                 id = request.cause.id
                 rule = request.cause.rule
                 cause = rule.name if id == Id.MONSTER else id.name
-                self.lose(cause=cause, position=request.pos)
+                self.lose(cause=cause, p=request.p)
             elif isinstance(request, MoveRequest):
                 move_requests.append(request)
             elif isinstance(request, ShowHintRequest):
@@ -138,13 +138,13 @@ class Gameboard:
         if self.state == self.State.PLAY:
             self.state = state
 
-    def win(self, color, position):
-        self.result = WinResult(color=color, position=position, score=0,
+    def win(self, color, p):
+        self.result = WinResult(color=color, p=p, score=0,
                                 tick=self.tick)
         self.transition(self.State.WIN)
 
-    def lose(self, cause, position):
-        self.result = LoseResult(cause=cause, position=position, tick=self.tick)
+    def lose(self, cause, p):
+        self.result = LoseResult(cause=cause, p=p, tick=self.tick)
         self.transition(self.State.LOSE)
 
     def time_remaining(self):

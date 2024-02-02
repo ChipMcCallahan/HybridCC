@@ -2,9 +2,8 @@ import logging
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import MoveRequest
-from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import COLOR, SIDES
-from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import PUSHABLE
 
@@ -27,12 +26,12 @@ class Corner(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if direction.reverse().name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def test_exit(self, mob, position, direction):
+    def test_exit(self, mob, p, direction):
         if direction.name not in self.sides:
             return MoveResult.PASS, []
 

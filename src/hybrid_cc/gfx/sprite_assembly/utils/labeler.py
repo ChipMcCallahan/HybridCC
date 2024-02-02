@@ -25,7 +25,7 @@ class Labeler:
         self.labels = {}
 
     @staticmethod
-    def _calculate_position(text_width, p):
+    def _calculate_p(text_width, p):
         x, y = 0, 0
 
         # Horizontal position
@@ -61,7 +61,7 @@ class Labeler:
                       + max(0, len(label) - 1))
 
         # Calculate label position
-        x, y = self._calculate_position(text_width, p)
+        x, y = self._calculate_p(text_width, p)
 
         # Calculate rectangle size
         rect_x0 = x - 1

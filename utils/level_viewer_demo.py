@@ -1,10 +1,10 @@
+import importlib.resources
 import logging
-import os
 import tkinter as tk
 from importlib import resources
 from tkinter import filedialog, Menu
+
 from PIL import ImageTk
-import importlib.resources
 
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.utils.level_imager import LevelImager

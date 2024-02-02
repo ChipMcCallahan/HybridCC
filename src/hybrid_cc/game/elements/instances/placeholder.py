@@ -17,31 +17,31 @@ class Placeholder(Elem):
         cls.instance = None
 
     @classmethod
-    def construct_at(cls, pos, **kwargs):
-        elem = super().construct_at(pos, **kwargs)
+    def construct_at(cls, p, **kwargs):
+        elem = super().construct_at(p, **kwargs)
         cls.instance = elem
-        cls.positions.add(pos)
+        cls.positions.add(p)
         return elem
 
     @classmethod
     def do_class_planning(cls, **kwargs):
-        requests = [DestroyRequest(target=cls.instance, pos=p) for p in
+        requests = [DestroyRequest(target=cls.instance, p=p) for p in
                     cls.positions]
         cls.positions.clear()
         return [], requests
 
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         if mob.id == Id.PLAYER:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.id == Id.PLAYER:
             return [
-                DestroyRequest(target=mob, pos=position),
-                DestroyRequest(target=self, pos=position),
+                DestroyRequest(target=mob, p=p),
+                DestroyRequest(target=self, p=p),
                 # TODO: pass (id, rule) into placeholder creation. Not sure
                 # this is even possible since player moves first?
-                LoseRequest(cause=self, pos=position)
+                LoseRequest(cause=self, p=p)
             ]

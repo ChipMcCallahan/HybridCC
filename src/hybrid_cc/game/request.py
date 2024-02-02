@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Tuple, Optional, List
 
 from hybrid_cc.game.elements.elem import Elem
@@ -9,12 +9,12 @@ from hybrid_cc.shared.color import Color
 @dataclass
 class DestroyRequest:
     target: Elem
-    pos: Tuple[int, int, int]
+    p: Tuple[int, int, int]
 
 
 class CreateRequest:
-    def __init__(self, *, pos, id, **kwargs):
-        self.pos = pos
+    def __init__(self, *, p, id, **kwargs):
+        self.p = p
         self.id = id
         self.kwargs = kwargs
 
@@ -30,7 +30,7 @@ class MoveRequest:
     mob_id: int
     direction: Direction
     slap: Optional[Direction] = None
-    simulated_position: Optional[Tuple[int, int, int]] = None
+    simulated_p: Optional[Tuple[int, int, int]] = None
 
     @staticmethod
     def from_directions(mob_id, directions) -> List['MoveRequest']:
@@ -40,13 +40,13 @@ class MoveRequest:
 @dataclass
 class WinRequest:
     color: Color
-    pos: Tuple[int, int, int]
+    p: Tuple[int, int, int]
 
 
 @dataclass
 class LoseRequest:
     cause: Elem
-    pos: Tuple[int, int, int]
+    p: Tuple[int, int, int]
 
 
 @dataclass

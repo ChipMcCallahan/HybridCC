@@ -2,7 +2,7 @@ import logging
 
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest
-from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import COLOR, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING
@@ -32,12 +32,12 @@ class DirtBlock(Mob):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if mob.tagged(PUSHES):
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def start_enter(self, mob, position, direction):
+    def start_enter(self, mob, p, direction):
         # if we already failed in this direction, don't retry
         if self.tagged((FAILED_MOVE, direction)):
             return MoveResult.FAIL, []

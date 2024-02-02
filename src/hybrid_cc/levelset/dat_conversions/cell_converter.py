@@ -1,4 +1,3 @@
-import logging
 from typing import Dict
 
 from cc_tools import CC1

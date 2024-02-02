@@ -26,10 +26,10 @@ class Cloner(Elem):
         cls.positions.clear()
 
     @classmethod
-    def construct_at(cls, pos, **kwargs):
-        elem = super().construct_at(pos, **kwargs)
+    def construct_at(cls, p, **kwargs):
+        elem = super().construct_at(p, **kwargs)
         key = (elem.color, elem.channel)
-        cls.positions[key].append(pos)
+        cls.positions[key].append(p)
         return elem
 
     # --------------------------------------------------------------------------
@@ -75,21 +75,21 @@ class Cloner(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         # TODO: are there cases this would make sense?
         return MoveResult.FAIL, []
 
-    def finish_exit(self, mob, position, direction):
-        self.mobs.pop(position, None)
+    def finish_exit(self, mob, p, direction):
+        self.mobs.pop(p, None)
         mob.untag(OVERRIDDEN)
-        return [CreateRequest(pos=position, id=mob.id, **mob.kwargs)]
+        return [CreateRequest(p=p, id=mob.id, **mob.kwargs)]
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         mob.tag(OVERRIDDEN)
-        self.mobs[position] = mob
+        self.mobs[p] = mob
 
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def construct_mob_here(self, mob, position):
-        self.finish_enter(mob, position, mob.direction)
+    def construct_mob_here(self, mob, p):
+        self.finish_enter(mob, p, mob.direction)

@@ -1,7 +1,6 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, SIDES
 from hybrid_cc.shared.move_result import MoveResult
 
@@ -24,12 +23,12 @@ class Panel(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         if direction.reverse().name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []
 
-    def test_exit(self, mob, position, direction):
+    def test_exit(self, mob, p, direction):
         if direction.name in self.sides:
             return MoveResult.FAIL, []
         return MoveResult.PASS, []

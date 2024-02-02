@@ -4,8 +4,8 @@ from hybrid_cc.shared import Id
 
 
 class Cell:
-    def __init__(self, position):
-        self.position = position
+    def __init__(self, p):
+        self.p = p
         self.terrain = None
         self.terrain_mod = None
         self.pickup = None

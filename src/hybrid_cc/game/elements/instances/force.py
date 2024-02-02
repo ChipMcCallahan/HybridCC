@@ -50,7 +50,7 @@ class Force(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         if (mob.id == Id.PLAYER and not
                 mob.tools[Id.SUCTION_BOOTS]):
             if self.rule == ForceRule.RANDOM or self.direction == direction:
@@ -59,7 +59,7 @@ class Force(Elem):
         mob.untag(SLIDING)
         self.hovering.pop(mob.mob_id, None)
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.tools[Id.SUCTION_BOOTS]:
             return
         if mob.id != Id.PLAYER:
@@ -74,7 +74,7 @@ class Force(Elem):
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def construct_mob_here(self, mob, position):
+    def construct_mob_here(self, mob, p):
         if mob.id == Id.PLAYER:
             mob.tag(OVERRIDDEN)  # Prevent move on first tick.
-        self.finish_enter(mob, position, mob.direction)
+        self.finish_enter(mob, p, mob.direction)

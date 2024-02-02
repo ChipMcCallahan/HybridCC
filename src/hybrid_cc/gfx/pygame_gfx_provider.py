@@ -9,11 +9,10 @@ from hybrid_cc.game.elements.instances.toggle_wall import ToggleWall
 from hybrid_cc.game.elements.instances.trap import Trap
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared.color import Color
-from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
-from hybrid_cc.shared.monster_rule import MonsterRule
+from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.tag import SLIDING
 from hybrid_cc.shared.tool_rule import ToolRule
@@ -119,17 +118,17 @@ class PygameGfxProvider:
             return main_surface
         return frame
 
-    def provide_viewport(self, layers, logic_tick, nw_pos, se_pos, camera):
-        w, h = se_pos[0] - nw_pos[0] + 1, se_pos[1] - nw_pos[1] + 1
+    def provide_viewport(self, layers, logic_tick, nw_p, se_p, camera):
+        w, h = se_p[0] - nw_p[0] + 1, se_p[1] - nw_p[1] + 1
 
         raw_surface = pygame.Surface((w * 32,
                                       h * 32))
 
         for layer in layers:
-            for i in range(nw_pos[0], se_pos[0] + 1):
-                for j in range(nw_pos[1], se_pos[1] + 1):
-                    position = (i, j, 0)
-                    here = layer.get(position, None)
+            for i in range(nw_p[0], se_p[0] + 1):
+                for j in range(nw_p[1], se_p[1] + 1):
+                    p = (i, j, 0)
+                    here = layer.get(p, None)
                     if not is_iter(here):
                         here = [here]
                     for elem in here:
@@ -140,7 +139,7 @@ class PygameGfxProvider:
                             for tag in elem.tags:
                                 kwargs[tag] = True
                         if isinstance(elem, TrickWall):
-                            if position in TrickWall.show_secrets_positions:
+                            if p in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
                         if isinstance(elem, (ToggleWall, Trap, Button)):
                             key = (elem.color, elem.channel)
@@ -151,8 +150,8 @@ class PygameGfxProvider:
                         if not img:
                             continue
                         offset = offset or (0, 0)
-                        x = i + offset[0] - nw_pos[0]
-                        y = j + offset[1] - nw_pos[1]
+                        x = i + offset[0] - nw_p[0]
+                        y = j + offset[1] - nw_p[1]
                         raw_surface.blit(img,
                                          (x * 32,
                                           y * 32))

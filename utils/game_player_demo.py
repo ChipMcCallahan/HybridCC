@@ -5,10 +5,7 @@ import os
 import pygame
 import pygame_menu
 
-from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.gfx.pygame_gfx_provider import PygameGfxProvider
-from hybrid_cc.shared.color import Color
-from hybrid_cc.shared.tool_rule import ToolRule
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
@@ -224,22 +221,22 @@ class GamePlayerDemo:
         sides = {}
         for i in range(nw[0], se[0] + 1):
             for j in range(nw[1], se[1] + 1):
-                position = (i, j, 0)
+                p = (i, j, 0)
                 cell = self.state_mgr.gameboard.get((i, j, 0))
                 if cell.terrain:
-                    terrain[position] = cell.terrain
+                    terrain[p] = cell.terrain
                 if cell.terrain_mod:
-                    terrain_mod[position] = cell.terrain_mod
+                    terrain_mod[p] = cell.terrain_mod
                 if cell.pickup:
-                    pickup[position] = cell.pickup
+                    pickup[p] = cell.pickup
                 if cell.mob:
-                    mob[position] = cell.mob
+                    mob[p] = cell.mob
                 if cell.get_sides():
                     sides_list = cell.get_sides()
-                    if not position in sides:
-                        sides[position] = []
+                    if not p in sides:
+                        sides[p] = []
                     for elem in sides_list:
-                        sides[position].append(elem)
+                        sides[p].append(elem)
 
         viewport = self.gfx.provide_viewport((terrain, terrain_mod,
                                               pickup, mob, sides),

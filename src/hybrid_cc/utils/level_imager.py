@@ -1,5 +1,4 @@
 """Class that creates level images"""
-import logging
 
 from PIL import Image
 

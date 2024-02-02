@@ -1,7 +1,6 @@
 import logging
 
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import CHANNEL, COLOR
 
 
@@ -22,20 +21,20 @@ class Robot(Mob):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_enter(self, mob, position, direction):
+    def test_enter(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def test_exit(self, mob, position, direction):
+    def test_exit(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_enter(self, mob, position, direction):
+    def start_enter(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def start_exit(self, mob, position, direction):
+    def start_exit(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         raise NotImplementedError("Implement or remove.")

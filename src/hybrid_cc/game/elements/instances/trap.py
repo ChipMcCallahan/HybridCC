@@ -25,10 +25,10 @@ class Trap(Elem):
         cls.positions.clear()
 
     @classmethod
-    def construct_at(cls, pos, **kwargs):
-        elem = super().construct_at(pos, **kwargs)
+    def construct_at(cls, p, **kwargs):
+        elem = super().construct_at(p, **kwargs)
         key = (elem.color, elem.channel, elem.rule)
-        cls.positions[key].append(pos)
+        cls.positions[key].append(p)
         return elem
 
     # --------------------------------------------------------------------------
@@ -73,21 +73,21 @@ class Trap(Elem):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
-    def test_exit(self, mob, position, direction):
+    def test_exit(self, mob, p, direction):
         key = (self.color, self.channel)
         signal = Button.signal[key]
         if (self.rule.value + signal % 2) % 2 == 1:
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
-    def finish_enter(self, mob, position, direction):
-        self.mobs[position] = mob
+    def finish_enter(self, mob, p, direction):
+        self.mobs[p] = mob
 
-    def finish_exit(self, mob, position, direction):
-        self.mobs[position] = None
+    def finish_exit(self, mob, p, direction):
+        self.mobs[p] = None
 
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def construct_mob_here(self, mob, position):
-        self.finish_enter(mob, position, mob.direction)
+    def construct_mob_here(self, mob, p):
+        self.finish_enter(mob, p, mob.direction)

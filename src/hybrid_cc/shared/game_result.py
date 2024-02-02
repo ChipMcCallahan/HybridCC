@@ -7,7 +7,7 @@ from hybrid_cc.shared.color import Color
 @dataclass(frozen=True)
 class WinResult:
     color: Color
-    position: Tuple[int, int, int]
+    p: Tuple[int, int, int]
     score: int
     tick: int
 
@@ -15,5 +15,5 @@ class WinResult:
 @dataclass(frozen=True)
 class LoseResult:
     cause: str
-    position: Tuple[int, int, int]
+    p: Tuple[int, int, int]
     tick: int

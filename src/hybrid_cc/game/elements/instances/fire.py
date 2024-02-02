@@ -25,16 +25,16 @@ class Fire(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     @staticmethod
-    def test_enter(mob, position, direction):
+    def test_enter(mob, p, direction):
         if mob.id == Id.MONSTER and mob.rule != MonsterRule.FIREBALL:
             return MoveResult.FAIL, None
         return MoveResult.PASS, None
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         if mob.id == Id.PLAYER and not mob.tools[Id.FIRE_BOOTS]:
-            return [DestroyRequest(target=mob, pos=position),
-                    LoseRequest(cause=self, pos=position)]
+            return [DestroyRequest(target=mob, p=p),
+                    LoseRequest(cause=self, p=p)]
         if mob.id == Id.ICE_BLOCK:
-            return [DestroyRequest(target=self, pos=position),
-                    DestroyRequest(target=mob, pos=position),
-                    CreateRequest(id=Id.WATER, pos=position)]
+            return [DestroyRequest(target=self, p=p),
+                    DestroyRequest(target=mob, p=p),
+                    CreateRequest(id=Id.WATER, p=p)]

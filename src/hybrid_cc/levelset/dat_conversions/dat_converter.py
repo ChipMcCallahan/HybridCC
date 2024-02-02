@@ -1,5 +1,3 @@
-import logging
-
 from cc_tools import DATHandler
 
 from hybrid_cc.levelset import Level, Levelset

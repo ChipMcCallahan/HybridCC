@@ -43,8 +43,8 @@ class Button(Elem):
         cls.deferred_signals.clear()
 
     @classmethod
-    def construct_at(cls, pos, **kwargs):
-        elem = super().construct_at(pos, **kwargs)
+    def construct_at(cls, p, **kwargs):
+        elem = super().construct_at(p, **kwargs)
         rule = kwargs[RULE]
         if rule == ButtonRule.HOLD_ALL:
             color, channel = kwargs[COLOR], kwargs[CHANNEL]
@@ -74,7 +74,7 @@ class Button(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_exit(self, mob, position, direction):
+    def finish_exit(self, mob, p, direction):
         key = (self.color, self.channel)
         if self.rule == ButtonRule.HOLD_ONE:
             self.hold_one_counts[key] -= 1
@@ -88,7 +88,7 @@ class Button(Elem):
                 self.activate(mob)
             self.hold_all_counts[key] += 1
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         key = (self.color, self.channel)
         if self.rule == ButtonRule.TOGGLE:
             self.activate(mob)
@@ -118,6 +118,6 @@ class Button(Elem):
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def construct_mob_here(self, mob, position):
+    def construct_mob_here(self, mob, p):
         if self.rule in (ButtonRule.HOLD_ONE, ButtonRule.HOLD_ALL):
-            self.finish_enter(mob, position, mob.direction)
+            self.finish_enter(mob, p, mob.direction)

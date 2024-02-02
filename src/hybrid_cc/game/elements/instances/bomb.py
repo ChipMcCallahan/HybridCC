@@ -1,6 +1,5 @@
 import logging
 
-from hybrid_cc.game.constants import DESTROY
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
@@ -25,11 +24,11 @@ class Bomb(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
 
-    def finish_enter(self, mob, position, direction):
+    def finish_enter(self, mob, p, direction):
         requests = [
-            DestroyRequest(target=self, pos=position),
-            DestroyRequest(target=mob, pos=position)
+            DestroyRequest(target=self, p=p),
+            DestroyRequest(target=mob, p=p)
         ]
         if mob.id == Id.PLAYER:
-            requests.append(LoseRequest(cause=self, pos=position))
+            requests.append(LoseRequest(cause=self, p=p))
         return requests
