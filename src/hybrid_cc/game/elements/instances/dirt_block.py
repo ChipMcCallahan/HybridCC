@@ -3,13 +3,13 @@ import logging
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared import Id, Direction
-from hybrid_cc.shared.kwargs import COLOR
+from hybrid_cc.shared.kwargs import COLOR, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING
 
 
 class DirtBlock(Mob):
-    kwarg_filter = (COLOR,)  # Retain these kwargs only.
+    kwarg_filter = (COLOR, DIRECTION)  # Retain these kwargs only.
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

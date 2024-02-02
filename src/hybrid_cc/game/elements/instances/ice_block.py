@@ -3,13 +3,14 @@ import logging
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared import Direction
+from hybrid_cc.shared.kwargs import DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import FAILED_MOVE, PUSHES, ENTERS_DIRT, MOVED, \
     PUSHABLE, SLIDING
 
 
 class IceBlock(Mob):
-    kwarg_filter = tuple()  # Retain these kwargs only.
+    kwarg_filter = (DIRECTION,)  # Retain these kwargs only.
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
