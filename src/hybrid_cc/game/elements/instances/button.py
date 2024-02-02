@@ -3,6 +3,7 @@ from collections import defaultdict
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared.button_rule import ButtonRule
+from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
 from hybrid_cc.shared.tag import SLIDING
 
@@ -80,6 +81,9 @@ class Button(Elem):
             if self.hold_one_counts[key] == 0:
                 self.activate(mob)
         elif self.rule == ButtonRule.HOLD_ALL:
+            # HOLD_ALL buttons can only be held by colored blocks or tanks!
+            if self.color not in (Color.GREY, mob.color):
+                return
             if self.hold_all_counts[key] == 0:
                 self.activate(mob)
             self.hold_all_counts[key] += 1
@@ -93,6 +97,9 @@ class Button(Elem):
                 self.activate(mob)
             self.hold_one_counts[key] += 1
         elif self.rule == ButtonRule.HOLD_ALL:
+            # HOLD_ALL buttons can only be held by colored blocks or tanks!
+            if self.color not in (Color.GREY, mob.color):
+                return
             self.hold_all_counts[key] -= 1
             if self.hold_all_counts[key] == 0:
                 self.activate(mob)
@@ -107,3 +114,10 @@ class Button(Elem):
             kwargs["direction"] = direction
         signal = self.DeferredSignal(self.color, self.channel, **kwargs)
         self.deferred_signals.add(signal)
+
+    # --------------------------------------------------------------------------
+    # OTHER
+    # --------------------------------------------------------------------------
+    def construct_mob_here(self, mob, position):
+        if self.rule in (ButtonRule.HOLD_ONE, ButtonRule.HOLD_ALL):
+            self.finish_enter(mob, position, mob.direction)

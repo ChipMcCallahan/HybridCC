@@ -21,7 +21,6 @@ class Water(Elem):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
@@ -41,8 +40,13 @@ class Water(Elem):
         if mob.id == Id.PLAYER:
             requests.append(LoseRequest(cause=self.id))
         elif mob.id == Id.DIRT_BLOCK:
-            requests.append(
-                CreateRequest(pos=position, eid=Id.DIRT, color=mob.color))
+            requests.extend([
+                DestroyRequest(target=self, pos=position),
+                CreateRequest(pos=position, eid=Id.DIRT, color=mob.color)
+            ])
         elif mob.id == Id.ICE_BLOCK:
-            requests.append(CreateRequest(pos=position, eid=Id.ICE))
+            requests.extend([
+                DestroyRequest(target=self, pos=position),
+                CreateRequest(pos=position, eid=Id.ICE)
+            ])
         return requests

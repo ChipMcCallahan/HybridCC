@@ -142,8 +142,7 @@ class PygameGfxProvider:
                         if isinstance(elem, TrickWall):
                             if position in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
-                        if isinstance(elem, ToggleWall) or isinstance(elem,
-                                                                      Trap):
+                        if isinstance(elem, (ToggleWall, Trap, Button)):
                             key = (elem.color, elem.channel)
                             kwargs["current_state"] = Button.signal[key] % 2
 

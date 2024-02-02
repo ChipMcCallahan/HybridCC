@@ -22,7 +22,6 @@ class Key(Elem):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
@@ -37,4 +36,6 @@ class Key(Elem):
                 mob.keys[self.color] = "+"
             else:
                 mob.keys[self.color] += self.count
+            return [DestroyRequest(target=self, pos=position)]
+        elif self.rule == KeyRule.FRAGILE:
             return [DestroyRequest(target=self, pos=position)]
