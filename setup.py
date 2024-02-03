@@ -10,12 +10,13 @@ setup(
         'hybrid_cc': [
             'art/*/*',  # 2 levels deep
             'sets/*/*',  # 2 levels deep
-            'replays/*'  # 1 level deep
+            'json/official_replays/*',  # 1 level deep
+            'sfx/*/*'  # 2 levels deep
         ]
     },
     package_dir={"": "src"},
     install_requires=[
-        'setuptools==67.6.0',
+        'setuptools==69.0.3',
         'cc_tools @ git+https://github.com/ChipMcCallahan/CCTools.git',
         'pygame==2.5.2'
     ],

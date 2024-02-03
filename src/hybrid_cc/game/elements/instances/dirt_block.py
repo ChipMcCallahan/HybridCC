@@ -38,8 +38,8 @@ class DirtBlock(Mob):
         return MoveResult.FAIL, []
 
     def start_enter(self, mob, p, d):
-        # if we already failed in this direction, don't retry
-        if self.tagged((FAILED_MOVE, d)):
+        # if we already failed in this direction, don't retry unless sliding
+        if self.tagged((FAILED_MOVE, d)) and not self.tagged(SLIDING):
             return MoveResult.FAIL, []
 
         # if we already moved, don't move again. exception if we are sliding

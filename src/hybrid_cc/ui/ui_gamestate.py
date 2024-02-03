@@ -8,16 +8,18 @@ class UIGamestate:
         PAUSE = 3
         WIN = 4
         LOSE = 5
+        REPLAY = 6
 
     def __init__(self):
-        start, play, pause, win, lose = tuple(UIGamestate.State)
+        start, play, pause, win, lose, replay = tuple(UIGamestate.State)
         self.state = start
         self.allowed_transitions = {
-            start: [play],
+            start: [play, replay],
             play: [start, pause, win, lose],
+            replay: [start, pause, win, lose, play],
             pause: [play, start],
-            win: [start],
-            lose: [start]
+            win: [start, replay],
+            lose: [start, replay]
         }
 
     def can_transition_to(self, new_state):
@@ -49,6 +51,10 @@ class UIGamestate:
     def is_lose(self):
         return self.state == UIGamestate.State.LOSE
 
+    @property
+    def is_replay(self):
+        return self.state == UIGamestate.State.REPLAY
+
     def start(self):
         return self.transition_to(UIGamestate.State.START)
 
@@ -57,6 +63,9 @@ class UIGamestate:
 
     def play(self):
         return self.transition_to(UIGamestate.State.PLAY)
+
+    def replay(self):
+        return self.transition_to(UIGamestate.State.REPLAY)
 
     def win(self):
         return self.transition_to(UIGamestate.State.WIN)

@@ -18,7 +18,6 @@ class ReplayInput(Enum):
     W = 11
     WN = 12
 
-    @property
     def dirs(self):
         dirs = [None, None]
         if self != ReplayInput.NONE:
@@ -31,5 +30,9 @@ class ReplayInput(Enum):
             return ReplayInput.NONE
         s = ""
         for d in inputs:
-            s = d.name + s if d else s
+            s = s + d.name if d else s
         return ReplayInput[s]
+
+    @classmethod
+    def from_name(cls, name):
+        return cls[name] if name in cls.__members__ else None

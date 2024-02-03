@@ -83,11 +83,14 @@ class ElemHandler:
 
         # Instance level plans (mobs)
         for mob_id, mob in Mob.instances.items():
-            if mob.tagged(OVERRIDDEN):
-                continue
             method = getattr(mob, "do_planning", None)
             if method:
                 new_moves, new_requests = method(tick, inputs=inputs)
+
+                # Don't do anything with the requests if overridden.
+                if mob.tagged(OVERRIDDEN):
+                    continue
+
                 if new_moves:
                     if mob.id == Id.PLAYER:  # Player always moves first
                         moves = new_moves + moves

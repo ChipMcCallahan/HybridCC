@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from cc_tools import DATHandler
 
 from hybrid_cc.levelset import Level, Levelset
@@ -13,7 +15,7 @@ class DATConverter:
     @staticmethod
     def convert_levelset(dat_file_name):
         cc1_levels = DATHandler.read(dat_file_name).levels
-        new_levelset = Levelset(dat_file_name)
+        new_levelset = Levelset(Path(dat_file_name).stem)
 
         current_group = []
 
