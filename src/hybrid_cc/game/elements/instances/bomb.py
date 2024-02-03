@@ -26,8 +26,8 @@ class Bomb(Elem):
 
     def finish_enter(self, mob, p, d):
         requests = [
-            DestroyRequest(target=self, p=p),
-            DestroyRequest(target=mob, p=p)
+            DestroyRequest(src=mob, tgt=self, p=p),
+            DestroyRequest(src=self, tgt=mob, p=p)
         ]
         if mob.id == Id.PLAYER:
             requests.append(LoseRequest(cause=self, p=p))

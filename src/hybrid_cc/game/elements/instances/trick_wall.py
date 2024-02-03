@@ -50,12 +50,12 @@ class TrickWall(Elem):
         if (self.rule == TrickWallRule.BECOMES_WALL or
               self.rule == TrickWallRule.INVISIBLE_BECOMES_WALL):
             return MoveResult.FAIL, [
-                DestroyRequest(target=self, p=p),
+                DestroyRequest(src=mob, tgt=self, p=p),
                 CreateRequest(id=Id.WALL, p=p, color=self.color)
             ]
         elif self.rule == TrickWallRule.BECOMES_FLOOR:
             return MoveResult.PASS, [
-                DestroyRequest(target=self, p=p),
+                DestroyRequest(src=mob, tgt=self, p=p),
                 CreateRequest(id=Id.FLOOR, p=p, color=self.color)
             ]
         elif self.rule == TrickWallRule.PERMANENTLY_INVISIBLE:

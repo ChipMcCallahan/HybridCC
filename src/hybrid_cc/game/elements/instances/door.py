@@ -38,5 +38,5 @@ class Door(Elem):
                 if mob.keys[self.color] <= 0:
                     mob.keys.pop(self.color)
             return [
-                DestroyRequest(target=self, p=p)
+                DestroyRequest(src=mob, tgt=self, p=p)
             ]

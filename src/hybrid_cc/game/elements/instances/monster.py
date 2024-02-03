@@ -87,8 +87,8 @@ class Monster(Mob):
     def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             return [
-                DestroyRequest(target=mob, p=p),
-                DestroyRequest(target=self, p=p),
+                DestroyRequest(src=self, tgt=mob, p=p),
+                DestroyRequest(src=mob, tgt=self, p=p),
                 LoseRequest(cause=self, p=p)
             ]
 

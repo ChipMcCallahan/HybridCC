@@ -36,5 +36,5 @@ class Chip(Elem):
             self.chips_collected[self.color] = current + self.count
 
             return [
-                DestroyRequest(target=self, p=p),
+                DestroyRequest(src=mob, tgt=self, p=p),
             ]

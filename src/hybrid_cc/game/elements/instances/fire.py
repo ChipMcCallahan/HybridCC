@@ -32,9 +32,9 @@ class Fire(Elem):
 
     def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER and not mob.tools[Id.FIRE_BOOTS]:
-            return [DestroyRequest(target=mob, p=p),
+            return [DestroyRequest(src=self, tgt=mob, p=p),
                     LoseRequest(cause=self, p=p)]
         if mob.id == Id.ICE_BLOCK:
-            return [DestroyRequest(target=self, p=p),
-                    DestroyRequest(target=mob, p=p),
+            return [DestroyRequest(src=mob, tgt=self, p=p),
+                    DestroyRequest(src=self, tgt=mob, p=p),
                     CreateRequest(id=Id.WATER, p=p)]

@@ -41,6 +41,6 @@ class PopUpWall(Elem):
             create_request = CreateRequest(id=Id.WALL,
                                            p=p, color=self.color)
         return [
-            DestroyRequest(target=self, p=p),
+            DestroyRequest(src=mob, tgt=self, p=p),
             create_request
         ]

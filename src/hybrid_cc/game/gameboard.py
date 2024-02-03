@@ -114,7 +114,7 @@ class Gameboard:
         move_requests = []
         for request in requests:
             if isinstance(request, DestroyRequest):
-                target, p = request.target, request.p
+                target, p = request.tgt, request.p
                 self.map.destruct_at(p, target)
             elif isinstance(request, CreateRequest):
                 p, id, kwargs = request.p, request.id, request.kwargs

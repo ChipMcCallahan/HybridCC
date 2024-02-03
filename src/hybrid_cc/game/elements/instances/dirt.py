@@ -34,6 +34,6 @@ class Dirt(Elem):
 
     def finish_enter(self, mob, p, d):
         return [
-            DestroyRequest(target=self, p=p),
+            DestroyRequest(src=mob, tgt=self, p=p),
             CreateRequest(p=p, id=Id.FLOOR, color=self.color)
         ]

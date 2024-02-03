@@ -76,7 +76,7 @@ class Player(Mob):
 
     def finish_enter(self, mob, p, d):
         return [
-            DestroyRequest(target=self, p=p),
+            DestroyRequest(src=mob, tgt=self, p=p),
             LoseRequest(cause=mob, p=p)
         ]
 

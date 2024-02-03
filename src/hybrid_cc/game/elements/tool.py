@@ -24,7 +24,7 @@ class Tool(Elem):
     def finish_enter(self, mob, p, d):
         if self.rule == ToolRule.DEFAULT and mob.tagged(COLLECTS_ITEMS):
             mob.tools[self.id] += 1
-            requests = [DestroyRequest(target=self, p=p)]
+            requests = [DestroyRequest(src=mob, tgt=self, p=p)]
             if self.count > 1:
                 kwargs = {COUNT: self.count - 1, RULE: ToolRule.DEFAULT}
                 requests.append(

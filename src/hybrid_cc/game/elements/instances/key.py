@@ -36,6 +36,6 @@ class Key(Elem):
                 mob.keys[self.color] = "+"
             else:
                 mob.keys[self.color] += self.count
-            return [DestroyRequest(target=self, p=p)]
+            return [DestroyRequest(src=mob, tgt=self, p=p)]
         elif self.rule == KeyRule.FRAGILE:
-            return [DestroyRequest(target=self, p=p)]
+            return [DestroyRequest(src=mob, tgt=self, p=p)]

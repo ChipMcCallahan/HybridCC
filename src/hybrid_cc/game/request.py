@@ -8,7 +8,8 @@ from hybrid_cc.shared.color import Color
 
 @dataclass
 class DestroyRequest:
-    target: Elem
+    src: Optional[Elem]
+    tgt: Elem
     p: Tuple[int, int, int]
 
 
