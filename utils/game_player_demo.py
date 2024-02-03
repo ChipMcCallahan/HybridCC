@@ -109,7 +109,8 @@ class GamePlayerDemo:
         # surface
         surface.blit(text_surface, (x, y))
 
-    def render_centered_subsurface(self, surface, subsurface, y):
+    @staticmethod
+    def render_centered_subsurface(surface, subsurface, y):
         w, h = surface.get_size()
         sw, sh = subsurface.get_size()
         surface.blit(subsurface, ((w - sw) / 2, y))
@@ -127,9 +128,18 @@ class GamePlayerDemo:
             self.render_view_extras()
             self.render_viewport()
         elif self.state_mgr.is_win:
-            self.render_viewport("You Win!")
+            result = self.state_mgr.gameboard.result
+            self.render_viewport("Excellent!")
         elif self.state_mgr.is_lose:
-            self.render_viewport("You Lose!")
+            result = self.state_mgr.gameboard.result
+            cause, p, tick = result.cause, result.p, result.tick
+            msg = (
+                f"Level: {self.state_mgr.level.title}\n"
+                f"Cause of Death: {cause}.\n"
+                f"Position: {p}.\n"
+                f"Time Elapsed: {tick / 10} Seconds.")
+            self.render_viewport("Bummer!")
+            self.render_centered_text_top(msg)
 
     @staticmethod
     def blit_centered_rect(surface, rect_size, opacity=128,
@@ -150,7 +160,15 @@ class GamePlayerDemo:
         # calculated position
         surface.blit(rect_surface, (x, y))
 
+    def render_centered_text_top(self, text):
+        surface = pygame.Surface((288, 120))
+        self.render_centered_wrapped_text(surface, text, self.font,
+                                          (255, 255, 255))
+        self.render_centered_subsurface(self.screen, surface, 18)
+
     def render_view_extras(self):
+        self.render_centered_text_top(self.state_mgr.level.title)
+
         self.render_text(f"Time Remaining: "
                          f"{self.state_mgr.gameboard.time_remaining()}", 10,
                          10)
@@ -183,29 +201,37 @@ class GamePlayerDemo:
     @staticmethod
     def render_centered_wrapped_text(surface, text, font, color):
         def wrap_text(_text, _font, max_width):
-            if not _text:
-                return ""
-            words = _text.split()
-            _lines = []
-            while words:
+            paragraphs = _text.split('\n')  # Split by newline characters
+            wrapped_lines = []
+
+            for paragraph in paragraphs:
+                if not paragraph:
+                    wrapped_lines.append("")  # Ensure blank lines are respected
+                    continue
+                words = paragraph.split()
                 line_words = []
-                while words and _font.size(' '.join(line_words + [words[0]]))[
-                    0] <= max_width:
-                    line_words.append(words.pop(0))
-                line = ' '.join(line_words)
-                _lines.append(line)
-            return _lines
+                while words:
+                    while words and \
+                            _font.size(' '.join(line_words + [words[0]]))[
+                                0] <= max_width:
+                        line_words.append(words.pop(0))
+                    line = ' '.join(line_words)
+                    wrapped_lines.append(line)
+                    line_words = []  # Reset for the next line
+            return wrapped_lines
 
         lines = wrap_text(text, font, surface.get_width())
         total_height = sum(font.size(line)[1] for line in lines)
         y = (surface.get_height() - total_height) // 2
 
         for line in lines:
-            line_surface = font.render(line, True, color)
-            line_width, line_height = line_surface.get_size()
-            x = (surface.get_width() - line_width) // 2
-            surface.blit(line_surface, (x, y))
-            y += line_height
+            if line:  # Skip rendering for empty lines (purely newlines)
+                line_surface = font.render(line, True, color)
+                line_width, line_height = line_surface.get_size()
+                x = (surface.get_width() - line_width) // 2
+                surface.blit(line_surface, (x, y))
+                y += line_height  # Move to the next line position, even for
+                # empty lines
 
     def render_viewport(self, centered_text=None):
         # viewport_size = 11  # will clip this to 9x9
