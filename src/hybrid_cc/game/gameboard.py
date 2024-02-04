@@ -106,6 +106,8 @@ class Gameboard:
 
         self.tick += 1
         self.replay.update(self.tick, inputs)
+        if self.result:
+            self.replay.finalize(self.result)
         if self.time > 0 and self.time_remaining() == 0:
             self.lose(cause="CLOCK", p=Player.instance.p)
         self.camera.update()
@@ -144,12 +146,10 @@ class Gameboard:
         self.result = WinResult(color=color, p=p,
                                 score=10 * self.time_remaining(),
                                 tick=self.tick)
-        self.replay.finalize(self.result)
         self.transition(self.State.WIN)
 
     def lose(self, cause, p):
         self.result = LoseResult(cause=cause, p=p, tick=self.tick)
-        self.replay.finalize(self.result)
         self.transition(self.State.LOSE)
 
     def time_remaining(self):

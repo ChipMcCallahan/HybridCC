@@ -24,8 +24,8 @@ class Cell:
             if elem.id != Id.PLACEHOLDER:
                 logging.error(
                     f"{already_here.id.name} already exists at layer "
-                    f"{layer_name}. Ignoring create request for "
-                    f"{elem.id.name}.")
+                    f"{layer_name} and position {self.p}. Ignoring create "
+                    f"request for {elem.id.name}.")
             return
         set_layer = getattr(self, f"set_{layer_name}")
         set_layer(elem)
