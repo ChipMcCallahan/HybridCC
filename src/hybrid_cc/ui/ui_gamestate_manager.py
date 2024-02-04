@@ -5,6 +5,7 @@ import pygame
 
 from hybrid_cc.game.elements.instances.force import Force
 from hybrid_cc.game.elements.instances.ice import Ice
+from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.teleport import Teleport
 from hybrid_cc.game.elements.tool import Tool
 from hybrid_cc.game.gameboard import Gameboard
@@ -77,7 +78,7 @@ class UIGamestateManager:
                         self.state.replay()
 
                 if event.key == pygame.K_F9:
-                    self.state.lose()
+                    self.gameboard.lose(cause="QUIT", p=Player.instance.p)
 
                 if event.key in (pygame.K_RETURN, pygame.K_SPACE):
                     if self.state.is_play or self.state.is_replay:
