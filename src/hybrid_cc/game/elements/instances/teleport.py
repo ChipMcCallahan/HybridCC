@@ -2,7 +2,8 @@ import logging
 from collections import defaultdict
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.game.request import MoveRequest, UIInteractionRequest
+from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL
 
 
@@ -39,11 +40,15 @@ class Teleport(Elem):
     def do_class_planning(cls, **kwargs):
         to_remove = []
         moves = []
+        requests = []
         for mob_id, entry in cls.mobs.items():
             mob, color, channel, p = entry
             if not mob.exists():
                 to_remove.append(mob_id)
                 continue
+            if mob.id == Id.PLAYER:
+                requests = [UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
+                                                 type="use")]
             positions = cls.positions[(color, channel)]
             index = positions.index(p)
             start = (index + 1) % len(positions)
@@ -53,7 +58,7 @@ class Teleport(Elem):
                           for choice in choices])
         for mob_id in to_remove:
             cls.mobs.pop(mob_id, None)
-        return moves, []
+        return moves, requests
 
     # --------------------------------------------------------------------------
     # ACCESS RULES

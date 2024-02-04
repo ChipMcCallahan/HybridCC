@@ -42,7 +42,7 @@ class Mob(Elem):
         self.tags[tag] = value
 
     def untag(self, tag):
-        self.tags.pop(tag, None)
+        return self.tags.pop(tag, None)
 
     def tagged(self, tag):
         return self.tags.get(tag, False)

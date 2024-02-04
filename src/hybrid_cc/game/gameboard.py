@@ -17,6 +17,7 @@ from hybrid_cc.replays.replay import Replay
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.game_result import WinResult, LoseResult
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.ui.ui_hints import UIHints
 
 
 class Gameboard:
@@ -113,6 +114,7 @@ class Gameboard:
     def do_requests(self, requests):
         move_requests = []
         for request in requests:
+            UIHints.add(request)
             if isinstance(request, DestroyRequest):
                 target, p = request.tgt, request.p
                 self.map.destruct_at(p, target)

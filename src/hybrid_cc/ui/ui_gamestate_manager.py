@@ -3,11 +3,20 @@ from pathlib import Path
 
 import pygame
 
+from hybrid_cc.game.elements.instances.force import Force
+from hybrid_cc.game.elements.instances.ice import Ice
+from hybrid_cc.game.elements.instances.teleport import Teleport
+from hybrid_cc.game.elements.tool import Tool
 from hybrid_cc.game.gameboard import Gameboard
+from hybrid_cc.game.request import DestroyRequest, CreateRequest, LoseRequest, \
+    WinRequest, UIInteractionRequest
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
+from hybrid_cc.shared import Id
 from hybrid_cc.ui import InputCollector
+from hybrid_cc.ui.sfx_player import SfxPlayer
 from hybrid_cc.ui.ui_gamestate import UIGamestate
+from hybrid_cc.ui.ui_hints import UIHints
 
 
 class UIGamestateManager:
@@ -25,6 +34,7 @@ class UIGamestateManager:
         self.saved_replay = ""
         self.package_dir = importlib.resources.files(
             "hybrid_cc.json.official_replays")
+        self.sfx_player = SfxPlayer()
         self.reset()
 
     def do_events(self):
@@ -109,6 +119,69 @@ class UIGamestateManager:
                 elif self.gameboard.state == Gameboard.State.LOSE:
                     self.state.lose()
             self.logic_tick += 1  # Increment frame counter
+
+            sounds = set()
+            for ui_hint in UIHints.pending:
+                if isinstance(ui_hint, DestroyRequest):
+                    src, tgt, p = ui_hint.src, ui_hint.tgt, ui_hint.p
+                    if tgt.id == Id.BOMB:
+                        sounds.add("bomb")
+                    elif tgt.id == Id.CHIP:
+                        sounds.add("MSCLICK3")
+                    elif tgt.id == Id.KEY or isinstance(tgt, Tool):
+                        if src.id == Id.PLAYER:
+                            sounds.add("MSBLIP2")
+                        else:
+                            sounds.add("whisk")
+                    elif Id.WATER in (src.id, tgt.id):
+                        sounds.add("splash")
+                    elif tgt.id == Id.DOOR:
+                        sounds.add("MSDOOR")
+                    elif tgt.id == Id.DIRT:
+                        sounds.add("whisk")
+                    elif tgt.id == Id.SOCKET:
+                        sounds.add("door")
+                    elif tgt.id in (
+                            Id.POP_UP_WALL, Id.STEPPING_STONE, Id.TRICK_WALL):
+                        sounds.add("bump")
+                elif isinstance(ui_hint, CreateRequest):
+                    p, id = ui_hint.p, ui_hint.id
+                    if id == Id.WALL:
+                        sounds.add("popup")
+                elif isinstance(ui_hint, LoseRequest):
+                    sounds.add("MSBUMMER")
+                elif isinstance(ui_hint, WinRequest):
+                    sounds.add("tada")
+                elif isinstance(ui_hint, UIInteractionRequest):
+                    src, tgt, p, type = (
+                        ui_hint.src, ui_hint.tgt, ui_hint.p, ui_hint.type)
+                    if tgt.id == Id.FIRE:
+                        sounds.add("crackle")
+                    elif tgt.id == Id.WATER:
+                        sounds.add("plip")
+                    elif tgt is Ice or tgt.id == Id.ICE:
+                        if type == "slide":
+                            sounds.add("skate")
+                        else:
+                            sounds.add("snick")
+                    elif tgt is Force or tgt.id == Id.FORCE:
+                        if type == "slide":
+                            sounds.add("force")
+                        else:
+                            sounds.add("snick")
+                    elif tgt.id == Id.BUTTON:
+                        sounds.add("MSPOP2")
+                    elif tgt is Teleport or tgt.id == Id.TELEPORT:
+                        sounds.add("MSTELEPORT")
+                    elif tgt.id == Id.DIRT_BLOCK:
+                        sounds.add("block")
+                    elif tgt.id == Id.ICE_BLOCK:
+                        sounds.add("skate")
+                    elif tgt.id == Id.THIEF:
+                        sounds.add("MSSTRIKE")
+            for sound in sounds:
+                self.sfx_player.play(sound)
+            UIHints.pending.clear()
         elif self.state.is_win or self.state.is_lose:
             self.logic_tick += 1  # Keep the animation going
         return True

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, Type, Union
 
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Direction
@@ -58,3 +58,11 @@ class ShowHintRequest:
 @dataclass
 class HideHintRequest:
     pass
+
+
+@dataclass
+class UIInteractionRequest:
+    src: Elem
+    tgt: Union[Elem, Type[Elem]]
+    p: Tuple[int, int, int]
+    type: str

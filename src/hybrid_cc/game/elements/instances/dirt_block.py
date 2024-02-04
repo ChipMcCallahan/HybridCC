@@ -1,11 +1,13 @@
 import logging
 
+from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.mob import Mob
-from hybrid_cc.game.request import MoveRequest
-from hybrid_cc.shared import Direction
+from hybrid_cc.game.request import MoveRequest, UIInteractionRequest
+from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.kwargs import COLOR, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING
+from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING, \
+    PUSHED
 
 
 class DirtBlock(Mob):
@@ -48,6 +50,7 @@ class DirtBlock(Mob):
             if not (self.tagged(SLIDING) and self.d in (
                     d.right(), d.left())):
                 return MoveResult.FAIL, []
+        self.tag(PUSHED)
         return MoveResult.RETRY, [
             MoveRequest(mob_id=self.mob_id, d=d),
         ]
@@ -58,6 +61,10 @@ class DirtBlock(Mob):
     def on_completed_move(self, old_p, new_p, tick, **kwargs):
         super().on_completed_move(old_p, new_p, tick, **kwargs)
         self.tag(MOVED)
+        pusher = self.untag(PUSHED)
+        if pusher:
+            return [UIInteractionRequest(src=pusher, tgt=self, p=new_p,
+                                         type="push")]
 
     def on_failed_move(self, move_result, d):
         super().on_failed_move(move_result, d)

@@ -1,7 +1,8 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.request import DestroyRequest, LoseRequest, CreateRequest
+from hybrid_cc.game.request import DestroyRequest, LoseRequest, CreateRequest, \
+    UIInteractionRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.tag import SWIMMING
@@ -34,7 +35,7 @@ class Water(Elem):
             return
         if mob.tools[Id.FLIPPERS]:
             mob.tag(SWIMMING)
-            return
+            return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
 
         requests = [DestroyRequest(src=self, tgt=mob, p=p)]
         if mob.id == Id.PLAYER:

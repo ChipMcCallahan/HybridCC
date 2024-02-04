@@ -1,7 +1,8 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.request import DestroyRequest, LoseRequest, CreateRequest
+from hybrid_cc.game.request import DestroyRequest, LoseRequest, CreateRequest, \
+    UIInteractionRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.move_result import MoveResult
@@ -31,7 +32,10 @@ class Fire(Elem):
         return MoveResult.PASS, None
 
     def finish_enter(self, mob, p, d):
-        if mob.id == Id.PLAYER and not mob.tools[Id.FIRE_BOOTS]:
+        if mob.id == Id.PLAYER:
+            if mob.tools[Id.FIRE_BOOTS]:
+                return [
+                    UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
             return [DestroyRequest(src=self, tgt=mob, p=p),
                     LoseRequest(cause=self, p=p)]
         if mob.id == Id.ICE_BLOCK:

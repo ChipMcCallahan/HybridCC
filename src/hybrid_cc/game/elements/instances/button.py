@@ -2,6 +2,7 @@ import logging
 from collections import defaultdict
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import UIInteractionRequest
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL, DIRECTION
@@ -76,25 +77,28 @@ class Button(Elem):
 
     def finish_exit(self, mob, p, d):
         key = (self.color, self.channel)
+        requests = []
         if self.rule == ButtonRule.HOLD_ONE:
             self.hold_one_counts[key] -= 1
             if self.hold_one_counts[key] == 0:
-                self.activate(mob)
+                requests.extend(self.activate(mob, p))
         elif self.rule == ButtonRule.HOLD_ALL:
             # HOLD_ALL buttons can only be held by colored blocks or tanks!
             if self.color not in (Color.GREY, mob.color):
                 return
             if self.hold_all_counts[key] == 0:
-                self.activate(mob)
+                requests.extend(self.activate(mob, p))
             self.hold_all_counts[key] += 1
+        return requests
 
     def finish_enter(self, mob, p, d):
         key = (self.color, self.channel)
+        requests = []
         if self.rule == ButtonRule.TOGGLE:
-            self.activate(mob)
+            requests.extend(self.activate(mob, p))
         elif self.rule == ButtonRule.HOLD_ONE:
             if self.hold_one_counts[key] == 0:
-                self.activate(mob)
+                requests.extend(self.activate(mob, p))
             self.hold_one_counts[key] += 1
         elif self.rule == ButtonRule.HOLD_ALL:
             # HOLD_ALL buttons can only be held by colored blocks or tanks!
@@ -102,11 +106,12 @@ class Button(Elem):
                 return
             self.hold_all_counts[key] -= 1
             if self.hold_all_counts[key] == 0:
-                self.activate(mob)
+                requests.extend(self.activate(mob, p))
         elif self.rule == ButtonRule.DPAD:
-            self.activate(mob, d)
+            requests.extend(self.activate(mob, d))
+        return requests
 
-    def activate(self, mob, d=None):
+    def activate(self, mob, p, d=None):
         kwargs = {
             "defer": 0 if mob.tagged(SLIDING) else 1
         }
@@ -114,6 +119,7 @@ class Button(Elem):
             kwargs[DIRECTION] = d
         signal = self.DeferredSignal(self.color, self.channel, **kwargs)
         self.deferred_signals.add(signal)
+        return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
 
     # --------------------------------------------------------------------------
     # OTHER

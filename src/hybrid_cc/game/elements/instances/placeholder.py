@@ -25,8 +25,8 @@ class Placeholder(Elem):
 
     @classmethod
     def do_class_planning(cls, **kwargs):
-        requests = [DestroyRequest(src=None, tgt=cls.instance, p=p) for p in
-                    cls.positions]
+        requests = [DestroyRequest(src=cls.instance, tgt=cls.instance, p=p) for
+                    p in cls.positions]
         cls.positions.clear()
         return [], requests
 

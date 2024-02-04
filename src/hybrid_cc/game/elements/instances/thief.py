@@ -1,6 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.request import UIInteractionRequest
 from hybrid_cc.shared.kwargs import RULE
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import ENTERS_DIRT
@@ -32,7 +33,9 @@ class Thief(Elem):
         return MoveResult.FAIL, []
 
     def finish_enter(self, mob, p, d):
-        if self.rule == ThiefRule.KEYS:
+        if self.rule == ThiefRule.KEYS and mob.keys:
             mob.keys.clear()
-        elif self.rule == ThiefRule.TOOLS:
+            return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
+        elif self.rule == ThiefRule.TOOLS and mob.tools:
             mob.tools.clear()
+            return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]

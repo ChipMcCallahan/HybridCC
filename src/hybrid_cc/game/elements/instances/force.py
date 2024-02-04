@@ -1,7 +1,7 @@
 import logging
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.game.request import MoveRequest, UIInteractionRequest
 from hybrid_cc.game.rng import RNG
 from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.force_rule import ForceRule
@@ -27,6 +27,7 @@ class Force(Elem):
     @classmethod
     def do_class_planning(cls, **kwargs):
         to_remove = []
+        moves = []
         requests = []
         for mob_id, entry in cls.hovering.items():
             mob, d = entry
@@ -40,11 +41,14 @@ class Force(Elem):
                 dirs = []
                 while len(pool) > 0:
                     dirs.append(pool.pop(RNG.next() % len(pool)))
-            moves = MoveRequest.from_dirs(mob_id, dirs)
-            requests.extend(moves)
+            if mob.id == Id.PLAYER:
+                requests = [UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
+                                                 type="slide")]
+            new_moves = MoveRequest.from_dirs(mob_id, dirs)
+            moves.extend(new_moves)
         for mob_id in to_remove:
             cls.instances.pop(mob_id, None)
-        return requests, []
+        return moves, requests
 
     # --------------------------------------------------------------------------
     # ACCESS RULES
@@ -52,7 +56,7 @@ class Force(Elem):
 
     def finish_exit(self, mob, p, d):
         if (mob.id == Id.PLAYER and not
-                mob.tools[Id.SUCTION_BOOTS]):
+        mob.tools[Id.SUCTION_BOOTS]):
             if self.rule == ForceRule.RANDOM or self.d == d:
                 mob.tag(FORCED)
                 mob.tag(SPEED_BOOST)
@@ -62,7 +66,7 @@ class Force(Elem):
 
     def finish_enter(self, mob, p, d):
         if mob.tools[Id.SUCTION_BOOTS]:
-            return
+            return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
         if mob.id != Id.PLAYER:
             mob.tag(OVERRIDDEN)
         mob.tag(SLIDING, self.id)

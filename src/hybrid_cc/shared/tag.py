@@ -1,5 +1,6 @@
 # Temporary tags
 PUSHING = "pushing"
+PUSHED = "pushed"
 SWIMMING = "swimming"
 FAILED_MOVE = "failed_move"
 MOVED = "moved"
