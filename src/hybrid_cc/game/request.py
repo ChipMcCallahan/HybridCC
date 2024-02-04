@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Tuple, Optional, List, Type, Union
 
 from hybrid_cc.game.elements.elem import Elem
-from hybrid_cc.shared import Direction
+from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
 
 
@@ -32,6 +32,7 @@ class MoveRequest:
     d: Direction
     slap: Optional[Direction] = None
     simulated_p: Optional[Tuple[int, int, int]] = None
+    prioritize: Optional[bool] = False
 
     @staticmethod
     def from_dirs(mob_id, dirs) -> List['MoveRequest']:

@@ -66,7 +66,7 @@ class Cloner(Elem):
                 # noinspection PyUnresolvedReferences
                 requests.append(
                     MoveRequest(mob_id=mob.mob_id,
-                                d=mob.d))
+                                d=mob.d, prioritize=True))
         for p in to_remove:
             cls.mobs.pop(p, None)
         return requests, []
