@@ -42,8 +42,8 @@ class Force(Elem):
                 while len(pool) > 0:
                     dirs.append(pool.pop(RNG.next() % len(pool)))
             if mob.id == Id.PLAYER:
-                requests = [UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
-                                                 type="slide")]
+                requests.append([UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
+                                                      type="slide")])
             new_moves = MoveRequest.from_dirs(mob_id, dirs)
             moves.extend(new_moves)
         for mob_id in to_remove:

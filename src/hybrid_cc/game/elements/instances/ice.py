@@ -31,12 +31,12 @@ class Ice(Elem):
                 to_remove.append(mob_id)
             else:
                 if mob.id == Id.PLAYER:
-                    requests = [UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
-                                                     type="slide")]
-                moves = MoveRequest.from_dirs(mob_id,
-                                              (mob.d,
-                                               mob.d.reverse()))
-                moves.extend(moves)
+                    requests.append(
+                        UIInteractionRequest(src=mob, tgt=cls, p=mob.p,
+                                             type="slide"))
+                new_moves = MoveRequest.from_dirs(mob_id,
+                                                  (mob.d, mob.d.reverse()))
+                moves.extend(new_moves)
         for mob_id in to_remove:
             cls.instances.pop(mob_id, None)
         return moves, requests
