@@ -1,4 +1,5 @@
 import json
+import re
 from dataclasses import asdict
 from datetime import datetime
 from enum import Enum
@@ -63,7 +64,8 @@ class Replay:
             result = "WIN"
         elif isinstance(self.result, LoseResult):
             result = "LOSE"
-        filename = name or f"{timestamp_str}-[{level_title}]-[{result}].json"
+        filename = name or f"{timestamp_str}-[{level_title}]-[{result}]"
+        filename = self.sanitize_filename(filename) + ".json"
         with open(directory / filename, 'w') as f:
             f.write(json_str)
         return directory / filename
@@ -85,3 +87,12 @@ class Replay:
             return asdict(obj)
         raise TypeError(
             f"Object of type {type(obj).__name__} is not JSON serializable")
+
+    @staticmethod
+    def sanitize_filename(filename):
+        invalid_chars = '<>:"/\\|?*'
+        for char in invalid_chars:
+            filename = filename.replace(char, "")
+        filename = filename.strip().rstrip(".")
+        filename = re.sub(r'[^\w\s-]', '', filename)
+        return filename

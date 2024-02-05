@@ -33,8 +33,10 @@ class UIGamestateManager:
         self.level_set = None
         self.level = None
         self.saved_replay = ""
-        self.package_dir = importlib.resources.files(
-            "hybrid_cc.json.official_replays")
+        self.package_json = importlib.resources.files(
+            "hybrid_cc.solutions.json")
+        self.package_tws = importlib.resources.files(
+            "hybrid_cc.solutions.tws")
         self.sfx_player = SfxPlayer()
         self.reset()
 
@@ -67,12 +69,22 @@ class UIGamestateManager:
                         setname = self.level_set.name
                         title = self.gameboard.title
                         lvlnum = self.level_index + 1
-                        fname = f"{setname}-{lvlnum}-{title}.json"
+                        fname = f"{setname}-{lvlnum}-{title}"
 
                         self.saved_replay = self.gameboard.replay.save_to_file(
                             directory, self.level.title, fname)
                 if event.key == pygame.K_l and self.state.is_start:
                     self.get_replay()
+                    if self.replay:
+                        self.reset(self.replay.seed)
+                        self.state.replay()
+                if event.key == pygame.K_q and self.state.is_start:
+                    self.get_replay("ms_tws")
+                    if self.replay:
+                        self.reset(self.replay.seed)
+                        self.state.replay()
+                if event.key == pygame.K_w and self.state.is_start:
+                    self.get_replay("lynx_tws")
                     if self.replay:
                         self.reset(self.replay.seed)
                         self.state.replay()
@@ -255,10 +267,17 @@ class UIGamestateManager:
         save_dir.mkdir(exist_ok=True)  # Create if not there
         return save_dir
 
-    def get_replay(self):
-        resources = self.package_dir.iterdir()
+    def get_replay(self, mode="test"):
         setname = str(self.level_set.name).split(".")[0]
-        title = f"{setname}-{self.level_index + 1}-{self.level.title}.json"
+        title = f"{setname}-{self.level_index + 1}-{self.level.title}"
+        if mode == "test":
+            resources = self.package_json.iterdir()
+        else:
+            resources = self.package_tws.iterdir()
+            title += "-MS" if mode == "ms_tws" else "-LYNX"
+
+        title = Replay.sanitize_filename(title) + ".json"
+        print(title)
         for resource in resources:
             if str(resource.name) == title:
                 self.replay = Replay.load_from_file(resource)

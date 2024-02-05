@@ -2,12 +2,11 @@ import importlib.resources
 import unittest
 
 from hybrid_cc.game.gameboard import Gameboard
-from hybrid_cc.game.rng import RNG
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
 
 
-class TestGameboard(unittest.TestCase):
+class TestCCLPReplays(unittest.TestCase):
     def test_cclp1(self):
         package = 'hybrid_cc.sets.dat'
         package_dir = importlib.resources.files(package)
@@ -20,7 +19,7 @@ class TestGameboard(unittest.TestCase):
                 print(f"Replaying level {i + 1} ({level.title}).")
             else:
                 print(
-                    f"Skipping level {i + 1} ({level.title}) due to no replay.")
+                    f"--> Skipping level {i + 1} ({level.title}) due to no replay.")
                 continue
             gameboard = Gameboard(level, replay.seed)
             final_tick = replay.result["tick"]
@@ -37,11 +36,12 @@ class TestGameboard(unittest.TestCase):
                              replay.result['tick'])
 
     def get_replay(self, set_name, index, level):
-        package = 'hybrid_cc.json.official_replays'
+        package = 'hybrid_cc.solutions.json'
         package_dir = importlib.resources.files(package)
         resources = package_dir.iterdir()
         setname = str(set_name).split(".")[0]
-        title = f"{setname}-{index + 1}-{level.title}.json"
+        title = f"{setname}-{index + 1}-{level.title}"
+        title = Replay.sanitize_filename(title) + ".json"
         for resource in resources:
             if str(resource.name) == title:
                 return Replay.load_from_file(resource)
