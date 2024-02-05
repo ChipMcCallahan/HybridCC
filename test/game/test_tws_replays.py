@@ -1,4 +1,5 @@
 import importlib.resources
+import logging
 import unittest
 from pathlib import Path
 
@@ -12,8 +13,10 @@ from hybrid_cc.shared import Direction
 SET = "CCLP1"
 MODE = "MS"
 # MODE = "LYNX"
-POSTFIX = ".dac.tws"
-# POSTFIX = "-lynx.dac.tws"
+POSTFIX = ".dac.json"
+
+
+# POSTFIX = "-lynx.dac.json"
 
 
 class TestTWSReplays(unittest.TestCase):
@@ -30,7 +33,7 @@ class TestTWSReplays(unittest.TestCase):
         for i, level in enumerate(converted_cclp1.levels):  # TODO: DEBUG!
             replay = self.get_replay(f"{SET}.dat", i)
             if replay:
-                fname = f"{SET}-{i+1}-{level.title}-{MODE}"
+                fname = f"{SET}-{i + 1}-{level.title}-{MODE}"
                 home_dir = Path.home()
                 save_dir = home_dir / "hybridcc_replays"
                 replay.save_to_file(save_dir, level.title, fname)
@@ -64,34 +67,78 @@ class TestTWSReplays(unittest.TestCase):
             #                  replay.result['tick'])
 
     def get_replay(self, set_name, index):
-        package = 'hybrid_cc.solutions.tws'
+        package = 'hybrid_cc.solutions.json'
         package_dir = importlib.resources.files(package)
         resources = package_dir.iterdir()
         setname = str(set_name).split(".")[0]
 
-        tws = None
+        def load_and_map_numbers_to_moves(file_path):
+            import json
+
+            with open(file_path, 'r') as file:
+                data = json.load(file)
+            number_to_moves = {}
+            for item in data['solutions']:
+                number = item.get('number')
+                moves = item.get('moves')
+                if number is not None and moves is not None:
+                    number_to_moves[number] = moves
+            return number_to_moves
+
+        result = None
         if setname in self.tws:
-            tws = self.tws[setname]
+            result = self.tws[setname]
         else:
             title = f"{setname}{POSTFIX}"
-            for resource in resources:
-                if str(resource.name) == title:
-                    tws = TWSHandler(resource).decode()
-                    break
+            result = load_and_map_numbers_to_moves(package_dir / title)
+            self.tws[setname] = result
 
-        if not tws:
+        if not result or index + 1 not in result:
             return None
 
-        tws_replay = tws.replays[index]
+        json_moves = list(result[index + 1])
+
+        try:
+            return JsonInputParser.parse(json_moves)
+        except ValueError as e:
+            print(e)
+            return None
+
+
+class JsonInputParser:
+    multiplier = {'L': 2, 'R': 2, 'U': 2, 'D': 2, '.': 2,
+                  'l': 1, 'r': 1, 'u': 1, 'd': 1, ',': 1}
+    dirs = {'L': 'W', 'R': 'E', 'D': 'S', 'U': 'N'}
+
+    @classmethod
+    def parse(cls, chars):
+        # https://github.com/magical/tws2json/blob/master/format.txt
         replay = Replay()
-        tick = 0
-        for move in tws_replay.moves:
-            tick = (move.tick) // 2 + 1
-            if move.direction < 8:
-                d_str = ["N", "W", "S", "E", "NW", "SW", "NE", "SE"][
-                    move.direction]
-                replay.update(tick, [Direction[d] for d in d_str])
-            else:
-                return None
+        tick = 1
+
+        while len(chars) > 0:
+            frames = 1
+            i = 0
+            for i, c in enumerate(chars):
+                if not c.isdigit():
+                    if i > 0:
+                        frames = int(''.join(chars[:i]))
+                    break
+            chars = chars[i:]
+            d1, d2 = chars.pop(0), None
+            if d1 == "*":
+                raise ValueError("Mouse move handling is not implemented.")
+
+            if len(chars) > 0 and chars[0] == "+":
+                _, d2 = chars.pop(0), chars.pop(0)
+
+            frames *= cls.multiplier[d1]
+
+            d1 = cls.dirs.get(d1.upper(), None)
+            d2 = cls.dirs.get(d2.upper(), None) if d2 else None
+            d1 = Direction[d1] if d1 else None
+            d2 = Direction[d2] if d2 else None
+            replay.update(tick, [d1, d2])
+            tick += frames
         replay.finalize({"tick": tick})
         return replay
