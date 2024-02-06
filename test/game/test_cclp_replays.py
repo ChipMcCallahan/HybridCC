@@ -22,7 +22,6 @@ class TestCCLPReplays(unittest.TestCase):
     def do_cclp(self, set_name):
         package = 'hybrid_cc.sets.dat'
         package_dir = importlib.resources.files(package)
-        set_name = "CCLP1.dat"
         converted_cclp1 = DATConverter.convert_levelset(
             package_dir / set_name)
         results = {}
