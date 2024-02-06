@@ -10,33 +10,52 @@ from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
 from hybrid_cc.shared import Direction
 
-SET = "CCLP1"
+
 # MODE = "MS"
-MODE = "LYNX"
+# mode = "LYNX"
 # POSTFIX = ".dac.json"
-POSTFIX = "-lynx.dac.json"
+# postfix = "-lynx.dac.json"
 
 
 class TestTWSReplays(unittest.TestCase):
     tws = {}
 
-    def test_set(self):
+    def test_cclp1_ms(self):
+        self.do_set("CCLP1", "MS", ".dac.json")
+
+    def test_cclp1_lynx(self):
+        self.do_set("CCLP1", "LYNX", "-lynx.dac.json")
+
+    def test_cclxp2_ms(self):
+        self.do_set("CCLXP2", "MS", ".dac.json")
+
+    def test_cclp3_ms(self):
+        self.do_set("CCLP3", "MS", ".dac.json")
+
+    def test_cclp3_lynx(self):
+        self.do_set("CCLP3", "LYNX", "-lynx.dac.json")
+
+    def test_cclp4_ms(self):
+        self.do_set("CCLP4", "MS", ".dac.json")
+
+    def test_cclp4_lynx(self):
+        self.do_set("CCLP4", "LYNX", "-lynx.dac.json")
+
+    def do_set(self, set_name, mode, postfix):
         package = 'hybrid_cc.sets.dat'
         package_dir = importlib.resources.files(package)
-        converted_cclp1 = DATConverter.convert_levelset(
-            package_dir / f"{SET}.dat")
+        converted_cclp = DATConverter.convert_levelset(
+            package_dir / f"{set_name}.dat")
+
         passed = 0
         failed = 0
+        results = {}
+        for i, level in enumerate(converted_cclp.levels):
+            replay = self.get_replay(f"{set_name}.dat", i, postfix)
+            key = (i + 1, level.title)
 
-        for i, level in enumerate(converted_cclp1.levels):  # TODO: DEBUG!
-            replay = self.get_replay(f"{SET}.dat", i)
-            if replay:
-                fname = f"{SET}-{i + 1}-{level.title}-{MODE}"
-                home_dir = Path.home()
-                save_dir = home_dir / "hybridcc_replays"
-                replay.save_to_file(save_dir, level.title, fname)
-            else:
-                print(f"{i + 1}, {level.title}, INVALID, 0")
+            if not replay:
+                results[key] = ("INVALID", 0, 0)
                 continue
 
             gameboard = Gameboard(level, replay.seed)
@@ -47,27 +66,33 @@ class TestTWSReplays(unittest.TestCase):
                     gameboard.do_logic(inputs.dirs())
                     if gameboard.state == Gameboard.State.LOSE:
                         failed += 1
-                        # print(f"{i + 1}, {level.title}, FAIL, {tick}")
+                        results[key] = ("LOSE", gameboard.tick, final_tick)
                         break
                     elif gameboard.state == Gameboard.State.WIN:
                         passed += 1
-                        print(f"{i + 1}, {level.title}, PASS, {tick}")
+                        results[key] = ("WIN", gameboard.tick, final_tick)
                         break
-            except Exception as e:
-                print(e)
-            # self.assertEqual(gameboard.result.color.name,
-            #                  replay.result['color'])
-            # self.assertEqual(gameboard.result.p,
-            #                  tuple(replay.result['p']))
-            # self.assertEqual(gameboard.result.score,
-            #                  replay.result['score'])
-            # self.assertEqual(gameboard.result.tick,
-            #                  replay.result['tick'])
+                if key not in results:
+                    results[key] = ("TIME", gameboard.tick, final_tick)
+            except ValueError as e:
+                if not str(e).startswith("Break the infinite loop!"):
+                    raise AssertionError(
+                        f"Unexpected error: '{str(e)}'")
+                results[key] = ("INFINITE_LOOP", 0, 0)
 
-    def get_replay(self, set_name, index):
-        package = 'hybrid_cc.solutions.json'
+            fname = f"{set_name}-{i + 1}-{level.title}-{mode}"
+            if results[key][0] != "WIN":
+                fname += f"-{results[key][0]}"
+            home_dir = Path.home()
+            save_dir = home_dir / "hybridcc_replays"
+            replay.save_to_file(save_dir, level.title, fname)
+
+        for k, v in results.items():
+            print(f"{k[0]}, {k[1]}, {v[0]}, {v[1]}/{v[2]}")
+
+    def get_replay(self, set_name, index, postfix):
+        package = 'hybrid_cc.solutions.tws'
         package_dir = importlib.resources.files(package)
-        resources = package_dir.iterdir()
         setname = str(set_name).split(".")[0]
 
         def load_and_map_numbers_to_moves(file_path):
@@ -87,7 +112,7 @@ class TestTWSReplays(unittest.TestCase):
         if setname in self.tws:
             result = self.tws[setname]
         else:
-            title = f"{setname}{POSTFIX}"
+            title = f"{setname}{postfix}"
             result = load_and_map_numbers_to_moves(package_dir / title)
             self.tws[setname] = result
 

@@ -2,6 +2,7 @@
 PUSHING = "pushing"
 PUSHED = "pushed"
 SWIMMING = "swimming"
+RETRY_MOVE = "retry_move"
 FAILED_MOVE = "failed_move"
 MOVED = "moved"
 SLIDING = "sliding"

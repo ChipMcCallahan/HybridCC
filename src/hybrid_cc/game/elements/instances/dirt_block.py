@@ -7,7 +7,7 @@ from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.kwargs import COLOR, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import PUSHES, FAILED_MOVE, MOVED, PUSHABLE, SLIDING, \
-    PUSHED
+    PUSHED, RETRY_MOVE
 
 
 class DirtBlock(Mob):
@@ -16,6 +16,7 @@ class DirtBlock(Mob):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tag(PUSHABLE)
+        self.mobs_to_untag = []
 
     @classmethod
     def init_at_level_load(cls):
@@ -28,6 +29,9 @@ class DirtBlock(Mob):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
+        for mob in self.mobs_to_untag:
+            mob.untag(RETRY_MOVE)
+        self.mobs_to_untag.clear()
         return [], []
 
     # --------------------------------------------------------------------------
@@ -50,10 +54,16 @@ class DirtBlock(Mob):
             if not (self.tagged(SLIDING) and self.d in (
                     d.right(), d.left())):
                 return MoveResult.FAIL, []
-        self.tag(PUSHED)
-        return MoveResult.RETRY, [
-            MoveRequest(mob_id=self.mob_id, d=d),
-        ]
+        self.tag(PUSHED, mob)
+        if mob.tagged(RETRY_MOVE) != self:
+            mob.tag(RETRY_MOVE, self)
+            self.mobs_to_untag.append(mob)
+            return MoveResult.RETRY, [
+                MoveRequest(mob_id=self.mob_id, d=d),
+            ]
+        else:
+            mob.untag(RETRY_MOVE)
+            return MoveResult.FAIL, []
 
     # --------------------------------------------------------------------------
     # OTHER

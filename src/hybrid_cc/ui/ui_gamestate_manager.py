@@ -34,9 +34,9 @@ class UIGamestateManager:
         self.level = None
         self.saved_replay = ""
         self.package_json = importlib.resources.files(
-            "hybrid_cc.solutions.json")
+            "hybrid_cc.solutions.official")
         self.package_tws = importlib.resources.files(
-            "hybrid_cc.solutions.tws")
+            "hybrid_cc.solutions.parsed_tws")
         self.sfx_player = SfxPlayer()
         self.reset()
 

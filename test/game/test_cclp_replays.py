@@ -59,7 +59,7 @@ class TestCCLPReplays(unittest.TestCase):
         self.assertFalse(failures)
 
     def get_replay(self, set_name, index, level):
-        package = 'hybrid_cc.solutions.json'
+        package = 'hybrid_cc.solutions.official'
         package_dir = importlib.resources.files(package)
         resources = package_dir.iterdir()
         setname = str(set_name).split(".")[0]

@@ -7,7 +7,7 @@ from hybrid_cc.shared import Direction
 from hybrid_cc.shared.kwargs import DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import FAILED_MOVE, PUSHES, ENTERS_DIRT, MOVED, \
-    PUSHABLE, SLIDING, PUSHED
+    PUSHABLE, SLIDING, PUSHED, RETRY_MOVE
 
 
 class IceBlock(Mob):
@@ -17,6 +17,7 @@ class IceBlock(Mob):
         super().__init__(**kwargs)
         self.tag(ENTERS_DIRT)
         self.tag(PUSHABLE)
+        self.mobs_to_untag = []
 
     @classmethod
     def init_at_level_load(cls):
@@ -30,6 +31,9 @@ class IceBlock(Mob):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
+        for mob in self.mobs_to_untag:
+            mob.untag(RETRY_MOVE)
+        self.mobs_to_untag.clear()
         return [], []
 
     # --------------------------------------------------------------------------
@@ -52,9 +56,16 @@ class IceBlock(Mob):
                     d.right(), d.left())):
                 return MoveResult.FAIL, []
         self.tag(PUSHED, mob)
-        return MoveResult.RETRY, [
-            MoveRequest(mob_id=self.mob_id, d=d),
-        ]
+
+        if mob.tagged(RETRY_MOVE) != self:
+            mob.tag(RETRY_MOVE, self)
+            self.mobs_to_untag.append(mob)
+            return MoveResult.RETRY, [
+                MoveRequest(mob_id=self.mob_id, d=d),
+            ]
+        else:
+            mob.untag(RETRY_MOVE)
+            return MoveResult.FAIL, []
 
     # --------------------------------------------------------------------------
     # OTHER
