@@ -18,10 +18,10 @@ class Cell:
     def add(self, elem):
         layer_name = elem.id.layer().name.lower()
         already_here = getattr(self, layer_name, None)
-        if already_here:
+        if already_here and already_here.id != Id.PLACEHOLDER:
             # Don't log if a Placeholder is trying to overwrite. This is normal
             # for a cloner cloning.
-            if elem.id != Id.PLACEHOLDER:
+            if Id.PLACEHOLDER != elem.id:
                 logging.error(
                     f"{already_here.id.name} already exists at layer "
                     f"{layer_name} and position {self.p}. Ignoring create "

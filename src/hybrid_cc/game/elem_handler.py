@@ -70,18 +70,18 @@ class ElemHandler:
 
     def collect_move_plans(self, inputs, tick):
         moves, requests = [], []
-        priority_moves = []
+        player_moves = []  # these happen last
 
         # Class level plans (e.g. ice, force floor, dpad buttons)
         for elem_class in self.id_to_class.values():
             method = getattr(elem_class, "do_class_planning", None)
             if method:
                 new_moves, new_requests = method(inputs=inputs, tick=tick)
-                if new_moves:
-                    if new_moves[0].prioritize:
-                        priority_moves += new_moves
+                for move in new_moves or []:
+                    if move.mob_id == 0:    # This is the Player mob id
+                        player_moves.append(move)
                     else:
-                        moves += new_moves
+                        moves.append(move)
                 if new_requests:
                     requests.extend(new_requests)
 
@@ -96,18 +96,16 @@ class ElemHandler:
                     continue
 
                 if new_moves:
-                    if new_moves[0].prioritize:
-                        priority_moves += new_moves
-                    # Player always moves first, other than priority moves (
-                    # e.g. cloned block)
-                    elif mob.id == Id.PLAYER:
-                        moves = new_moves + moves
+                    # Player always moves last.
+                    if mob.id == Id.PLAYER:
+                        # Overriding force floors depends on this order
+                        player_moves = new_moves + player_moves
                     else:
                         moves += new_moves
                 if new_requests:
                     requests.extend(new_requests)
 
-        return priority_moves + moves, requests
+        return moves + player_moves, requests
 
     @staticmethod
     def get_mob(mob_id):

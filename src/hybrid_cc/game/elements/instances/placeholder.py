@@ -39,9 +39,5 @@ class Placeholder(Elem):
     def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             return [
-                DestroyRequest(src=self, tgt=mob, p=p),
                 DestroyRequest(src=mob, tgt=self, p=p),
-                # TODO: pass (id, rule) into placeholder creation. Not sure
-                # this is even possible since player moves first?
-                LoseRequest(cause=self, p=p)
             ]

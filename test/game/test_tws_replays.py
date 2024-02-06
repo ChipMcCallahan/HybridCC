@@ -11,12 +11,10 @@ from hybrid_cc.replays.replay import Replay
 from hybrid_cc.shared import Direction
 
 SET = "CCLP1"
-MODE = "MS"
-# MODE = "LYNX"
-POSTFIX = ".dac.json"
-
-
-# POSTFIX = "-lynx.dac.json"
+# MODE = "MS"
+MODE = "LYNX"
+# POSTFIX = ".dac.json"
+POSTFIX = "-lynx.dac.json"
 
 
 class TestTWSReplays(unittest.TestCase):

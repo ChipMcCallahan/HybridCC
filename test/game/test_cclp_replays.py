@@ -8,32 +8,56 @@ from hybrid_cc.replays.replay import Replay
 
 class TestCCLPReplays(unittest.TestCase):
     def test_cclp1(self):
+        self.do_cclp("CCLP1.dat")
+
+    def test_cclxp2(self):
+        self.do_cclp("CCLXP2.dat")
+
+    def test_cclp3(self):
+        self.do_cclp("CCLP3.dat")
+
+    def test_cclp4(self):
+        self.do_cclp("CCLP4.dat")
+
+    def do_cclp(self, set_name):
         package = 'hybrid_cc.sets.dat'
         package_dir = importlib.resources.files(package)
         set_name = "CCLP1.dat"
         converted_cclp1 = DATConverter.convert_levelset(
             package_dir / set_name)
+        results = {}
+        failures = False
         for i, level in enumerate(converted_cclp1.levels):
             replay = self.get_replay(set_name, i, level)
-            if replay:
-                print(f"Replaying level {i + 1} ({level.title}).")
-            else:
+            if not replay:
                 print(
                     f"--> Skipping level {i + 1} ({level.title}) due to no replay.")
                 continue
             gameboard = Gameboard(level, replay.seed)
             final_tick = replay.result["tick"]
-            for tick in range(1, final_tick + 2):
-                inputs = replay.get(tick)
-                gameboard.do_logic(inputs.dirs())
-            self.assertEqual(gameboard.result.color.name,
-                             replay.result['color'])
-            self.assertEqual(gameboard.result.p,
-                             tuple(replay.result['p']))
-            self.assertEqual(gameboard.result.score,
-                             replay.result['score'])
-            self.assertEqual(gameboard.result.tick,
-                             replay.result['tick'])
+            try:
+                for tick in range(1, final_tick + 2):
+                    inputs = replay.get(tick)
+                    gameboard.do_logic(inputs.dirs())
+            except Exception as e:
+                failures = True
+                print(level.title, e)
+
+            result = []
+            if (not gameboard.result) or (
+                    not hasattr(gameboard.result, 'color')):
+                result = [False, False, False, False]
+            else:
+                result.append(
+                    gameboard.result.color.name == replay.result['color'])
+                result.append(gameboard.result.p == tuple(replay.result['p']))
+                result.append(gameboard.result.score == replay.result['score'])
+                result.append(gameboard.result.tick == replay.result['tick'])
+            results[(i, level.title)] = result
+            print((i+1, level.title), result)
+        for _, v in results.items():
+            self.assertFalse(False in v)
+        self.assertFalse(failures)
 
     def get_replay(self, set_name, index, level):
         package = 'hybrid_cc.solutions.json'

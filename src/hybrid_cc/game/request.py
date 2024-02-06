@@ -32,7 +32,6 @@ class MoveRequest:
     d: Direction
     slap: Optional[Direction] = None
     simulated_p: Optional[Tuple[int, int, int]] = None
-    prioritize: Optional[bool] = False
 
     @staticmethod
     def from_dirs(mob_id, dirs) -> List['MoveRequest']:
