@@ -29,7 +29,7 @@ class InputCollector:
         self.pressed_keys = []
         self.released_keys = []
 
-    def capture_keypress_events(self, events, pressed):
+    def capture_keypress_events(self, pressed):
         for k, v in self.key_map.items():
             if pressed[k] and v not in self.pressed_keys:
                 self.pressed_keys.append(v)

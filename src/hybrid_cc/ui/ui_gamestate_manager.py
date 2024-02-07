@@ -112,13 +112,16 @@ class UIGamestateManager:
             # Collect inputs on every logic tick EXCEPT for the first one
             # after a movement tick. Tradeoff between missing a move and
             # over-moving which happens a lot without this check.
-            if self.logic_tick % 4 != 1:
-                self.input_collector.capture_keypress_events(events, pressed)
+            # if self.logic_tick % 4 != 1:
+            self.input_collector.capture_keypress_events(pressed)
 
             # Collect inputs at 10Hz (every 4th frame)
             if self.logic_tick % 4 == 0:
                 self.movement_tick += 1
                 self.inputs = self.input_collector.collect()
+                for k, v in self.input_collector.key_map.items():
+                    if not pressed[k] and k in self.inputs:
+                        self.inputs.remove(v)
 
                 if self.state.is_replay:
                     if self.inputs:
