@@ -1,4 +1,5 @@
 import importlib.resources
+import sys
 from pathlib import Path
 
 import pygame
@@ -45,7 +46,7 @@ class UIGamestateManager:
         for event in events:
             if event.type == pygame.QUIT:
                 pygame.quit()
-                exit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_F5:
                     self.toggle_pause()
@@ -276,10 +277,9 @@ class UIGamestateManager:
             resources = self.package_tws.iterdir()
             title += "-MS" if mode == "ms_tws" else "-LYNX"
 
-        title = Replay.sanitize_filename(title) + ".json"
-        print(title)
+        title = Replay.sanitize_filename(title)
         for resource in resources:
-            if str(resource.name) == title:
+            if str(resource.name).startswith(title):
                 self.replay = Replay.load_from_file(resource)
                 return
         self.replay = None

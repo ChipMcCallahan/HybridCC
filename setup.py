@@ -10,7 +10,7 @@ setup(
         'hybrid_cc': [
             'art/*/*',  # 2 levels deep
             'sets/*/*',  # 2 levels deep
-            'solutions/json/*',  # 1 level deep
+            'solutions/*/*',  # 1 level deep
             'sfx/*/*'  # 2 levels deep
         ]
     },

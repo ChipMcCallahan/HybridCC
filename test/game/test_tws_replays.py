@@ -88,7 +88,11 @@ class TestTWSReplays(unittest.TestCase):
             replay.save_to_file(save_dir, level.title, fname)
 
         for k, v in results.items():
-            print(f"{k[0]}, {k[1]}, {v[0]}, {v[1]}/{v[2]}")
+            pct = (v[1] / v[2]) * 100
+            if v[0] == "LOSE" and pct > 50:
+                print(f"{k[0]}, {k[1]}, {v[0]}, {v[1]}/{v[2]}     [{pct}]")
+            else:
+                print(f"{k[0]}, {k[1]}, {v[0]}, {v[1]}/{v[2]}")
 
     def get_replay(self, set_name, index, postfix):
         package = 'hybrid_cc.solutions.tws'

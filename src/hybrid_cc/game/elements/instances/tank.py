@@ -35,7 +35,8 @@ class Tank(Mob):
             self.d = dpad_d or self.d
             self.last_signal = dpad_signal
         if signal > self.last_signal:
-            self.d = self.d.reverse()
+            if (signal - self.last_signal) % 2 == 1:
+                self.d = self.d.reverse()
             self.last_signal = signal
         return [MoveRequest(mob_id=self.mob_id, d=self.d)], []
 

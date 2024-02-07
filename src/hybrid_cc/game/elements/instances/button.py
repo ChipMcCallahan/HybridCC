@@ -11,7 +11,7 @@ from hybrid_cc.shared.tag import SLIDING
 
 class Button(Elem):
     kwarg_filter = (COLOR, RULE, CHANNEL)  # Retain these kwargs only.
-    deferred_signals = set()  # we don't want to update the signal until next turn
+    deferred_signals = []
 
     # we need to defer this 1-2 ticks depending on mob speed.
 
@@ -118,7 +118,7 @@ class Button(Elem):
         if d and d.is_cardinal():
             kwargs[DIRECTION] = d
         signal = self.DeferredSignal(self.color, self.channel, **kwargs)
-        self.deferred_signals.add(signal)
+        self.deferred_signals.append(signal)
         return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
 
     # --------------------------------------------------------------------------
