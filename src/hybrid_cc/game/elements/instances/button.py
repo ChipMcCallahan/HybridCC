@@ -108,7 +108,7 @@ class Button(Elem):
             if self.hold_all_counts[key] == 0:
                 requests.extend(self.activate(mob, p))
         elif self.rule == ButtonRule.DPAD:
-            requests.extend(self.activate(mob, d))
+            requests.extend(self.activate(mob, p, d))
         return requests
 
     def activate(self, mob, p, d=None):

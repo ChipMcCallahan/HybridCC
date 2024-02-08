@@ -25,8 +25,8 @@ COLOR_CODE = {
     CC1.BALL_W: Color.YELLOW,
     CC1.WALKER_N: Color.MAGENTA,
     CC1.WALKER_E: Color.CYAN,
-    CC1.WALKER_S: Color.ORANGE,
-    CC1.WALKER_W: Color.TAN,
+    CC1.WALKER_S: Color.PINK,
+    CC1.WALKER_W: Color.BROWN,
 }
 
 NUMBER_CODE = {
@@ -262,7 +262,7 @@ class CellConverter:
                 else:
                     kwargs = (CellConverter.colorize(bottom) or
                               CellConverter.channelize(bottom))
-                    kwargs[COLOR] = kwargs.get(COLOR, Color.TAN)
+                    kwargs[COLOR] = kwargs.get(COLOR, Color.BROWN)
                     kwargs[RULE] = TrapRule.STARTS_OPEN
                     if channel:
                         kwargs[CHANNEL] = channel
@@ -499,20 +499,20 @@ class CellConverter:
                 kwargs[CHANNEL] = channel or "NONE"
                 kwargs[COLOR] = Color.RED
         elif top == CC1.TRAP_BUTTON:
-            kwargs = {COLOR: Color.TAN}
+            kwargs = {COLOR: Color.BROWN}
             if bottom == CC1.GREEN_BUTTON:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
-                kwargs[COLOR] = Color.ORANGE
+                kwargs[COLOR] = Color.PINK
             elif bottom == top:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
-                kwargs[COLOR] = Color.TAN
+                kwargs[COLOR] = Color.BROWN
             elif channel and bottom in COLOR_CODE:
                 kwargs.update(CellConverter.colorize(bottom))
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[CHANNEL] = channel
             elif bottom == CC1.CLONER:
                 kwargs[RULE] = ButtonRule.DPAD
-                kwargs[COLOR] = Color.TAN
+                kwargs[COLOR] = Color.BROWN
             elif bottom in NUMBER_CODE:
                 kwargs.update(CellConverter.channelize(bottom))
                 kwargs[RULE] = ButtonRule.DPAD
@@ -521,5 +521,5 @@ class CellConverter:
                 # unassigned tan buttons might unintentionally
                 # act as toggles for tan elements, so assign otherwise
                 kwargs[CHANNEL] = channel or "NONE"
-                kwargs[COLOR] = Color.TAN
+                kwargs[COLOR] = Color.BROWN
         cell.terrain_mod = LevelElem(Id.BUTTON, **kwargs)

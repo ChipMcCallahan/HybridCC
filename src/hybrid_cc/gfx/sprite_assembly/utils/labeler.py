@@ -47,6 +47,8 @@ class Labeler:
         return x, y
 
     def label(self, label, p=5, color="white"):
+        color = "white"  #TODO: If we want to keep all labels white, then
+                         #change the method signature to match.
         key = (label, p, color)
         if key in self.labels:
             return self.labels[key]
