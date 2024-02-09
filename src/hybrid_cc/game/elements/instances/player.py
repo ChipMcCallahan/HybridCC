@@ -51,8 +51,8 @@ class Player(Mob):
             return [], []
 
         self.untag(SPEED_BOOST)
-        # If we're getting to submit our move inputs, we're not forced anymore.
-        self.untag(FORCED)
+        if not self.tagged(OVERRIDDEN):
+            self.untag(FORCED)
         self.last_move_tick = None
 
         primary, secondary = inputs

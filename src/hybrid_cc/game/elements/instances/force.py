@@ -67,7 +67,9 @@ class Force(Elem):
     def finish_enter(self, mob, p, d):
         if mob.tools[Id.SUCTION_BOOTS]:
             return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
-        if mob.id != Id.PLAYER:
+        if mob.id == Id.PLAYER:
+            mob.untag(SPEED_BOOST)  # Otherwise Player would get a free move
+        else:
             mob.tag(OVERRIDDEN)
         mob.tag(SLIDING, self.id)
         if self.rule == ForceRule.RANDOM:
