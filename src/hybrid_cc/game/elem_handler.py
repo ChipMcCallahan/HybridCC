@@ -43,7 +43,7 @@ from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
     CHANNEL
-from hybrid_cc.shared.tag import OVERRIDDEN
+from hybrid_cc.shared.tag import OVERRIDDEN, SLIDING
 
 DEFAULT_KWARGS = {
     COLOR: Color.GREY,
@@ -140,7 +140,8 @@ class ElemHandler:
 
     def collect_move_plans(self, inputs, tick):
         moves, requests = [], []
-        player_moves = []  # these happen last
+        player_moves = []  # these happen second to last
+        sliding_moves = []  # these happen last
 
         # Class level plans (e.g. ice, force floor, dpad buttons)
         for elem_class in self.id_to_class.values():
@@ -148,8 +149,11 @@ class ElemHandler:
             if method:
                 new_moves, new_requests = method(inputs=inputs, tick=tick)
                 for move in new_moves or []:
-                    if move.mob_id == 0:    # This is the Player mob id
+                    mob = Mob.instances[move.mob_id]
+                    if mob.id == Id.PLAYER:    # This is the Player mob id
                         player_moves.append(move)
+                    elif mob.tagged(SLIDING):
+                        sliding_moves.append(move)
                     else:
                         moves.append(move)
                 if new_requests:
@@ -175,7 +179,7 @@ class ElemHandler:
                 if new_requests:
                     requests.extend(new_requests)
 
-        return moves + player_moves, requests
+        return moves + player_moves + sliding_moves, requests
 
     @staticmethod
     def get_mob(mob_id):
