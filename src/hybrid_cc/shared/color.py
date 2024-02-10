@@ -9,5 +9,5 @@ class Color(Enum):
     YELLOW = "#FFFF00"
     MAGENTA = "#FF00FF"
     CYAN = "#00FFFF"
-    PINK = "#FFC0CB"
-    BROWN = "#D2691E"
+    ORANGE = "#FF8C00"
+    BROWN = "#4B3619"

@@ -25,7 +25,7 @@ COLOR_CODE = {
     CC1.BALL_W: Color.YELLOW,
     CC1.WALKER_N: Color.MAGENTA,
     CC1.WALKER_E: Color.CYAN,
-    CC1.WALKER_S: Color.PINK,
+    CC1.WALKER_S: Color.ORANGE,
     CC1.WALKER_W: Color.BROWN,
 }
 
@@ -502,7 +502,7 @@ class CellConverter:
             kwargs = {COLOR: Color.BROWN}
             if bottom == CC1.GREEN_BUTTON:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
-                kwargs[COLOR] = Color.PINK
+                kwargs[COLOR] = Color.ORANGE
             elif bottom == top:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 kwargs[COLOR] = Color.BROWN
