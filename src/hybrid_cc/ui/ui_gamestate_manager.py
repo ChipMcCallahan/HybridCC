@@ -106,6 +106,17 @@ class UIGamestateManager:
                     if self.state.replay():
                         self.replay = self.gameboard.replay
                         self.reset(self.replay.seed)
+                elif event.key == pygame.K_z:
+                    # DEBUG: this fast forwards to 2.5 seconds prior to death
+                    if self.state.replay() and self.gameboard.replay.last_tick:
+                        self.replay = self.gameboard.replay
+                        self.reset(self.replay.seed)
+                        end_tick = max(0, self.replay.last_tick - 20)
+                        for tick in range(1, end_tick):
+                            inputs = self.replay.get(tick)
+                            self.gameboard.do_logic(inputs.dirs())
+                            self.logic_tick += 4
+                            self.movement_tick += 1
         if self.state.is_play or self.state.is_replay:
             pressed = pygame.key.get_pressed()
 
