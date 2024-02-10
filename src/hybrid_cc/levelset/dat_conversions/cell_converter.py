@@ -141,11 +141,14 @@ class CellConverter:
                 cell.terrain = LevelElem(Id.DIRT, **kwargs)
 
             elif top in CC1.ice():
+                # add corner if it exists
                 if top != CC1.ICE:
                     cell.add_sides(
                         LevelElem(Id.CORNER, sides=CC1.dirs(top.reverse())))
+                    if top != bottom:
+                        cell.terrain = LevelElem(Id.ICE)
                 # doubled corners yield just the corner
-                if top != bottom or top == CC1.ICE:
+                else:
                     cell.terrain = LevelElem(Id.ICE)
 
             elif top in CC1.forces():
@@ -334,7 +337,9 @@ class CellConverter:
                     populate(bottom)
 
             elif top == CC1.CHIP_EXIT:
-                pass
+                kwargs = CellConverter.count(bottom)
+                kwargs[RULE] = SteppingStoneRule.ICE
+                cell.terrain = LevelElem(Id.STEPPING_STONE, **kwargs)
 
             elif top == CC1.UNUSED_EXIT_0:
                 pass

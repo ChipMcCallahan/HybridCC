@@ -30,10 +30,9 @@ class SteppingStone(Elem):
                                            p=p,
                                            count=self.count - 1,
                                            rule=self.rule)
-        elif self.rule == SteppingStoneRule.WATER:
-            create_request = CreateRequest(id=Id.WATER, p=p)
         else:
-            create_request = CreateRequest(id=Id.FIRE, p=p)
+            create_request = CreateRequest(id=Id[self.rule.name],
+                                           p=p)
         return [
             DestroyRequest(src=mob, tgt=self, p=p),
             create_request

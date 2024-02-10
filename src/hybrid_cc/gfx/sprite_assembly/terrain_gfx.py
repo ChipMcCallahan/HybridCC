@@ -133,8 +133,12 @@ class TerrainGfx:
 
     def stepping_stone(self, elem, **kwargs):
         top = self.assembler.custom(12)
-        bottom = self.fire(
-            elem) if elem.rule == SteppingStoneRule.FIRE else self.water(elem)
+        if elem.rule == SteppingStoneRule.FIRE:
+            bottom = self.fire(elem)
+        elif elem.rule == SteppingStoneRule.WATER:
+            bottom = self.water(elem)
+        else:
+            bottom = [self.ice(elem)]
         combined = []
         for frame in bottom:
             combined.append(self.assembler.stack(frame, top))
