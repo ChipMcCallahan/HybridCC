@@ -243,9 +243,12 @@ class CellConverter:
                 kwargs[RULE] = (BombRule.STARTS_DISARMED
                                 if bottom == CC1.BOMB
                                 else BombRule.STARTS_ARMED)
+                if bottom in CC1.keys():
+                    kwargs[COLOR] = Color[bottom.name.split("_")[0].upper()]
+                    kwargs[RULE] = BombRule.STARTS_DISARMED
                 cell.pickup = LevelElem(Id.BOMB, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
-                        CC1.mobs().difference({CC1.BOMB,})):
+                        CC1.mobs().difference({CC1.BOMB, })):
                     populate(bottom)
 
             elif top == CC1.TRAP:

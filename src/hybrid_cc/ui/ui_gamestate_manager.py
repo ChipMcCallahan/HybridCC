@@ -162,7 +162,7 @@ class UIGamestateManager:
                         current_state = Button.signal[key]
                         is_armed = (index + current_state) % 2 == 0
                         if is_armed:
-                            sounds.add("bomb")
+                            sounds.add("whisk")
                         else:
                             sounds.add("snick")
                     elif tgt.id == Id.CHIP:
