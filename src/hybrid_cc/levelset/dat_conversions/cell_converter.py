@@ -496,7 +496,9 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.TOGGLE
                 # unassigned red buttons might unintentionally
                 # act as toggles for red elements, so assign otherwise
-                kwargs[CHANNEL] = channel or "NONE"
+                if not channel:
+                    channel = "NONE" if bottom == CC1.FLOOR else 0
+                kwargs[CHANNEL] = channel
                 kwargs[COLOR] = Color.RED
         elif top == CC1.TRAP_BUTTON:
             kwargs = {COLOR: Color.BROWN}
@@ -520,6 +522,8 @@ class CellConverter:
                 kwargs[RULE] = ButtonRule.HOLD_ONE
                 # unassigned tan buttons might unintentionally
                 # act as toggles for tan elements, so assign otherwise
-                kwargs[CHANNEL] = channel or "NONE"
+                if not channel:
+                    channel = "NONE" if bottom == CC1.FLOOR else 0
+                kwargs[CHANNEL] = channel
                 kwargs[COLOR] = Color.BROWN
         cell.terrain_mod = LevelElem(Id.BUTTON, **kwargs)

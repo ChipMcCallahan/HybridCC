@@ -7,7 +7,6 @@ from hybrid_cc.shared.color import Color
 # How much brightness increase to apply to various colors so they look right.
 BRIGHTNESS_ADJUSTMENTS = {
     "green": 2.0,
-    "blue": 1.7,
     "brown": 3.0,
     "orange": 2.0
 }

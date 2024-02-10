@@ -28,7 +28,8 @@ class Socket(Elem):
     def test_enter(self, mob, p, d):
         if mob.tagged(ENTERS_DIRT):
             chips = Chip.chips_collected.get(self.color, 0)
-            if chips >= self.chips_required[self.color]:
+            needed = self.chips_required.get(self.color, 0)
+            if chips >= needed:
                 return MoveResult.PASS, None
         return MoveResult.FAIL, None
 
