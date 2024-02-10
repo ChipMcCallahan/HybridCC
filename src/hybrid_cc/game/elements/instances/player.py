@@ -3,6 +3,7 @@ import logging
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import PUSHING, PUSHES, COLLECTS_CHIPS, \
     COLLECTS_ITEMS, ENTERS_DIRT, FORCED, OVERRIDDEN, SLIDING, SPEED_BOOST
 from hybrid_cc.shared.kwargs import DIRECTION
@@ -73,6 +74,10 @@ class Player(Mob):
     # --------------------------------------------------------------------------
     # ACCESS RULES
     # --------------------------------------------------------------------------
+    def test_enter(self, mob, p, d):
+        if mob.id == Id.PLAYER:
+            return MoveResult.FAIL, []
+        return MoveResult.PASS, []
 
     def finish_enter(self, mob, p, d):
         return [
