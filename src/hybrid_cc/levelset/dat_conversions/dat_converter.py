@@ -51,8 +51,10 @@ class DATConverter:
         conversion_rules = [] if len(title_split) == 1 else title_split[1:]
         level.time = cc1_levels[0].time
         level.hint = cc1_levels[0].hint
-        level.chips[Color.GREY] = sum(
+        grey_chips = sum(
             cc1_level.chips for cc1_level in cc1_levels)
+        if grey_chips:
+            level.chips[Color.GREY] = grey_chips
 
         channels = {}
         next_trap = 1

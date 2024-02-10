@@ -252,6 +252,7 @@ class GamePlayerDemo:
     @staticmethod
     def render_centered_wrapped_text(surface, text, font, color):
         def wrap_text(_text, _font, max_width):
+            _text = _text or ""
             paragraphs = _text.split('\n')  # Split by newline characters
             wrapped_lines = []
 
