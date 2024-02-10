@@ -4,6 +4,7 @@ from cc_tools import CC1
 
 from hybrid_cc.levelset import LevelElem, LevelCell
 from hybrid_cc.shared import Id, Direction
+from hybrid_cc.shared.bomb_rule import BombRule
 from hybrid_cc.shared.button_rule import ButtonRule
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.force_rule import ForceRule
@@ -235,12 +236,16 @@ class CellConverter:
                 cell.terrain = LevelElem(Id.TELEPORT, **kwargs)
 
             elif top == CC1.BOMB:
-                kwargs = CellConverter.colorize(bottom)
+                kwargs = CellConverter.colorize(
+                    bottom) or CellConverter.channelize(bottom)
                 if COLOR not in kwargs:
                     kwargs[COLOR] = Color.RED
+                kwargs[RULE] = (BombRule.STARTS_DISARMED
+                                if bottom == CC1.BOMB
+                                else BombRule.STARTS_ARMED)
                 cell.pickup = LevelElem(Id.BOMB, **kwargs)
                 if bottom in CC1.valid().difference(CC1.pickups()).difference(
-                        CC1.mobs()):
+                        CC1.mobs().difference({CC1.BOMB,})):
                     populate(bottom)
 
             elif top == CC1.TRAP:

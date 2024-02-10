@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pygame
 
+from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.force import Force
 from hybrid_cc.game.elements.instances.ice import Ice
 from hybrid_cc.game.elements.instances.player import Player
@@ -15,6 +16,7 @@ from hybrid_cc.game.request import DestroyRequest, CreateRequest, LoseRequest, \
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
 from hybrid_cc.shared import Id
+from hybrid_cc.shared.bomb_rule import BombRule
 from hybrid_cc.ui import InputCollector
 from hybrid_cc.ui.sfx_player import SfxPlayer
 from hybrid_cc.ui.ui_gamestate import UIGamestate
@@ -153,7 +155,16 @@ class UIGamestateManager:
                 if isinstance(ui_hint, DestroyRequest):
                     src, tgt, p = ui_hint.src, ui_hint.tgt, ui_hint.p
                     if tgt.id == Id.BOMB:
-                        sounds.add("bomb")
+                        key = (tgt.color, tgt.channel)
+                        index = [BombRule.STARTS_ARMED,
+                                 BombRule.STARTS_DISARMED].index(
+                            tgt.rule)
+                        current_state = Button.signal[key]
+                        is_armed = (index + current_state) % 2 == 0
+                        if is_armed:
+                            sounds.add("bomb")
+                        else:
+                            sounds.add("snick")
                     elif tgt.id == Id.CHIP:
                         sounds.add("MSCLICK3")
                     elif tgt.id == Id.KEY or isinstance(tgt, Tool):

@@ -1,6 +1,9 @@
 from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
+from hybrid_cc.shared.bomb_rule import BombRule
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.tool_rule import ToolRule
+
+CURRENT_STATE = "current_state"
 
 
 class PickupGfx:
@@ -12,8 +15,16 @@ class PickupGfx:
         return self.assembler.label_ne(label, color)
 
     def bomb(self, elem, **kwargs):
-        base = self.assembler.custom(16)
-        return self.assembler.colorize(base, elem.color)
+        current_state = kwargs.get(CURRENT_STATE, 0)
+        index = [BombRule.STARTS_ARMED, BombRule.STARTS_DISARMED].index(
+            elem.rule)
+        is_armed = (index + current_state) % 2 == 0
+        base = self.assembler.custom(16 if is_armed else 48)
+        colored = self.assembler.colorize(base, elem.color)
+        if elem.channel:
+            label = self.label(elem.channel, elem.color)
+            return self.assembler.stack(colored, label)
+        return colored
 
     def chip(self, elem, **kwargs):
         base = self.assembler.custom(14)

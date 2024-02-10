@@ -3,6 +3,7 @@ import logging
 import pygame
 from PIL import Image
 
+from hybrid_cc.game.elements.instances.bomb import Bomb
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.toggle_wall import ToggleWall
@@ -145,7 +146,7 @@ class PygameGfxProvider:
                         if isinstance(elem, TrickWall):
                             if p in TrickWall.show_secrets_positions:
                                 kwargs["show_secrets"] = True
-                        if isinstance(elem, (ToggleWall, Trap, Button)):
+                        if isinstance(elem, (ToggleWall, Trap, Button, Bomb)):
                             key = (elem.color, elem.channel)
                             kwargs["current_state"] = Button.signal[key] % 2
 
