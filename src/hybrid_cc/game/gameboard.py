@@ -95,6 +95,8 @@ class Gameboard:
                                                       move.simulated_p)
             if result == MoveResult.RETRY:
                 raw_moves.appendleft(move)
+            elif result == MoveResult.DEFER:
+                raw_moves.append(move)
             debug_counts[mob.mob_id] += 1
             if debug_counts[mob.mob_id] > 1000:
                 raise ValueError(
