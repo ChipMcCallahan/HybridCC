@@ -22,6 +22,13 @@ from hybrid_cc.ui.sfx_player import SfxPlayer
 from hybrid_cc.ui.ui_gamestate import UIGamestate
 from hybrid_cc.ui.ui_hints import UIHints
 
+KEY_MAP = {
+    pygame.K_UP: "N",
+    pygame.K_DOWN: "S",
+    pygame.K_LEFT: "W",
+    pygame.K_RIGHT: "E"
+}
+
 
 class UIGamestateManager:
     def __init__(self):
@@ -120,21 +127,16 @@ class UIGamestateManager:
                             self.logic_tick += 4
                             self.movement_tick += 1
         if self.state.is_play or self.state.is_replay:
-            pressed = pygame.key.get_pressed()
+            subtick = self.logic_tick % 4
 
-            # Collect inputs on every logic tick EXCEPT for the first one
-            # after a movement tick. Tradeoff between missing a move and
-            # over-moving which happens a lot without this check.
-            # if self.logic_tick % 4 != 1:
-            self.input_collector.capture_keypress_events(pressed)
+            pressed = pygame.key.get_pressed()
+            self.input_collector.capture(
+                [KEY_MAP[k] for k in KEY_MAP if pressed[k]])
 
             # Collect inputs at 10Hz (every 4th frame)
-            if self.logic_tick % 4 == 0:
+            if subtick == 0:
                 self.movement_tick += 1
                 self.inputs = self.input_collector.collect()
-                for k, v in self.input_collector.key_map.items():
-                    if not pressed[k] and k in self.inputs:
-                        self.inputs.remove(v)
 
                 if self.state.is_replay:
                     if self.inputs:
@@ -162,9 +164,9 @@ class UIGamestateManager:
                         current_state = Button.signal[key]
                         is_armed = (index + current_state) % 2 == 0
                         if is_armed:
-                            sounds.add("whisk")
+                            sounds.add("bomb")
                         else:
-                            sounds.add("snick")
+                            sounds.add("whisk")
                     elif tgt.id == Id.CHIP:
                         sounds.add("MSCLICK3")
                     elif tgt.id == Id.KEY or isinstance(tgt, Tool):
