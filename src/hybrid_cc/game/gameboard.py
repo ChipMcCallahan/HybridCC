@@ -3,6 +3,7 @@ from collections import deque, defaultdict
 from enum import Enum
 
 from hybrid_cc.game.camera import Camera
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.elements.instances.player import Player
@@ -40,7 +41,7 @@ class Gameboard:
         self.time = level.time
         self.hints = {}  # map from position to string
         self.hint = level.hint  # default hint if not in dict
-        self.tick = 0
+        Clock.reset()
         self.state = Gameboard.State.PLAY
         self.camera = Camera(Mob.instances[0], self)
         self.show_hint = False
@@ -79,7 +80,7 @@ class Gameboard:
                 i2 = d
         inputs = (i1, i2)
 
-        moves, requests = self.elems.collect_move_plans(inputs, self.tick)
+        moves, requests = self.elems.collect_move_plans(inputs)
         self.do_requests(requests)
 
         raw_moves = deque(moves)
@@ -91,7 +92,7 @@ class Gameboard:
             mob = self.elems.get_mob(mob_id)
             if (not mob) or (mob_id in moved):
                 continue
-            result, requests = self.move_handler.move(mob, d, self.tick, slap,
+            result, requests = self.move_handler.move(mob, d, slap,
                                                       move.simulated_p)
             if result == MoveResult.RETRY:
                 raw_moves.appendleft(move)
@@ -106,8 +107,8 @@ class Gameboard:
             if result == MoveResult.PASS:
                 moved.add(mob_id)
 
-        self.tick += 1
-        self.replay.update(self.tick, inputs)
+        Clock.increment()
+        self.replay.update(Clock.tick, inputs)
         if self.result:
             self.replay.finalize(self.result)
         if self.time > 0 and self.time_remaining() == 0:
@@ -147,15 +148,15 @@ class Gameboard:
     def win(self, color, p):
         self.result = WinResult(color=color, p=p,
                                 score=10 * self.time_remaining(),
-                                tick=self.tick)
+                                tick=Clock.tick)
         self.transition(self.State.WIN)
 
     def lose(self, cause, p):
-        self.result = LoseResult(cause=cause, p=p, tick=self.tick)
+        self.result = LoseResult(cause=cause, p=p, tick=Clock.tick)
         self.transition(self.State.LOSE)
 
     def time_remaining(self):
-        return max(self.time - self.tick // 10, 0)
+        return max(self.time - Clock.tick // 10, 0)
 
     @staticmethod
     def chips_remaining():

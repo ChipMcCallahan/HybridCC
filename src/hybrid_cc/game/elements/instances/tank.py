@@ -24,8 +24,8 @@ class Tank(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, tick, **kwargs):
-        if self.moved_last_n_ticks(tick, n=1):
+    def do_planning(self, **kwargs):
+        if self.moved_last_n_ticks(n=1):
             return [], []
 
         key = (self.color, self.channel)
@@ -61,6 +61,6 @@ class Tank(Mob):
     # OTHER
     # --------------------------------------------------------------------------
 
-    def on_completed_move(self, old_p, new_p, tick, **kwargs):
-        super().on_completed_move(old_p, new_p, tick, **kwargs)
+    def on_completed_move(self, old_p, new_p, **kwargs):
+        super().on_completed_move(old_p, new_p, **kwargs)
         return [CreateRequest(p=old_p, id=Id.PLACEHOLDER)]

@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Direction
 
@@ -23,10 +24,10 @@ class Mob(Elem):
         self.keys = defaultdict(int)
         self.tools = defaultdict(int)
 
-    def on_completed_move(self, old_p, new_p, tick, *, simulated_p=None):
+    def on_completed_move(self, old_p, new_p, *, simulated_p=None):
         self.p = new_p
         self.d = Direction.from_move(simulated_p or old_p, new_p)
-        self.last_move_tick = tick
+        self.last_move_tick = Clock.tick
 
     def on_failed_move(self, move_result, d):
         self.last_move_tick = None
@@ -34,9 +35,9 @@ class Mob(Elem):
     def exists(self):
         return self.mob_id in Mob.instances
 
-    def moved_last_n_ticks(self, tick, *, n=1):
+    def moved_last_n_ticks(self, *, n=1):
         return (self.last_move_tick is not None
-                and tick - self.last_move_tick <= n)
+                and Clock.tick - self.last_move_tick <= n)
 
     def tag(self, tag, value=True):
         self.tags[tag] = value

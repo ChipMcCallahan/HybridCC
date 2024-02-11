@@ -5,7 +5,7 @@ class MoveHandler:
     def __init__(self, map):
         self.map = map
 
-    def move(self, mob, d, tick, slap=None, sim_p=None):
+    def move(self, mob, d, slap=None, sim_p=None):
         requests = []
         result, new_requests = self.test_move(mob, d, sim_p)
         requests += new_requests or []
@@ -28,7 +28,7 @@ class MoveHandler:
                 _, new_requests = self.start_move(mob, slap, sim_p)
                 requests += new_requests or []
 
-        requests += self.finish_move(mob, d, tick, sim_p) or []
+        requests += self.finish_move(mob, d, sim_p) or []
 
         return result, requests
 
@@ -79,7 +79,7 @@ class MoveHandler:
                     return result, requests
         return result, requests
 
-    def finish_move(self, mob, d, tick, sim_p=None):
+    def finish_move(self, mob, d, sim_p=None):
         here_p, offset = mob.p, d.value
         there_p = tuple(a + b for a, b in zip(sim_p or here_p, offset))
 
@@ -107,7 +107,7 @@ class MoveHandler:
 
         here.remove(mob)
         there.add(mob)
-        new_requests = mob.on_completed_move(here_p, there_p, tick,
+        new_requests = mob.on_completed_move(here_p, there_p,
                                              simulated_p=sim_p)
         if new_requests:
             requests.extend(new_requests)

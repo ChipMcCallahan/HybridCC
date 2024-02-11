@@ -25,9 +25,9 @@ class Monster(Mob):
     # PLANNING PHASE
     # --------------------------------------------------------------------------
 
-    def do_planning(self, tick, **kwargs):
+    def do_planning(self, **kwargs):
         n = 3 if self.rule in (MonsterRule.TEETH, MonsterRule.BLOB) else 1
-        if self.moved_last_n_ticks(tick, n=n):
+        if self.moved_last_n_ticks(n=n):
             return [], []
 
         d = self.d
@@ -96,6 +96,6 @@ class Monster(Mob):
     # OTHER
     # --------------------------------------------------------------------------
 
-    def on_completed_move(self, old_p, new_p, tick, **kwargs):
-        super().on_completed_move(old_p, new_p, tick, **kwargs)
+    def on_completed_move(self, old_p, new_p, **kwargs):
+        super().on_completed_move(old_p, new_p, **kwargs)
         return [CreateRequest(p=old_p, id=Id.PLACEHOLDER)]

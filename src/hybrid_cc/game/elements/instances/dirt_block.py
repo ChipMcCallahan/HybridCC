@@ -25,7 +25,7 @@ class DirtBlock(Mob):
     # --------------------------------------------------------------------------
     # PLANNING PHASE
     # --------------------------------------------------------------------------
-    def do_planning(self, tick, **kwargs):
+    def do_planning(self, **kwargs):
         self.untag(MOVED)
         for d in "NESW":
             self.untag((FAILED_MOVE, Direction[d]))
@@ -68,8 +68,8 @@ class DirtBlock(Mob):
     # --------------------------------------------------------------------------
     # OTHER
     # --------------------------------------------------------------------------
-    def on_completed_move(self, old_p, new_p, tick, **kwargs):
-        super().on_completed_move(old_p, new_p, tick, **kwargs)
+    def on_completed_move(self, old_p, new_p, **kwargs):
+        super().on_completed_move(old_p, new_p, **kwargs)
         self.tag(MOVED)
         pusher = self.untag(PUSHED)
         if pusher:

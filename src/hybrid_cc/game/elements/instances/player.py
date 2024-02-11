@@ -1,5 +1,6 @@
 import logging
 
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.game.request import MoveRequest, DestroyRequest, LoseRequest
 from hybrid_cc.shared import Id
@@ -35,19 +36,18 @@ class Player(Mob):
     def do_class_planning(cls, **kwargs):
         # This method is a hack to allow Player to be overridden for the
         # first tick of the game if starting on a FF.
-        tick = kwargs['tick']
         overridden = cls.instance.tagged(OVERRIDDEN)
         on_ff = cls.instance.tagged(SLIDING) == Id.FORCE
 
-        if overridden and on_ff and tick > 0:
+        if overridden and on_ff and Clock.tick > 0:
             cls.instance.untag(OVERRIDDEN)
         return None, None
 
-    def do_planning(self, tick, **kwargs):
+    def do_planning(self, **kwargs):
         inputs = kwargs.get("inputs", [])
         self.untag(PUSHING)
 
-        if self.moved_last_n_ticks(tick, n=1) and not self.tagged(
+        if self.moved_last_n_ticks(n=1) and not self.tagged(
                 FORCED) and not self.tagged(SPEED_BOOST):
             return [], []
 
@@ -89,8 +89,8 @@ class Player(Mob):
     # OTHER
     # --------------------------------------------------------------------------
 
-    def on_completed_move(self, old_p, new_p, tick, **kwargs):
-        super().on_completed_move(old_p, new_p, tick, **kwargs)
+    def on_completed_move(self, old_p, new_p, **kwargs):
+        super().on_completed_move(old_p, new_p, **kwargs)
         self.untag(PUSHING)
 
     def on_failed_move(self, move_result, d):

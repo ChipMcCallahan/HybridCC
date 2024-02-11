@@ -138,7 +138,7 @@ class ElemHandler:
             new_kwargs[kwarg] = kwargs.get(kwarg) or DEFAULT_KWARGS[kwarg]
         return new_kwargs
 
-    def collect_move_plans(self, inputs, tick):
+    def collect_move_plans(self, inputs):
         moves, requests = [], []
         player_moves = []  # these happen second to last
         sliding_moves = []  # these happen last
@@ -147,7 +147,7 @@ class ElemHandler:
         for elem_class in self.id_to_class.values():
             method = getattr(elem_class, "do_class_planning", None)
             if method:
-                new_moves, new_requests = method(inputs=inputs, tick=tick)
+                new_moves, new_requests = method(inputs=inputs)
                 for move in new_moves or []:
                     mob = Mob.instances[move.mob_id]
                     if mob.id == Id.PLAYER:    # This is the Player mob id
@@ -163,7 +163,7 @@ class ElemHandler:
         for mob_id, mob in Mob.instances.items():
             method = getattr(mob, "do_planning", None)
             if method:
-                new_moves, new_requests = method(tick, inputs=inputs)
+                new_moves, new_requests = method(inputs=inputs)
 
                 # Don't do anything with the requests if overridden.
                 if mob.tagged(OVERRIDDEN):
