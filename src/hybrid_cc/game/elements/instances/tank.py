@@ -7,6 +7,7 @@ from hybrid_cc.game.request import DestroyRequest, LoseRequest, MoveRequest, \
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import SLIDING
 
 
 class Tank(Mob):
@@ -25,9 +26,6 @@ class Tank(Mob):
     # --------------------------------------------------------------------------
 
     def do_planning(self, **kwargs):
-        if self.moved_last_n_ticks(n=1):
-            return [], []
-
         key = (self.color, self.channel)
         signal = Button.signal[key]
         dpad_d, dpad_signal = Button.dpad_signal[key]
@@ -35,9 +33,12 @@ class Tank(Mob):
             self.d = dpad_d or self.d
             self.last_signal = dpad_signal
         if signal > self.last_signal:
-            if (signal - self.last_signal) % 2 == 1:
+            if (signal - self.last_signal) % 2 == 1 and not self.tagged(
+                    SLIDING):
                 self.d = self.d.reverse()
             self.last_signal = signal
+        if self.moved_last_n_ticks(n=1):
+            return [], []
         return [MoveRequest(mob_id=self.mob_id, d=self.d)], []
 
     # --------------------------------------------------------------------------
