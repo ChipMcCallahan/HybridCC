@@ -6,6 +6,7 @@ from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.request import MoveRequest
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
 from hybrid_cc.shared.move_result import MoveResult
+from hybrid_cc.shared.tag import OVERRIDDEN
 
 
 class Trap(Elem):
@@ -43,7 +44,6 @@ class Trap(Elem):
             color, channel, rule = key
             signal = Button.signal[(color, channel)]
             last_signal = cls.last_signals[(color, channel)]
-
             cls.last_signals[(color, channel)] = signal
             can_exit = (rule.value + signal % 2) % 2 == 1
             if not can_exit or signal <= last_signal:
@@ -63,6 +63,7 @@ class Trap(Elem):
                     continue
                 if d and d.is_cardinal():
                     mob.d = d
+                mob.untag(OVERRIDDEN)
                 requests.append(
                     MoveRequest(mob_id=mob.mob_id,
                                 d=mob.d))
@@ -74,16 +75,17 @@ class Trap(Elem):
     # ACCESS RULES
     # --------------------------------------------------------------------------
     def test_exit(self, mob, p, d):
-        key = (self.color, self.channel)
-        signal = Button.signal[key]
-        if (self.rule.value + signal % 2) % 2 == 1:
+        if self.can_exit():
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 
     def finish_enter(self, mob, p, d):
         self.mobs[p] = mob
+        if not self.can_exit():
+            mob.tag(OVERRIDDEN)
 
     def finish_exit(self, mob, p, d):
+        mob.untag(OVERRIDDEN)
         self.mobs[p] = None
 
     # --------------------------------------------------------------------------
@@ -91,3 +93,8 @@ class Trap(Elem):
     # --------------------------------------------------------------------------
     def construct_mob_here(self, mob, p):
         self.finish_enter(mob, p, mob.d)
+
+    def can_exit(self):
+        key = (self.color, self.channel)
+        signal = Button.signal[key]
+        return (self.rule.value + signal % 2) % 2 == 1
