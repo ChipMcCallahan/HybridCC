@@ -33,7 +33,7 @@ class GfxProvider:
             keyword arguments.
         """
         # Combine key and kwargs into a single hashable object for caching
-        cache_key = (elem, frozenset(extra_kwargs.items()))
+        cache_key = (hash(elem), frozenset(extra_kwargs.items()))
 
         # Check if the item is in the cache
         if cache_key in self.cache:

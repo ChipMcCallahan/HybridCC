@@ -15,6 +15,7 @@ from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.hashable_object import HashableObject
 from hybrid_cc.shared.key_rule import KeyRule
+from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.tag import SLIDING, SPEED_BOOST, FORCED
 from hybrid_cc.shared.tool_rule import ToolRule
@@ -31,7 +32,7 @@ class PygameGfxProvider:
     def provide(self, elem, **extra_kwargs):
         if elem.id == Id.PLACEHOLDER:
             return None
-        cache_key = (elem, frozenset(extra_kwargs.items()))
+        cache_key = (hash(elem), frozenset(extra_kwargs.items()))
         # Check if the item is in the cache
         if cache_key in self.cache:
             return self.cache[cache_key]
