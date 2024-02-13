@@ -13,6 +13,7 @@ from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.gfx.gfx_provider import GfxProvider
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.hashable_object import HashableObject
 from hybrid_cc.shared.key_rule import KeyRule
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.tag import SLIDING, SPEED_BOOST, FORCED
@@ -27,10 +28,10 @@ class PygameGfxProvider:
         self.gfx_provider = GfxProvider()
         self.viewport = pygame.Surface((320, 320))
 
-    def provide(self, id_and_kwargs, **extra_kwargs):
-        if id_and_kwargs.id == Id.PLACEHOLDER:
+    def provide(self, elem, **extra_kwargs):
+        if elem.id == Id.PLACEHOLDER:
             return None
-        cache_key = (id_and_kwargs, frozenset(extra_kwargs.items()))
+        cache_key = (elem, frozenset(extra_kwargs.items()))
         # Check if the item is in the cache
         if cache_key in self.cache:
             return self.cache[cache_key]
@@ -41,12 +42,12 @@ class PygameGfxProvider:
         if self.cache_misses % 10000 == 0:
             logging.warning(f"{self.cache_misses} Pygame cache misses so far")
 
-        pil_result = self.gfx_provider.provide(id_and_kwargs, **extra_kwargs)
+        pil_result = self.gfx_provider.provide(elem, **extra_kwargs)
         if is_iter(pil_result):
             pyg_result = [self.to_pygame_surface(i) for i in pil_result]
         else:
             pyg_result = self.to_pygame_surface(pil_result)
-        if id_and_kwargs.id in (Id.DIRT_BLOCK, Id.ICE_BLOCK):
+        if elem.id in (Id.DIRT_BLOCK, Id.ICE_BLOCK):
             pyg_result = [pyg_result] * 8
         self.cache[cache_key] = pyg_result
         return pyg_result
@@ -78,7 +79,7 @@ class PygameGfxProvider:
             index = stale_tick * 4 + logic_tick % 4
 
             fast = elem.tagged(SLIDING) or (elem.id == Id.PLAYER and (
-                        elem.tagged(FORCED) or elem.tagged(SPEED_BOOST)))
+                    elem.tagged(FORCED) or elem.tagged(SPEED_BOOST)))
 
             if fast and (0 < index < 5):
                 frame = self.moving_double(frames[0], index * 2 - 1, elem)
@@ -173,17 +174,6 @@ class PygameGfxProvider:
         crop_width, crop_height = 9 * 32, 9 * 32
         return raw_surface.subsurface((crop_x, crop_y, crop_width, crop_height))
 
-    class HashableObject:
-        def __init__(self, **attributes):
-            self.__dict__.update(attributes)
-
-        def __hash__(self):
-            return hash(tuple(sorted(self.__dict__.items())))
-
-        def __eq__(self, other):
-            return (isinstance(other, self.__class__) and
-                    self.__dict__ == other.__dict__)
-
     floor_elem = HashableObject(id=Id.FLOOR, color=Color.GREY)
     inventory_elems = {}
 
@@ -199,8 +189,8 @@ class PygameGfxProvider:
         for index, pair in enumerate(keys):
             color, count = pair
             if pair not in self.inventory_elems:
-                elem = self.HashableObject(id=Id.KEY, color=color, count=count,
-                                           rule=KeyRule.DEFAULT)
+                elem = HashableObject(id=Id.KEY, color=color, count=count,
+                                      rule=KeyRule.DEFAULT)
                 self.inventory_elems[pair] = elem
             floor_img, _ = self.provide_one(self.floor_elem)
             key_img, _ = self.provide_one(self.inventory_elems[pair])
@@ -221,8 +211,8 @@ class PygameGfxProvider:
         for index, pair in enumerate(tools):
             id, count = pair
             if pair not in self.inventory_elems:
-                elem = self.HashableObject(id=id, count=count,
-                                           rule=ToolRule.DEFAULT)
+                elem = HashableObject(id=id, count=count,
+                                      rule=ToolRule.DEFAULT)
                 self.inventory_elems[pair] = elem
             floor_img, _ = self.provide_one(self.floor_elem)
             tool_img, _ = self.provide_one(self.inventory_elems[pair])

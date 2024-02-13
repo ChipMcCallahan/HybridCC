@@ -4,12 +4,13 @@ from typing import Tuple, Optional, List, Type, Union
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
+from hybrid_cc.shared.hashable_object import HashableObject
 
 
 @dataclass
 class DestroyRequest:
-    src: Optional[Elem]
-    tgt: Elem
+    src: Optional[Elem|HashableObject]
+    tgt: Elem|HashableObject
     p: Tuple[int, int, int]
 
 

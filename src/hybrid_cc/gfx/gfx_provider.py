@@ -19,12 +19,12 @@ class GfxProvider:
         self.sides_gfx = SidesGfx()
         self.mob_gfx = MobGfx()
 
-    def provide(self, id_and_kwargs, **extra_kwargs):
+    def provide(self, elem, **extra_kwargs):
         """
         Provide a graphic based on an object and optional additional parameters.
 
         Parameters:
-            id_and_kwargs (hashable): The object to provide graphics for.
+            elem (hashable): The object to provide graphics for.
             **extra_kwargs: Additional keyword arguments to be considered for
             the graphics provision.
 
@@ -33,7 +33,7 @@ class GfxProvider:
             keyword arguments.
         """
         # Combine key and kwargs into a single hashable object for caching
-        cache_key = (id_and_kwargs, frozenset(extra_kwargs.items()))
+        cache_key = (elem, frozenset(extra_kwargs.items()))
 
         # Check if the item is in the cache
         if cache_key in self.cache:
@@ -43,7 +43,7 @@ class GfxProvider:
         if self.cache_misses % 10000 == 0:
             logging.warning(f"{self.cache_misses} cache misses so far")
 
-        id = id_and_kwargs.id if hasattr(id_and_kwargs, "id") else None
+        id = elem.id if hasattr(elem, "id") else None
         layer = id.layer() if hasattr(id, "layer") else None
 
         if id and layer:
@@ -55,14 +55,14 @@ class GfxProvider:
                 Layer.MOB: self.mob_gfx
             }
             method = getattr(gfx_obj[layer], id.name.lower(), None)
-            result = method(id_and_kwargs, **extra_kwargs)
+            result = method(elem, **extra_kwargs)
             self.cache[cache_key] = result
             return result
 
         raise ValueError("No Gfx Could be provided.")
 
-    def provide_one(self, id_and_kwargs, **extra_kwargs):
-        frames = self.provide(id_and_kwargs, **extra_kwargs)
+    def provide_one(self, elem, **extra_kwargs):
+        frames = self.provide(elem, **extra_kwargs)
         if is_iter(frames):
             return frames[0]
         return frames
