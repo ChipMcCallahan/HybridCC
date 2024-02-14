@@ -4,9 +4,14 @@ from collections import defaultdict
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.request import MoveRequest
+from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
+from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.move_result import MoveResult
 from hybrid_cc.shared.tag import OVERRIDDEN
+
+SHOULD_CONCUSS = {MonsterRule.BALL, MonsterRule.WALKER, MonsterRule.FIREBALL,
+                  MonsterRule.GLIDER}
 
 
 class Trap(Elem):
@@ -45,8 +50,9 @@ class Trap(Elem):
             signal = Button.signal[(color, channel)]
             last_signal = cls.last_signals[(color, channel)]
             cls.last_signals[(color, channel)] = signal
+
             can_exit = (rule.value + signal % 2) % 2 == 1
-            if not can_exit or signal <= last_signal:
+            if not can_exit:
                 continue
 
             dpad_d, dpad_signal = Button.dpad_signal[
@@ -54,6 +60,7 @@ class Trap(Elem):
             d = None
             if dpad_signal and dpad_signal > last_signal:
                 d = dpad_d
+
             for p in positions:
                 mob = cls.mobs.get(p, None)
                 if not mob:
@@ -63,10 +70,12 @@ class Trap(Elem):
                     continue
                 if d and d.is_cardinal():
                     mob.d = d
-                mob.untag(OVERRIDDEN)
-                requests.append(
-                    MoveRequest(mob_id=mob.mob_id,
-                                d=mob.d))
+                if mob.rule not in SHOULD_CONCUSS:
+                    mob.untag(OVERRIDDEN)
+                if not mob.moved_last_n_ticks(n=1):
+                    requests.append(
+                        MoveRequest(mob_id=mob.mob_id,
+                                    d=mob.d))
         for p in to_remove:
             cls.mobs.pop(p, None)
         return requests, []
@@ -81,7 +90,7 @@ class Trap(Elem):
 
     def finish_enter(self, mob, p, d):
         self.mobs[p] = mob
-        if not self.can_exit():
+        if mob.id != Id.PLAYER:
             mob.tag(OVERRIDDEN)
 
     def finish_exit(self, mob, p, d):
