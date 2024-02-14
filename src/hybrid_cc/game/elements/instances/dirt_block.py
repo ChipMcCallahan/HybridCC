@@ -40,6 +40,13 @@ class DirtBlock(Mob):
 
     def test_enter(self, mob, p, d):
         if mob.tagged(PUSHES):
+            # For a sliding mob, if we are pushing same or opposite its
+            # direction, fail the move if the mob moved last tick, else allow
+            # the move. This prevents pushing oncoming blocks, but still allows
+            # pushes off of e.g. nailed thief.
+            if self.tagged(SLIDING) and self.d in (
+                    d, d.reverse()) and self.moved_last_n_ticks(n=1):
+                return MoveResult.FAIL, []
             return MoveResult.PASS, []
         return MoveResult.FAIL, []
 

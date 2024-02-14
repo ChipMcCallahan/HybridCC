@@ -36,6 +36,7 @@ class Force(Elem):
                 continue
             if d:
                 dirs = [d]
+                mob.d = d
             else:
                 pool = [Direction[d] for d in "NESW"]
                 dirs = []
@@ -75,7 +76,6 @@ class Force(Elem):
         if self.rule == ForceRule.RANDOM:
             self.hovering[mob.mob_id] = (mob, None)
         else:
-            mob.d = self.d
             self.hovering[mob.mob_id] = (mob, self.d)
 
     # --------------------------------------------------------------------------
