@@ -16,6 +16,7 @@ class Tank(Mob):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.last_signal = 0
+        self.facing = None
 
     @classmethod
     def init_at_level_load(cls):
@@ -30,13 +31,16 @@ class Tank(Mob):
         signal = Button.signal[key]
         dpad_d, dpad_signal = Button.dpad_signal[key]
         if dpad_signal and dpad_signal > self.last_signal:
-            self.d = dpad_d or self.d
+            self.facing = dpad_d or self.d
             self.last_signal = dpad_signal
         if signal > self.last_signal:
             if (signal - self.last_signal) % 2 == 1 and not self.tagged(
                     SLIDING):
-                self.d = self.d.reverse()
+                self.facing = self.d.reverse()
             self.last_signal = signal
+        if self.tagged(SLIDING) or not self.moved_last_n_ticks(n=1):
+            self.d = self.facing or self.d
+            self.facing = None
         if self.moved_last_n_ticks(n=1):
             return [], []
         return [MoveRequest(mob_id=self.mob_id, d=self.d)], []
