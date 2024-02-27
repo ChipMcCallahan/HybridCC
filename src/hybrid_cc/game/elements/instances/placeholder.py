@@ -36,7 +36,7 @@ class Placeholder(Elem):
 
     def start_enter(self, mob, p, d):
         move_result = MoveResult.PASS
-        if mob.id != Id.PLAYER:
+        if mob.id in (Id.MONSTER, Id.TANK):
             previously_tried = mob.mob_id in self.trying_to_enter[p]
             if not previously_tried:
                 move_result = MoveResult.DEFER
