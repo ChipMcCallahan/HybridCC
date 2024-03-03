@@ -5,12 +5,14 @@ from PIL import Image
 
 from hybrid_cc.game.elements.instances.bomb import Bomb
 from hybrid_cc.game.elements.instances.button import Button
+from hybrid_cc.game.elements.instances.cloner import Cloner
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.toggle_wall import ToggleWall
 from hybrid_cc.game.elements.instances.trap import Trap
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.gfx.gfx_provider import GfxProvider
+from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.hashable_object import HashableObject
@@ -72,10 +74,18 @@ class PygameGfxProvider:
         frames = self.provide(elem, **kwargs)
         if not is_iter(frames):
             return frames, None
+
+        still_frame = frames[0]
+        terrain_channel = kwargs.get("terrain_channel", None)
+        if terrain_channel:
+            channelled_frames = self.provide(elem,
+                **{**kwargs, **{"se_label": terrain_channel}})
+            still_frame = channelled_frames[0]
+
         move_tick = logic_tick // 4
         if isinstance(elem, Mob):
             if elem.last_move_tick is None:
-                return frames[0], None
+                return still_frame, None
             stale_tick = move_tick - elem.last_move_tick
             index = stale_tick * 4 + logic_tick % 4
 
@@ -83,7 +93,7 @@ class PygameGfxProvider:
                     elem.tagged(FORCED) or elem.tagged(SPEED_BOOST)))
 
             if fast:
-                if (0 < index < 5):
+                if 0 < index < 5:
                     frame = self.moving_double(frames[0], index * 2 - 1, elem)
                     offset = (0, 0)
                     if elem.d == Direction.S:
@@ -92,7 +102,7 @@ class PygameGfxProvider:
                         offset = (-1, 0)  # render one tile left of normal
                     return frame, offset
                 else:
-                    return frames[0], (0, 0)
+                    return still_frame, (0, 0)
             elif stale_tick < 2:
                 frames = self.expand_to_8_frames(frames)
                 frame = self.moving_double(frames[index], index, elem)
@@ -103,12 +113,12 @@ class PygameGfxProvider:
                     offset = (-1, 0)  # render one tile left of normal
                 return frame, offset
             else:
-                return frames[0], None
+                return still_frame, None
         if len(frames) == 4:
             return frames[(move_tick // 2) % 4], None
         elif len(frames) == 8:
             return frames[(move_tick // 2) % 8], None
-        return frames[0], None
+        return still_frame, None
 
     @staticmethod
     def moving_double(frame, index, elem):
@@ -134,6 +144,7 @@ class PygameGfxProvider:
         raw_surface = pygame.Surface((w * 32,
                                       h * 32))
 
+        terrain_channels = {}
         for layer in layers:
             for i in range(nw_p[0], se_p[0] + 1):
                 for j in range(nw_p[1], se_p[1] + 1):
@@ -145,6 +156,10 @@ class PygameGfxProvider:
                         kwargs = {}
                         if not elem:
                             continue
+                        if isinstance(elem, (Trap, Cloner)):
+                            terrain_channels[(i, j)] = elem.channel
+                        if (i, j) in terrain_channels and isinstance(elem, Mob):
+                            kwargs["terrain_channel"] = terrain_channels[(i, j)]
                         if isinstance(elem, Player):
                             for tag in elem.tags:
                                 kwargs[tag] = True

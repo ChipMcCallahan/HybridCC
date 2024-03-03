@@ -1,5 +1,6 @@
 import logging
 
+from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.gfx.sprite_assembly.mob_gfx import MobGfx
 from hybrid_cc.gfx.sprite_assembly.pickup_gfx import PickupGfx
 from hybrid_cc.gfx.sprite_assembly.sides_gfx import SidesGfx
@@ -18,6 +19,7 @@ class GfxProvider:
         self.pickup_gfx = PickupGfx()
         self.sides_gfx = SidesGfx()
         self.mob_gfx = MobGfx()
+        self.assembler = GfxAssembler()
 
     def provide(self, elem, **extra_kwargs):
         """
@@ -56,6 +58,14 @@ class GfxProvider:
             }
             method = getattr(gfx_obj[layer], id.name.lower(), None)
             result = method(elem, **extra_kwargs)
+
+            if "se_label" in extra_kwargs:
+                label = self.assembler.label_se(extra_kwargs["se_label"])
+                if is_iter(result):
+                    result = [self.assembler.stack(f, label) for f in result]
+                else:
+                    result = self.assembler.stack(result, label)
+
             self.cache[cache_key] = result
             return result
 
