@@ -9,6 +9,7 @@ from hybrid_cc.game.elements.instances.chip import Chip
 from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.socket import Socket
 from hybrid_cc.game.elements.mob import Mob
+from hybrid_cc.game.gamestate import Gamestate
 from hybrid_cc.game.map import Map
 from hybrid_cc.game.move_handler import MoveHandler
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, WinRequest, \
@@ -24,11 +25,6 @@ from hybrid_cc.ui.ui_hints import UIHints
 class Gameboard:
     """Gameboard class."""
 
-    class State(Enum):
-        PLAY = 1
-        WIN = 2
-        LOSE = 3
-
     def __init__(self, level, seed=None):
         """Initialize a new Gameboard instance."""
         self.result = None
@@ -42,7 +38,7 @@ class Gameboard:
         self.hints = {}  # map from position to string
         self.hint = level.hint  # default hint if not in dict
         Clock.reset()
-        self.state = Gameboard.State.PLAY
+        Gamestate.reset()
         self.camera = Camera(Mob.instances[0], self)
         self.show_hint = False
         RNG.reset(seed)
@@ -141,19 +137,15 @@ class Gameboard:
                 self.show_hint = False
         return move_requests
 
-    def transition(self, state):
-        if self.state == self.State.PLAY:
-            self.state = state
-
     def win(self, color, p):
         self.result = WinResult(color=color, p=p,
                                 score=10 * self.time_remaining(),
                                 tick=Clock.tick)
-        self.transition(self.State.WIN)
+        Gamestate.win()
 
     def lose(self, cause, p):
         self.result = LoseResult(cause=cause, p=p, tick=Clock.tick)
-        self.transition(self.State.LOSE)
+        Gamestate.lose()
 
     def time_remaining(self):
         return max(self.time - Clock.tick // 10, 0)

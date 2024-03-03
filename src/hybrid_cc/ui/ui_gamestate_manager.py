@@ -11,6 +11,7 @@ from hybrid_cc.game.elements.instances.player import Player
 from hybrid_cc.game.elements.instances.teleport import Teleport
 from hybrid_cc.game.elements.tool import Tool
 from hybrid_cc.game.gameboard import Gameboard
+from hybrid_cc.game.gamestate import Gamestate
 from hybrid_cc.game.request import DestroyRequest, CreateRequest, LoseRequest, \
     WinRequest, UIInteractionRequest
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
@@ -146,9 +147,9 @@ class UIGamestateManager:
                         self.inputs = replay_input.dirs()
 
                 self.gameboard.do_logic(self.inputs)
-                if self.gameboard.state == Gameboard.State.WIN:
+                if Gamestate.is_win():
                     self.state.win()
-                elif self.gameboard.state == Gameboard.State.LOSE:
+                elif Gamestate.is_lose():
                     self.state.lose()
             self.logic_tick += 1  # Increment frame counter
 

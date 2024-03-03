@@ -29,6 +29,8 @@ class Fire(Elem):
     def test_enter(mob, p, d):
         if mob.id == Id.MONSTER and mob.rule != MonsterRule.FIREBALL:
             return MoveResult.FAIL, None
+        elif mob.id == Id.TANK:
+            return MoveResult.FAIL, None
         return MoveResult.PASS, None
 
     def finish_enter(self, mob, p, d):

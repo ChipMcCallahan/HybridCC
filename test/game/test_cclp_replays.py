@@ -19,6 +19,9 @@ class TestCCLPReplays(unittest.TestCase):
     def test_cclp4(self):
         self.do_cclp("CCLP4.dat")
 
+    def test_cclp5(self):
+        self.do_cclp("CCLP5.dat")
+
     def do_cclp(self, set_name):
         package = 'hybrid_cc.sets.dat'
         package_dir = importlib.resources.files(package)

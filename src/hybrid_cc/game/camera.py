@@ -39,8 +39,11 @@ class Camera:
             index = stale_time * 4 + logic_tick % 4
             fraction = 0
             fast = self.target.tagged(SLIDING) or self.target.tagged(SPEED_BOOST)
-            if fast and (0 < index < 5):
-                fraction = 1 - (index - 1) / 4 - 1/8
+            if fast:
+                if 0 < index < 5:
+                    fraction = 1 - (index - 1) / 4 - 1/8
+                else:
+                    fraction = 0
             elif stale_time < 2:
                 fraction = 1 - (index / 8)
 

@@ -6,6 +6,7 @@ from pathlib import Path
 from cc_tools import TWSHandler
 
 from hybrid_cc.game.gameboard import Gameboard
+from hybrid_cc.game.gamestate import Gamestate
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
 from hybrid_cc.shared import Direction
@@ -64,11 +65,11 @@ class TestTWSReplays(unittest.TestCase):
                 for tick in range(1, final_tick + 2):
                     inputs = replay.get(tick)
                     gameboard.do_logic(inputs.dirs())
-                    if gameboard.state == Gameboard.State.LOSE:
+                    if Gamestate.is_lose():
                         failed += 1
                         results[key] = ("LOSE", gameboard.tick, final_tick)
                         break
-                    elif gameboard.state == Gameboard.State.WIN:
+                    elif Gamestate.is_win():
                         passed += 1
                         results[key] = ("WIN", gameboard.tick, final_tick)
                         break

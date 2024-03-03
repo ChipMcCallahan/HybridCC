@@ -82,14 +82,17 @@ class PygameGfxProvider:
             fast = elem.tagged(SLIDING) or (elem.id == Id.PLAYER and (
                     elem.tagged(FORCED) or elem.tagged(SPEED_BOOST)))
 
-            if fast and (0 < index < 5):
-                frame = self.moving_double(frames[0], index * 2 - 1, elem)
-                offset = (0, 0)
-                if elem.d == Direction.S:
-                    offset = (0, -1)  # render one tile higher than normal
-                elif elem.d == Direction.E:
-                    offset = (-1, 0)  # render one tile left of normal
-                return frame, offset
+            if fast:
+                if (0 < index < 5):
+                    frame = self.moving_double(frames[0], index * 2 - 1, elem)
+                    offset = (0, 0)
+                    if elem.d == Direction.S:
+                        offset = (0, -1)  # render one tile higher than normal
+                    elif elem.d == Direction.E:
+                        offset = (-1, 0)  # render one tile left of normal
+                    return frame, offset
+                else:
+                    return frames[0], (0, 0)
             elif stale_tick < 2:
                 frames = self.expand_to_8_frames(frames)
                 frame = self.moving_double(frames[index], index, elem)
