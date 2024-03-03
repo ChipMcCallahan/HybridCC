@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pygame
 
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.game.elements.instances.button import Button
 from hybrid_cc.game.elements.instances.force import Force
 from hybrid_cc.game.elements.instances.ice import Ice
@@ -16,10 +17,11 @@ from hybrid_cc.game.request import DestroyRequest, CreateRequest, LoseRequest, \
     WinRequest, UIInteractionRequest
 from hybrid_cc.levelset.dat_conversions.dat_converter import DATConverter
 from hybrid_cc.replays.replay import Replay
-from hybrid_cc.shared import Id
+from hybrid_cc.shared import Id, Layer
 from hybrid_cc.shared.bomb_rule import BombRule
 from hybrid_cc.ui import InputCollector
 from hybrid_cc.ui.sfx_player import SfxPlayer
+from hybrid_cc.ui.tranimations import Tranimations, Tranimation
 from hybrid_cc.ui.ui_gamestate import UIGamestate
 from hybrid_cc.ui.ui_hints import UIHints
 
@@ -157,6 +159,13 @@ class UIGamestateManager:
             for ui_hint in UIHints.pending:
                 if isinstance(ui_hint, DestroyRequest):
                     src, tgt, p = ui_hint.src, ui_hint.tgt, ui_hint.p
+
+                    tranim = Tranimation(tgt, "fade")
+                    if tgt.id.layer() == Layer.MOB:
+                        Tranimations.add_upper(p, tranim)
+                    else:
+                        Tranimations.add_lower(p, tranim)
+
                     if tgt.id == Id.BOMB:
                         key = (tgt.color, tgt.channel)
                         index = [BombRule.STARTS_ARMED,
@@ -235,6 +244,7 @@ class UIGamestateManager:
         self.input_collector.reset()
         self.setup_gameboard(seed)
         self.saved_replay = ""
+        Tranimations.reset()
 
     def toggle_pause(self):
         if self.state.is_pause:

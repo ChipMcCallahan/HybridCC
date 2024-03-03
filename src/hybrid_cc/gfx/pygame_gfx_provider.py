@@ -12,15 +12,14 @@ from hybrid_cc.game.elements.instances.trap import Trap
 from hybrid_cc.game.elements.instances.trick_wall import TrickWall
 from hybrid_cc.game.elements.mob import Mob
 from hybrid_cc.gfx.gfx_provider import GfxProvider
-from hybrid_cc.gfx.sprite_assembly.gfx_assembler import GfxAssembler
 from hybrid_cc.shared import Direction, Id
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.hashable_object import HashableObject
 from hybrid_cc.shared.key_rule import KeyRule
-from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.shared_utils import is_iter
 from hybrid_cc.shared.tag import SLIDING, SPEED_BOOST, FORCED
 from hybrid_cc.shared.tool_rule import ToolRule
+from hybrid_cc.ui.tranimations import Tranimation
 
 
 # noinspection PyTypeChecker
@@ -79,7 +78,8 @@ class PygameGfxProvider:
         terrain_channel = kwargs.get("terrain_channel", None)
         if terrain_channel:
             channelled_frames = self.provide(elem,
-                **{**kwargs, **{"se_label": terrain_channel}})
+                                             **{**kwargs, **{
+                                                 "se_label": terrain_channel}})
             still_frame = channelled_frames[0]
 
         move_tick = logic_tick // 4
@@ -141,45 +141,50 @@ class PygameGfxProvider:
     def provide_viewport(self, layers, logic_tick, nw_p, se_p, camera):
         w, h = se_p[0] - nw_p[0] + 1, se_p[1] - nw_p[1] + 1
 
-        raw_surface = pygame.Surface((w * 32,
-                                      h * 32))
+        raw_surface = pygame.Surface((w * 32, h * 32))
 
         terrain_channels = {}
         for layer in layers:
-            for i in range(nw_p[0], se_p[0] + 1):
-                for j in range(nw_p[1], se_p[1] + 1):
-                    p = (i, j, 0)
-                    here = layer.get(p, None)
-                    if not is_iter(here):
-                        here = [here]
-                    for elem in here:
-                        kwargs = {}
-                        if not elem:
-                            continue
-                        if isinstance(elem, (Trap, Cloner)):
-                            terrain_channels[(i, j)] = elem.channel
-                        if (i, j) in terrain_channels and isinstance(elem, Mob):
-                            kwargs["terrain_channel"] = terrain_channels[(i, j)]
-                        if isinstance(elem, Player):
-                            for tag in elem.tags:
-                                kwargs[tag] = True
-                        if isinstance(elem, TrickWall):
-                            if p in TrickWall.show_secrets_positions:
-                                kwargs["show_secrets"] = True
-                        if isinstance(elem, (ToggleWall, Trap, Button, Bomb)):
-                            key = (elem.color, elem.channel)
-                            kwargs["current_state"] = Button.signal[key] % 2
+            for p, here in layer.items():
+                if not is_iter(here):
+                    here = [here]
+                for item in here:
+                    transparency = 0
+                    kwargs = {}
+                    elem = item
+                    if isinstance(elem, Tranimation):
+                        elem, effect, strength = (
+                            elem.item, elem.effect, elem.strength)
+                        if effect == "fade":
+                            transparency = (8 - strength) / 8
+                    if isinstance(elem, (Trap, Cloner)):
+                        terrain_channels[p] = elem.channel
+                    if p in terrain_channels and isinstance(elem, Mob):
+                        kwargs["terrain_channel"] = terrain_channels[p]
+                    if isinstance(elem, Player):
+                        for tag in elem.tags:
+                            kwargs[tag] = True
+                    if isinstance(elem, TrickWall):
+                        if p in TrickWall.show_secrets_positions:
+                            kwargs["show_secrets"] = True
+                    if isinstance(elem, (ToggleWall, Trap, Button, Bomb)):
+                        key = (elem.color, elem.channel)
+                        kwargs["current_state"] = Button.signal[key] % 2
 
-                        img, offset = self.provide_one(elem, logic_tick,
-                                                       **kwargs)
-                        if not img:
-                            continue
-                        offset = offset or (0, 0)
-                        x = i + offset[0] - nw_p[0]
-                        y = j + offset[1] - nw_p[1]
-                        raw_surface.blit(img,
-                                         (x * 32,
-                                          y * 32))
+                    img, offset = self.provide_one(elem, logic_tick,
+                                                   **kwargs)
+                    if not img:
+                        continue
+                    if transparency:
+                        alpha_value = int((1 - transparency) * 255)
+                        img = img.copy()
+                        img.set_alpha(alpha_value)
+                    offset = offset or (0, 0)
+                    x = p[0] + offset[0] - nw_p[0]
+                    y = p[1] + offset[1] - nw_p[1]
+                    raw_surface.blit(img,
+                                     (x * 32,
+                                      y * 32))
 
         if (w, h) == (9, 9):
             return raw_surface

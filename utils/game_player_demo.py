@@ -5,8 +5,10 @@ import os
 import pygame
 import pygame_menu
 
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.gfx.pygame_gfx_provider import PygameGfxProvider
 from hybrid_cc.ui.music_player import MusicPlayer
+from hybrid_cc.ui.tranimations import Tranimations
 from hybrid_cc.ui.ui_gamestate_manager import UIGamestateManager
 
 BLACK_THEME = pygame_menu.themes.THEME_DARK.copy()
@@ -307,9 +309,11 @@ class GamePlayerDemo:
             self.state_mgr.logic_tick)
 
         terrain = {}
+        tranimations_lower = {}
         terrain_mod = {}
         pickup = {}
         mob = {}
+        tranimations_upper = {}
         sides = {}
         for i in range(nw[0], se[0] + 1):
             for j in range(nw[1], se[1] + 1):
@@ -317,12 +321,18 @@ class GamePlayerDemo:
                 cell = self.state_mgr.gameboard.get((i, j, 0))
                 if cell.terrain:
                     terrain[p] = cell.terrain
+                lower = Tranimations.get_lower(p)
+                if lower:
+                    tranimations_lower[p] = lower
                 if cell.terrain_mod:
                     terrain_mod[p] = cell.terrain_mod
                 if cell.pickup:
                     pickup[p] = cell.pickup
                 if cell.mob:
                     mob[p] = cell.mob
+                upper = Tranimations.get_upper(p)
+                if upper:
+                    tranimations_upper[p] = upper
                 if cell.get_sides():
                     sides_list = cell.get_sides()
                     if p not in sides:
@@ -330,8 +340,9 @@ class GamePlayerDemo:
                     for elem in sides_list:
                         sides[p].append(elem)
 
-        viewport = self.gfx.provide_viewport((terrain, terrain_mod,
-                                              pickup, mob, sides),
+        viewport = self.gfx.provide_viewport((terrain, tranimations_lower,
+                                              terrain_mod, pickup, mob,
+                                              tranimations_upper, sides),
                                              self.state_mgr.logic_tick,
                                              nw, se,
                                              self.state_mgr.gameboard.camera)
