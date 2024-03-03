@@ -1,12 +1,11 @@
-from dataclasses import dataclass
-
-from hybrid_cc.game.elements.elem import Elem
+from hybrid_cc.game.clock import Clock
 
 
 class Tranimation:
     def __init__(self, item, effect):
         self.item = item
         self.effect = effect
+        self.tick = Clock.tick
         self.strength = 8
 
 
@@ -19,8 +18,9 @@ class Tranimations:
         tranim = layer.get(p, None)
         if tranim:
             tranim.strength -= 1
-            if tranim.strength == 0:
+            if Clock.tick - tranim.tick > 1 or tranim.strength < 0:
                 layer.pop(p)
+                return None
         return tranim
 
     @classmethod
