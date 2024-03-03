@@ -17,6 +17,9 @@ class Cell:
     # -----------
     def add(self, elem):
         layer_name = elem.id.layer().name.lower()
+        # don't overwrite existing mobs with placeholders.
+        if elem.id == Id.PLACEHOLDER and self.get_mob():
+            return
         set_layer = getattr(self, f"set_{layer_name}")
         set_layer(elem)
 

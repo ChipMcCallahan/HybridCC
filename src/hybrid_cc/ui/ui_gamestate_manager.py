@@ -129,6 +129,7 @@ class UIGamestateManager:
                             self.gameboard.do_logic(inputs.dirs())
                             self.logic_tick += 4
                             self.movement_tick += 1
+                        UIHints.clear()
         if self.state.is_play or self.state.is_replay:
             subtick = self.logic_tick % 4
 
