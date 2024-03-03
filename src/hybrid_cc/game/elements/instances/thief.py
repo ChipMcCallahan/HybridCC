@@ -36,6 +36,9 @@ class Thief(Elem):
         if self.rule == ThiefRule.KEYS and mob.keys:
             mob.keys.clear()
             return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
-        elif self.rule == ThiefRule.TOOLS and mob.tools:
+        elif self.rule == ThiefRule.TOOLS:
+            stealing = any(value != 0 for value in mob.tools.values())
             mob.tools.clear()
-            return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
+            if stealing:
+                return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
+        return []
