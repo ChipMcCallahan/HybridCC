@@ -5,6 +5,7 @@ from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import MoveRequest, UIInteractionRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL
+from hybrid_cc.shared.tag import SPEED_BOOST, FORCED
 
 
 class Teleport(Elem):
@@ -67,4 +68,8 @@ class Teleport(Elem):
         self.mobs.pop(mob.mob_id, None)
 
     def finish_enter(self, mob, p, d):
+        if mob.id == Id.PLAYER:
+            # Otherwise Player would get a free move
+            mob.untag(SPEED_BOOST)
+            mob.untag(FORCED)
         self.mobs[mob.mob_id] = (mob, self.color, self.channel, p)
