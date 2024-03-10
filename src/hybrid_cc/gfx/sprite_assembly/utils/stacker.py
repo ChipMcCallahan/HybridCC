@@ -1,4 +1,6 @@
 """Module for stacking multiple images with transparency into one."""
+import logging
+
 from PIL import Image
 
 
@@ -28,7 +30,8 @@ class Stacker:
         # Verify all images are the same size
         image_size = images[0].size
         if not all(img.size == image_size for img in images):
-            raise ValueError("All images must be the same size to combine.")
+            logging.warning("Images differ in size, skipping combine.")
+            return images[0]
 
         # Create a new image with the width and height of the first image
         combined_image = Image.new('RGBA', image_size)
