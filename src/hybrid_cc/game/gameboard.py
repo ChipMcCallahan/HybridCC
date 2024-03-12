@@ -114,6 +114,7 @@ class Gameboard:
 
     def do_requests(self, requests):
         move_requests = []
+        end_game = None
         for request in requests:
             UIHints.add(request)
             if isinstance(request, DestroyRequest):
@@ -123,18 +124,30 @@ class Gameboard:
                 p, id, kwargs = request.p, request.id, request.kwargs
                 self.map.construct_at(p, id, **kwargs)
             elif isinstance(request, WinRequest):
-                self.win(request.color, request.p)
+                if not end_game:
+                    end_game = request
+                # self.win(request.color, request.p)
             elif isinstance(request, LoseRequest):
                 id = request.cause.id
                 rule = request.cause.rule
                 cause = rule.name if id == Id.MONSTER else id.name
-                self.lose(cause=cause, p=request.p)
+                end_game = request
+                # self.lose(cause=cause, p=request.p)
             elif isinstance(request, MoveRequest):
                 move_requests.append(request)
             elif isinstance(request, ShowHintRequest):
                 self.show_hint = True
             elif isinstance(request, HideHintRequest):
                 self.show_hint = False
+        if end_game:
+            request = end_game
+            if isinstance(request, WinRequest):
+                self.win(request.color, request.p)
+            elif isinstance(request, LoseRequest):
+                id = request.cause.id
+                rule = request.cause.rule
+                cause = rule.name if id == Id.MONSTER else id.name
+                self.lose(cause=cause, p=request.p)
         return move_requests
 
     def win(self, color, p):
