@@ -7,7 +7,7 @@ from hybrid_cc.game.request import DestroyRequest, LoseRequest, MoveRequest, \
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL, DIRECTION
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import SLIDING
+from hybrid_cc.shared.tag import SLIDING, OVERRIDDEN
 
 
 class Tank(Mob):
@@ -31,12 +31,14 @@ class Tank(Mob):
         signal = Button.signal[key]
         dpad_d, dpad_signal = Button.dpad_signal[key]
         if dpad_signal and dpad_signal > self.last_signal:
-            self.facing = dpad_d or self.d
+            if not self.tagged(OVERRIDDEN):
+                self.facing = dpad_d or self.d
             self.last_signal = dpad_signal
         if signal > self.last_signal:
             if (signal - self.last_signal) % 2 == 1 and not self.tagged(
                     SLIDING):
-                self.facing = self.d.reverse()
+                if not self.tagged(OVERRIDDEN):
+                    self.facing = self.d.reverse()
             self.last_signal = signal
         if self.tagged(SLIDING) or not self.moved_last_n_ticks(n=1):
             self.d = self.facing or self.d
