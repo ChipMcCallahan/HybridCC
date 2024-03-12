@@ -43,7 +43,7 @@ from hybrid_cc.shared import Id, Direction
 from hybrid_cc.shared.color import Color
 from hybrid_cc.shared.kwargs import DIRECTION, SIDES, COLOR, RULE, COUNT, \
     CHANNEL
-from hybrid_cc.shared.tag import OVERRIDDEN, SLIDING
+from hybrid_cc.shared.tag import OVERRIDDEN, SLIDING, TRAPPED
 
 DEFAULT_KWARGS = {
     COLOR: Color.GREY,
@@ -166,7 +166,7 @@ class ElemHandler:
                 new_moves, new_requests = method(inputs=inputs)
 
                 # Don't do anything with the requests if overridden.
-                if mob.tagged(OVERRIDDEN):
+                if mob.tagged(OVERRIDDEN) or mob.tagged(TRAPPED):
                     continue
 
                 if new_moves:

@@ -8,6 +8,7 @@ MOVED = "moved"
 SLIDING = "sliding"
 FORCED = "forced"
 OVERRIDDEN = "overridden"
+TRAPPED = "trapped"
 SPEED_BOOST = "speed_boost"
 
 # Permanent tags or traits

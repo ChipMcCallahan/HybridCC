@@ -8,7 +8,7 @@ from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, RULE, CHANNEL
 from hybrid_cc.shared.monster_rule import MonsterRule
 from hybrid_cc.shared.move_result import MoveResult
-from hybrid_cc.shared.tag import OVERRIDDEN
+from hybrid_cc.shared.tag import TRAPPED
 
 SHOULD_CONCUSS = {MonsterRule.BALL, MonsterRule.WALKER, MonsterRule.FIREBALL,
                   MonsterRule.GLIDER}
@@ -71,7 +71,7 @@ class Trap(Elem):
                 if d and d.is_cardinal():
                     mob.d = d
                 if mob.rule not in SHOULD_CONCUSS:
-                    mob.untag(OVERRIDDEN)
+                    mob.untag(TRAPPED)
                 if not mob.moved_last_n_ticks(n=1):
                     requests.append(
                         MoveRequest(mob_id=mob.mob_id,
@@ -91,10 +91,10 @@ class Trap(Elem):
     def finish_enter(self, mob, p, d):
         self.mobs[p] = mob
         if mob.id != Id.PLAYER:
-            mob.tag(OVERRIDDEN)
+            mob.tag(TRAPPED)
 
     def finish_exit(self, mob, p, d):
-        mob.untag(OVERRIDDEN)
+        mob.untag(TRAPPED)
         self.mobs[p] = None
 
     # --------------------------------------------------------------------------
