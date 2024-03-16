@@ -51,7 +51,7 @@ DEFAULT_KWARGS = {
     COUNT: 1,
     CHANNEL: 0,
     SIDES: "",
-    DIRECTION: Direction.S
+    DIRECTION: None
 }
 
 

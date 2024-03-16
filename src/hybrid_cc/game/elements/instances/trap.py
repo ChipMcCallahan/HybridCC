@@ -63,7 +63,7 @@ class Trap(Elem):
 
             for p in positions:
                 mob = cls.mobs.get(p, None)
-                if not mob:
+                if not mob or not mob.d:
                     continue
                 if not mob.exists():
                     to_remove.append(p)
