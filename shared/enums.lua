@@ -1,8 +1,3 @@
--- shared/enums.lua
--- Combines the various Enum-like structures (bomb_rule, button_rule, color, etc.)
--- into a single Lua table. Each section corresponds to one Python file from
--- the original code.
-
 local Enums = {}
 
 Enums.BombRule = {
