@@ -61,6 +61,8 @@ class Force(Elem):
             if self.rule == ForceRule.RANDOM or self.d == d:
                 mob.tag(FORCED)
                 mob.tag(SPEED_BOOST)
+            else:
+                mob.untag(SPEED_BOOST)
         mob.untag(OVERRIDDEN)
         mob.untag(SLIDING)
         self.hovering.pop(mob.mob_id, None)
@@ -69,7 +71,7 @@ class Force(Elem):
         if mob.tools[Id.SUCTION_BOOTS]:
             return [UIInteractionRequest(src=mob, tgt=self, p=p, type="step")]
         if mob.id == Id.PLAYER:
-            mob.untag(SPEED_BOOST)  # Otherwise Player would get a free move
+            mob.tag(SPEED_BOOST)  # Allow boosting on ffs
         else:
             mob.tag(OVERRIDDEN)
         mob.tag(SLIDING, self.id)

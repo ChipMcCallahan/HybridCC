@@ -1,20 +1,20 @@
 import logging
 from collections import defaultdict
 
+from hybrid_cc.game.clock import Clock
 from hybrid_cc.game.elements.elem import Elem
 from hybrid_cc.game.request import MoveRequest, UIInteractionRequest
 from hybrid_cc.shared import Id
 from hybrid_cc.shared.kwargs import COLOR, CHANNEL
-from hybrid_cc.shared.tag import SPEED_BOOST, FORCED, SLIDING
+from hybrid_cc.shared.tag import SPEED_BOOST, FORCED, SLIDING, OVERRIDDEN
 
 
 class Teleport(Elem):
     kwarg_filter = (COLOR, CHANNEL)  # Retain these kwargs only.
     positions = defaultdict(list)  # Map from (color, channel) to ordered
     # list of positions
-    mobs = {}  # Map from mob_id to (mob, color, channel, position) for mobs in
-
-    # need of teleportation.
+    mobs = {}  # Map from mob_id to (mob, color, channel, position, tick) for
+    # mobs in need of teleportation.
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -43,7 +43,11 @@ class Teleport(Elem):
         moves = []
         requests = []
         for mob_id, entry in cls.mobs.items():
-            mob, color, channel, p = entry
+            mob, color, channel, p, enter_tick = entry
+            if Clock.tick - enter_tick <= 1:
+                continue
+            if Clock.tick - enter_tick > 2:
+                mob.untag(OVERRIDDEN)  # let mob leave if blocked
             if not mob.exists():
                 to_remove.append(mob_id)
                 continue
@@ -66,12 +70,12 @@ class Teleport(Elem):
     # --------------------------------------------------------------------------
     def finish_exit(self, mob, p, d):
         self.mobs.pop(mob.mob_id, None)
-        mob.untag(SLIDING)
+        mob.untag(OVERRIDDEN)
 
     def finish_enter(self, mob, p, d):
         if mob.id == Id.PLAYER:
             # Otherwise Player would get a free move
             mob.untag(SPEED_BOOST)
             mob.untag(FORCED)
-        mob.tag(SLIDING)
-        self.mobs[mob.mob_id] = (mob, self.color, self.channel, p)
+        mob.tag(OVERRIDDEN)
+        self.mobs[mob.mob_id] = (mob, self.color, self.channel, p, Clock.tick)

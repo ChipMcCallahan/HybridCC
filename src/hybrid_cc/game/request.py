@@ -9,8 +9,8 @@ from hybrid_cc.shared.hashable_object import HashableObject
 
 @dataclass
 class DestroyRequest:
-    src: Optional[Elem|HashableObject]
-    tgt: Elem|HashableObject
+    src: Optional[Elem | HashableObject]
+    tgt: Elem | HashableObject
     p: Tuple[int, int, int]
 
 
@@ -33,10 +33,12 @@ class MoveRequest:
     d: Direction
     slap: Optional[Direction] = None
     simulated_p: Optional[Tuple[int, int, int]] = None
+    deferred: bool = False
 
     @staticmethod
-    def from_dirs(mob_id, dirs) -> List['MoveRequest']:
-        return [MoveRequest(mob_id=mob_id, d=d) for d in dirs]
+    def from_dirs(mob_id, dirs, deferred=False) -> List['MoveRequest']:
+        return [MoveRequest(mob_id=mob_id, d=d, deferred=deferred) for d in
+                dirs]
 
 
 @dataclass

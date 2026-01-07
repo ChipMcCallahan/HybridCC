@@ -51,7 +51,11 @@ class Player(Mob):
                 FORCED) and not self.tagged(SPEED_BOOST):
             return [], []
 
+        # Boosting moves are deferred so that they don't override FF moves, e.g.
+        deferred = self.tagged(SPEED_BOOST) and self.moved_last_n_ticks(
+            n=1) and not self.tagged(FORCED)
         self.untag(SPEED_BOOST)
+
         if not self.tagged(OVERRIDDEN):
             self.untag(FORCED)
         self.last_move_tick = None
@@ -63,11 +67,11 @@ class Player(Mob):
         if primary:
             moves.append(
                 MoveRequest(mob_id=self.mob_id, d=primary,
-                            slap=secondary)
+                            slap=secondary, deferred=deferred)
             )
         if secondary:
             moves.append(
-                MoveRequest(mob_id=self.mob_id, d=secondary)
+                MoveRequest(mob_id=self.mob_id, d=secondary, deferred=deferred)
             )
         return moves, []
 

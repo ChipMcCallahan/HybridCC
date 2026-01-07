@@ -140,8 +140,9 @@ class ElemHandler:
 
     def collect_move_plans(self, inputs):
         moves, requests = [], []
-        player_moves = []  # these happen second to last
-        sliding_moves = []  # these happen last
+        player_moves = []  # these happen after regular moves
+        sliding_moves = []  # these happen after player moves
+        deferred_moves = []  # these happen after sliding moves
 
         # Class level plans (e.g. ice, force floor, dpad buttons)
         for elem_class in self.id_to_class.values():
@@ -150,7 +151,9 @@ class ElemHandler:
                 new_moves, new_requests = method(inputs=inputs)
                 for move in new_moves or []:
                     mob = Mob.instances[move.mob_id]
-                    if mob.id == Id.PLAYER:    # This is the Player mob id
+                    if move.deferred:
+                        deferred_moves.append(move)
+                    elif mob.id == Id.PLAYER:    # This is the Player mob id
                         player_moves.append(move)
                     elif mob.tagged(SLIDING):
                         sliding_moves.append(move)
@@ -170,8 +173,9 @@ class ElemHandler:
                     continue
 
                 if new_moves:
-                    # Player always moves last.
-                    if mob.id == Id.PLAYER:
+                    if new_moves[0].deferred:
+                        deferred_moves = deferred_moves + new_moves
+                    elif mob.id == Id.PLAYER:
                         # Overriding force floors depends on this order
                         player_moves = new_moves + player_moves
                     else:
@@ -179,7 +183,7 @@ class ElemHandler:
                 if new_requests:
                     requests.extend(new_requests)
 
-        return moves + player_moves + sliding_moves, requests
+        return moves + player_moves + sliding_moves + deferred_moves, requests
 
     @staticmethod
     def get_mob(mob_id):
